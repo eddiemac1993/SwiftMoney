@@ -1,0 +1,63 @@
+{% extends 'mma/base.html' %}
+
+{% block content %}
+<h1>Welcome, {{ user.username }}</h1>
+
+<div class="dashboard-summary">
+    <h2>Account Summary</h2>
+    <p>Cash Balance: {{ balance.cash }}</p>
+    <p>Float Balance: {{ balance.float }}</p>
+    <p>Interest Accrued: {{ balance.interest }}</p>
+</div>
+
+<div class="today-activity">
+    <h2>Today's Activity</h2>
+    <p>Total Transactions: {{ total_transactions }}</p>
+    <p>Total Volume: {{ total_volume }}</p>
+</div>
+
+<div class="recent-transactions">
+    <h2>Recent Transactions</h2>
+    <ul>
+    {% for transaction in recent_transactions %}
+        <li>{{ transaction.created_at|date:"Y-m-d H:i" }} - {{ transaction.transaction_type }} - {{ transaction.amount }}</li>
+    {% empty %}
+        <li>No recent transactions.</li>
+    {% endfor %}
+    </ul>
+</div>
+
+<div class="week-stats">
+    <h2>This Week's Stats</h2>
+    <p>Transaction Count: {{ week_stats.transaction_count }}</p>
+    <p>Transaction Volume: {{ week_stats.transaction_volume }}</p>
+</div>
+
+<div class="pending-requests">
+    <h2>Pending Requests</h2>
+    <h3>Float Requests</h3>
+    <ul>
+    {% for request in float_requests %}
+        <li>{{ request.created_at|date:"Y-m-d" }} - {{ request.service }} - {{ request.amount }}</li>
+    {% empty %}
+        <li>No pending float requests.</li>
+    {% endfor %}
+    </ul>
+    <h3>Cash Requests</h3>
+    <ul>
+    {% for request in cash_requests %}
+        <li>{{ request.created_at|date:"Y-m-d" }} - {{ request.amount }}</li>
+    {% empty %}
+        <li>No pending cash requests.</li>
+    {% endfor %}
+    </ul>
+</div>
+
+<div class="quick-actions">
+    <h2>Quick Actions</h2>
+    <a href="{% url 'request_float' %}" class="btn btn-primary">Request Float</a>
+    <a href="{% url 'request_cash' %}" class="btn btn-primary">Request Cash</a>
+    <a href="{% url 'update_balance' %}" class="btn btn-secondary">Update Balance</a>
+    <a href="{% url 'cashout' %}" class="btn btn-warning">Cash Out</a>
+</div>
+{% endblock %}
