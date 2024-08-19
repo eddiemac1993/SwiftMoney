@@ -1,0 +1,127 @@
+{% extends 'mma/base.html' %}
+
+{% block title %}Register{% endblock %}
+
+{% block content %}
+    <style>
+        .register-container {
+            max-width: 400px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 12px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.3s, box-shadow 0.3s;
+        }
+
+        .register-container h1 {
+            font-size: 24px;
+            margin-bottom: 20px;
+            color: #333;
+            text-align: center;
+        }
+
+        .register-form {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .register-form input,
+        .register-form button {
+            margin-bottom: 15px;
+            padding: 10px;
+            border-radius: 6px;
+            border: 1px solid #ddd;
+            font-size: 16px;
+        }
+
+        .register-form input:focus {
+            border-color: #5161ce;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(81, 97, 206, 0.2);
+        }
+
+        .btn-primary {
+            background-color: #5161ce;
+            color: #fff;
+            border: none;
+            padding: 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+
+        .btn-primary:hover {
+            background-color: #4156b0;
+        }
+
+        .links {
+            display: flex;
+            justify-content: center;
+            margin-top: 15px;
+        }
+
+        .link {
+            color: #5161ce;
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.3s;
+        }
+
+        .link:hover {
+            text-decoration: underline;
+            color: #4156b0;
+        }
+
+        /* Night Mode Styles */
+        .night-mode .register-container {
+            background-color: #444;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .night-mode .register-container h1 {
+            color: #fff;
+        }
+
+        .night-mode .register-form input {
+            border-color: #666;
+            background-color: #555;
+            color: #fff;
+        }
+
+        .night-mode .register-form input:focus {
+            border-color: #5161ce;
+            box-shadow: 0 0 0 3px rgba(81, 97, 206, 0.2);
+        }
+
+        .night-mode .btn-primary {
+            background-color: #5161ce;
+            color: #fff;
+        }
+
+        .night-mode .btn-primary:hover {
+            background-color: #4156b0;
+        }
+
+        .night-mode .link {
+            color: #9ab0e1;
+        }
+
+        .night-mode .link:hover {
+            color: #a0b1e1;
+        }
+    </style>
+
+    <div class="register-container">
+        <h1>Register</h1>
+        <form method="post" class="register-form">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="btn-primary">Register</button>
+        </form>
+        <div class="links">
+            <a href="{% url 'login' %}" class="link">Login</a>
+        </div>
+    </div>
+{% endblock %}

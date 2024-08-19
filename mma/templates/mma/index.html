@@ -1,0 +1,29 @@
+<!-- users/templates/users/index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Index Page</title>
+    </head>
+<body>
+    <header>
+        <h1>Welcome to SwiftMoney</h1>
+        <nav>
+            <ul>
+                <li><a href="{% url 'login' %}">Login</a></li>
+                <li><a href="{% url 'register' %}">Register</a></li>
+                <li><a href="{% url 'profile' %}">Profile</a></li>
+                <li><a href="{% url 'logout' %}">Logout</a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <h2>Home Page</h2>
+        <p>This is the home page of the SwiftMoney application. Here you can find important information and navigate to other sections.</p>
+    </main>
+    <footer>
+        <p>&copy; 2024 SwiftMoney. All rights reserved.</p>
+    </footer>
+</body>
+</html>

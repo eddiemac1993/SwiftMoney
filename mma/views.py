@@ -21,6 +21,12 @@ from .forms import ReportForm
 def is_admin(user):
     return user.is_staff
 
+# users/views.py
+from django.shortcuts import render
+
+def index(request):
+    return render(request, 'mma/index.html')
+
 @login_required
 def receipt(request, transaction_id):
     transaction = get_object_or_404(Transaction, id=transaction_id)
@@ -246,29 +252,35 @@ def approve_cash_request(request, request_id):
     
     return redirect('admin_approval')
 
+from django.utils import timezone
+from datetime import timedelta
+from decimal import Decimal
+from .models import Balance, FloatRequest, CashRequest, Transaction
+
 def calculate_interest():
     yesterday = timezone.now().date() - timedelta(days=1)
     balances = Balance.objects.all()
-    
+
     for balance in balances:
         agent_amount = balance.cash + balance.float
         requested_amount = FloatRequest.objects.filter(agent=balance.agent, is_approved=True, created_at__date=yesterday).aggregate(Sum('amount'))['amount__sum'] or 0
         requested_amount += CashRequest.objects.filter(agent=balance.agent, is_approved=True, created_at__date=yesterday).aggregate(Sum('amount'))['amount__sum'] or 0
-        
+
         agent_interest = agent_amount * Decimal('0.03')
         requested_interest = requested_amount * Decimal('0.15')
         total_interest = agent_interest + requested_interest
-        
+
         balance.interest += total_interest
         balance.save()
-        
+
         Transaction.objects.create(
             agent=balance.agent,
             amount=total_interest,
             transaction_type='interest_added'
         )
-    
+
     print(f"Interest calculated for {timezone.now().date()}")
+
 
 @login_required
 def cashout(request):
@@ -290,3 +302,41 @@ def cashout(request):
         return redirect('dashboard')
     
     return render(request, 'mma/cashout.html')
+
+# mma/views.py
+
+from django.shortcuts import render
+from .models import Transaction  # Assuming you have a Transaction model
+
+def transaction_list(request):
+    transactions = Transaction.objects.all()
+    return render(request, 'mma/transaction_list.html', {'transactions': transactions})
+
+# mma/views.py
+
+from django.shortcuts import render, get_object_or_404
+from .models import Transaction  # Assuming you have a Transaction model
+
+def transaction_detail(request, id):
+    transaction = get_object_or_404(Transaction, id=id)
+    return render(request, 'mma/transaction_detail.html', {'transaction': transaction})
+
+
+# mma/views.py
+
+from django.shortcuts import render
+from .models import FloatRequest  # Assuming you have a FloatRequest model
+
+def float_request_list(request):
+    float_requests = FloatRequest.objects.all()
+    return render(request, 'mma/float_request_list.html', {'float_requests': float_requests})
+
+
+# mma/views.py
+
+from django.shortcuts import render
+from .models import CashRequest  # Assuming you have a CashRequest model
+
+def cash_request_list(request):
+    cash_requests = CashRequest.objects.all()
+    return render(request, 'mma/cash_request_list.html', {'cash_requests': cash_requests})

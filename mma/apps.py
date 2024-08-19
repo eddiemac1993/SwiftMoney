@@ -1,5 +1,3 @@
-# mma/apps.py
-
 from django.apps import AppConfig
 
 class MmaConfig(AppConfig):
@@ -7,5 +5,7 @@ class MmaConfig(AppConfig):
     name = 'mma'
 
     def ready(self):
-        from . import schedulers
-        schedulers.start()
+        # Comment out or remove the scheduler start call if it's no longer needed
+        # from . import schedulers
+        # schedulers.start()
+        pass

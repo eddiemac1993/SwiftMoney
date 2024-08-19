@@ -24,7 +24,6 @@ def register(request):
         form = CustomUserCreationForm()
     return render(request, 'users/register.html', {'form': form})
 
-@login_required
 def welcome(request):
     return render(request, 'users/welcome.html')
 

@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Logout</title>
+    <style>
+        .logout-container {
+            max-width: 300px;
+            margin: 100px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        .logout-container h1 {
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+        .logout-container form {
+            margin-bottom: 20px;
+        }
+        .logout-container button {
+            background-color: #5161ce;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+        .logout-container button:hover {
+            background-color: #4156b0;
+        }
+    </style>
+</head>
+<body>
+    <div class="logout-container">
+        <h1>You have been logged out</h1>
+        <form method="post">
+            {% csrf_token %}
+            <button type="submit">Log out</button>
+        </form>
+        <p><a href="{% url 'login' %}">Login again</a> or <a href="{% url 'welcome' %}">Return to welcome page</a>.</p>
+    </div>
+</body>
+</html>

@@ -26,3 +26,4 @@ def start():
 
     scheduler.start()
     print("Scheduler started...", file=sys.stdout)
+    print("Scheduler jobs:", scheduler.get_jobs(), file=sys.stdout)

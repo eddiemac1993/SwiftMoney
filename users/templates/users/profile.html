@@ -1,0 +1,85 @@
+{% extends 'mma/base.html' %}
+
+{% block title %}Profile{% endblock %}
+
+{% block content %}
+    <style>
+        .profile-container {
+            max-width: 400px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 12px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.3s, box-shadow 0.3s;
+        }
+
+        .profile-container h1 {
+            font-size: 24px;
+            margin-bottom: 20px;
+            color: #333;
+            text-align: center;
+        }
+
+        .profile-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .profile-content p {
+            font-size: 18px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .btn-primary {
+            background-color: #5161ce;
+            color: #fff;
+            border: none;
+            padding: 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+            text-align: center;
+            display: block;
+            width: 100%;
+        }
+
+        .btn-primary:hover {
+            background-color: #4156b0;
+        }
+
+        /* Night Mode Styles */
+        .night-mode .profile-container {
+            background-color: #444;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .night-mode .profile-container h1 {
+            color: #fff;
+        }
+
+        .night-mode .profile-content p {
+            color: #fff;
+        }
+
+        .night-mode .btn-primary {
+            background-color: #5161ce;
+            color: #fff;
+        }
+
+        .night-mode .btn-primary:hover {
+            background-color: #4156b0;
+        }
+    </style>
+
+    <div class="profile-container">
+        <h1>Profile</h1>
+        <div class="profile-content">
+            <p>Welcome, <strong>{{ user.username }}</strong>!</p>
+            <a href="{% url 'logout' %}" class="btn-primary">Logout</a>
+        </div>
+    </div>
+{% endblock %}
