@@ -1,35 +1,90 @@
-{% extends 'mma/base.html' %}
+{% extends "mma/base.html" %}
 
-{% block title %}
-    Transaction Details - SwiftMoney
+{% block title %}Transaction Details{% endblock %}
+
+{% block extra_css %}
+<style>
+    .transaction-detail-card {
+        background-color: var(--card-background);
+        border-radius: 10px;
+        padding: 20px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        margin: 20px 0;
+    }
+
+    .transaction-detail-card h2 {
+        color: var(--text-color);
+        margin-bottom: 15px;
+        font-size: 1.5rem;
+    }
+
+    .transaction-info {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .transaction-info-item {
+        display: flex;
+        justify-content: space-between;
+        padding: 10px 0;
+        border-bottom: 1px solid var(--secondary-text);
+    }
+
+    .transaction-info-item:last-child {
+        border-bottom: none;
+    }
+
+    .transaction-info-item .label {
+        font-weight: bold;
+        color: var(--secondary-text);
+    }
+
+    .transaction-info-item .value {
+        color: var(--text-color);
+    }
+
+    .back-link {
+        display: inline-block;
+        margin-top: 20px;
+        text-decoration: none;
+        color: var(--primary-color);
+    }
+
+    .back-link:hover {
+        text-decoration: underline;
+    }
+</style>
 {% endblock %}
 
 {% block content %}
-<div class="card">
-    <div class="card-header">
+<div class="container">
+    <div class="transaction-detail-card">
         <h2>Transaction Details</h2>
-    </div>
-    <div class="card-body">
-        <dl class="row">
-            <dt class="col-sm-3">Transaction ID</dt>
-            <dd class="col-sm-9">{{ transaction.id }}</dd>
-
-            <dt class="col-sm-3">Date</dt>
-            <dd class="col-sm-9">{{ transaction.date }}</dd>
-
-            <dt class="col-sm-3">Agent</dt>
-            <dd class="col-sm-9">{{ transaction.agent.username }}</dd>
-
-            <dt class="col-sm-3">Amount</dt>
-            <dd class="col-sm-9">{{ transaction.amount }}</dd>
-
-            <dt class="col-sm-3">Transaction Type</dt>
-            <dd class="col-sm-9">{{ transaction.transaction_type }}</dd>
-
-            <dt class="col-sm-3">Description</dt>
-            <dd class="col-sm-9">{{ transaction.description }}</dd>
-        </dl>
-        <a href="{% url 'transaction_list' %}" class="btn btn-primary">Back to Transactions</a>
+        <div class="transaction-info">
+            <div class="transaction-info-item">
+                <div class="label">Transaction ID:</div>
+                <div class="value">{{ transaction.id }}</div>
+            </div>
+            <div class="transaction-info-item">
+                <div class="label">Type:</div>
+                <div class="value">{{ transaction.transaction_type }}</div>
+            </div>
+            <div class="transaction-info-item">
+                <div class="label">Amount:</div>
+                <div class="value">K{{ transaction.amount }}</div>
+            </div>
+            <div class="transaction-info-item">
+                <div class="label">Date:</div>
+                <div class="value">{{ transaction.created_at|date:"Y-m-d" }}</div>
+            </div>
+            <div class="transaction-info-item">
+                <div class="label">Description:</div>
+                <div class="value">{{ transaction.description }}</div>
+            </div>
+            <!-- Add more fields here if needed -->
+        </div>
+        <a href="{% url 'transaction_list' %}" class="back-link">Back to Transaction List</a>
     </div>
 </div>
 {% endblock %}

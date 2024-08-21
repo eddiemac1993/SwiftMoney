@@ -1,40 +1,80 @@
-{% extends 'base.html' %}
+{% extends "mma/base.html" %}
 
-{% block title %}
-    Cash Request List - SwiftMoney
+{% block title %}Cash Requests{% endblock %}
+
+{% block extra_css %}
+<style>
+    .request-list-card {
+        background-color: var(--card-background);
+        border-radius: 10px;
+        padding: 20px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        margin: 20px 0;
+    }
+
+    .request-list-card h2 {
+        color: var(--text-color);
+        margin-bottom: 15px;
+        font-size: 1.5rem;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.9em;
+    }
+
+    th, td {
+        padding: 10px;
+        text-align: left;
+        border-bottom: 1px solid var(--secondary-text);
+    }
+
+    th {
+        color: var(--secondary-text);
+        font-weight: normal;
+    }
+
+    .status-approved {
+        color: #4CAF50;
+    }
+
+    .status-pending {
+        color: #FFC107;
+    }
+</style>
 {% endblock %}
 
 {% block content %}
 <div class="container">
-    <h2>Cash Requests</h2>
-    <table class="table table-striped">
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Agent</th>
-                <th>Amount Requested</th>
-                <th>Date Requested</th>
-                <th>Status</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for request in cash_requests %}
-            <tr>
-                <td>{{ request.id }}</td>
-                <td>{{ request.agent.username }}</td>
-                <td>{{ request.amount_requested }}</td>
-                <td>{{ request.date_requested }}</td>
-                <td>{{ request.status }}</td>
-                <td>
-                    <a href="{% url 'cash_request_detail' request.id %}" class="btn btn-info btn-sm">View Details</a>
-                </td>
-            </tr>
-            {% empty %}
-            <tr>
-                <td colspan="6" class="text-center">No cash requests found.</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+    <div class="request-list-card">
+        <h2>Cash Requests</h2>
+        <div class="table-responsive">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Amount</th>
+                        <th>Status</th>
+                        <th>Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for request in cash_requests %}
+                    <tr>
+                        <td>K{{ request.amount }}</td>
+                        <td class="{% if request.is_approved %}status-approved{% else %}status-pending{% endif %}">
+                            {% if request.is_approved %}Approved{% else %}Pending{% endif %}
+                        </td>
+                        <td>{{ request.created_at|date:"Y-m-d" }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="3">No cash requests yet.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
 </div>
 {% endblock %}

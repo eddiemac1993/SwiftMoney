@@ -1,0 +1,67 @@
+{% extends 'mma/base.html' %}
+
+{% block title %}Invoice{% endblock %}
+
+{% block extra_css %}
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        color: #000;
+        background-color: #fff;
+    }
+    
+    .invoice-container {
+        width: 80%;
+        margin: 0 auto;
+        padding: 20px;
+        border: 1px solid #000;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .header {
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    .header h1 {
+        color: #2ecc71; /* Green color for SWIFTMONEY */
+    }
+
+    .details {
+        margin-bottom: 20px;
+    }
+
+    .details p {
+        margin: 5px 0;
+    }
+
+    .details strong {
+        color: #000;
+    }
+
+    .footer {
+        text-align: center;
+        margin-top: 20px;
+        font-size: 0.8em;
+        color: #333;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="invoice-container">
+    <div class="header">
+        <h1>SWIFTMONEY</h1>
+        <p>Invoice</p>
+    </div>
+    <div class="details">
+        <p><strong>Date:</strong> {{ transaction.date }}</p>
+        <p><strong>Invoice ID:</strong> {{ transaction.id }}</p>
+        <p><strong>Amount:</strong> K{{ transaction.amount }}</p>
+        <p><strong>Description:</strong> {{ transaction.description }}</p>
+    </div>
+    <div class="footer">
+        <p>Thank you for your prompt payment!</p>
+    </div>
+</div>
+{% endblock %}

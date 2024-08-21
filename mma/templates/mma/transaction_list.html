@@ -1,53 +1,87 @@
-{% extends 'mma/base.html' %}
+{% extends "mma/base.html" %}
 
-{% block title %}
-    Transaction List - SwiftMoney
+{% block title %}Transaction List{% endblock %}
+
+{% block extra_css %}
+<style>
+    .transaction-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 20px 0;
+        font-size: 1rem;
+    }
+
+    .transaction-table th,
+    .transaction-table td {
+        padding: 12px 15px;
+        text-align: left;
+        border-bottom: 1px solid var(--secondary-text);
+    }
+
+    .transaction-table th {
+        background-color: var(--primary-color);
+        color: white;
+    }
+
+    .transaction-table tr:hover {
+        background-color: var(--table-hover);
+    }
+
+    .transaction-table td a {
+        color: var(--primary-color);
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+    }
+
+    .transaction-table td a:hover {
+        text-decoration: underline;
+    }
+
+    .transaction-table td i {
+        margin-right: 8px;
+    }
+
+    .no-transactions {
+        text-align: center;
+        padding: 20px;
+        color: var(--secondary-text);
+    }
+</style>
 {% endblock %}
 
 {% block content %}
-    <header>
-        <h1>Welcome, {{ user.username }}</h1>
-        <nav>
-            <ul>
-                <li><a href="{% url 'dashboard' %}">Dashboard</a></li>
-                <li><a href="{% url 'request_float' %}">Request Float</a></li>
-                <li><a href="{% url 'request_cash' %}">Request Cash</a></li>
-                <li><a href="{% url 'cashout' %}">Cash Out</a></li>
-                <li><a href="{% url 'logout' %}">Logout</a></li>
-            </ul>
-        </nav>
-    </header>
-<div class="card">
-    <div class="card-header">
-        <h2>Transaction List</h2>
-    </div>
-    <div class="card-body">
-        {% if transactions %}
-            <table class="table table-striped">
-                <thead>
-                    <tr>
-                        <th>Transaction ID</th>
-                        <th>Date</th>
-                        <th>Agent</th>
-                        <th>Amount</th>
-                        <th>Type</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for transaction in transactions %}
-                        <tr>
-                            <td>{{ transaction.id }}</td>
-                            <td>{{ transaction.date }}</td>
-                            <td>{{ transaction.agent.username }}</td>
-                            <td>{{ transaction.amount }}</td>
-                            <td>{{ transaction.transaction_type }}</td>
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        {% else %}
-            <p>No transactions available.</p>
-        {% endif %}
-    </div>
+<div class="container">
+    <h2>All Transactions</h2>
+    {% if transactions %}
+        <table class="transaction-table">
+            <thead>
+                <tr>
+                    <th>Transaction ID</th>
+                    <th>Type</th>
+                    <th>Amount</th>
+                    <th>Date</th>
+                    <th>Details</th>
+                    <th>Receipt</th>
+                    <th>Invoice</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for transaction in transactions %}
+                <tr>
+                    <td>{{ transaction.id }}</td>
+                    <td>{{ transaction.transaction_type }}</td>
+                    <td>K{{ transaction.amount }}</td>
+                    <td>{{ transaction.created_at|date:"Y-m-d" }}</td>
+                    <td><a href="{% url 'transaction_detail' transaction.id %}">View Details</a></td>
+                    <td><a href="{% url 'download_receipt' transaction_id=transaction.id %}"><i class="fas fa-receipt"></i> Receipt</a></td>
+                    <td><a href="{% url 'download_invoice' transaction_id=transaction.id %}"><i class="fas fa-file-invoice"></i> Invoice</a></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p class="no-transactions">No transactions found.</p>
+    {% endif %}
 </div>
 {% endblock %}

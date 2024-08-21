@@ -24,7 +24,12 @@
                 <p class="card-content">{{ pending_cash_requests }}</p>
             </div>
         </div>
-        
+        <!-- Links to download receipts and invoices -->
+        <div class="button-group">
+            <h2 class="section-title">Download Examples</h2>
+            <a href="{% url 'download_receipt' transaction_id=1 %}" class="btn">Download Example Receipt</a>
+            <a href="{% url 'download_invoice' transaction_id=1 %}" class="btn">Download Example Invoice</a>
+        </div>
         <div class="button-group">
             <a href="{% url 'a_approval' %}" class="btn">Manage Approvals</a>
             <a href="{% url 'a_user_list' %}" class="btn">View Users</a>

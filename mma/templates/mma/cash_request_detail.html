@@ -1,0 +1,52 @@
+{% extends 'mma/base.html' %}
+
+{% block title %}Cash Request Detail{% endblock %}
+
+{% block extra_css %}
+<style>
+    .details-container {
+        max-width: 600px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+
+    .details-card {
+        padding: 20px;
+        border: 1px solid var(--secondary-text);
+        border-radius: 10px;
+        background-color: var(--card-background);
+    }
+
+    .details-card p {
+        margin-bottom: 10px;
+    }
+
+    .back-link {
+        display: inline-block;
+        margin-bottom: 20px;
+        color: var(--primary-color);
+        text-decoration: none;
+        font-weight: bold;
+        transition: color 0.3s;
+    }
+
+    .back-link:hover {
+        color: #45a049;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="details-container">
+    <a href="{% url 'cash_request_list' %}" class="back-link">
+        <i class="fas fa-list-alt"></i> Back to Cash Requests
+    </a>
+    <div class="details-card">
+        <h2>Request #{{ cash_request.id }}</h2>
+        <p><strong>Date:</strong> {{ cash_request.date }}</p>
+        <p><strong>Amount Requested:</strong> {{ cash_request.amount }}</p>
+        <p><strong>Status:</strong> {{ cash_request.status }}</p>
+        <p><strong>Notes:</strong> {{ cash_request.notes }}</p>
+    </div>
+</div>
+{% endblock %}

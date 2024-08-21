@@ -20,11 +20,15 @@ urlpatterns = [
 
     path('float-requests/', views.float_request_list, name='float_request_list'),  # Added float request list view
     path('cash-requests/', views.cash_request_list, name='cash_request_list'),  # Added cash request list view
+    path('float-requests/<int:id>/', views.float_request_detail, name='float_request_detail'),
 
     path('cashout/', views.cashout, name='cashout'),
         # Receipt and Invoice URLs
     path('receipt/<int:transaction_id>/', views.receipt, name='receipt'),
     path('invoice/<int:transaction_id>/', views.invoice, name='invoice'),
+
+    path('receipt/<int:transaction_id>/download/', views.download_receipt, name='download_receipt'),
+    path('invoice/<int:transaction_id>/download/', views.download_invoice, name='download_invoice'),
 
     # Admin URLs
     path('admin/dashboard/', views.admin_dashboard, name='admin_dashboard'),

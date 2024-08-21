@@ -238,32 +238,35 @@
         </div>
 
         <div class="card">
-            <h2>Recent Transactions</h2>
-            <div class="table-responsive">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Type</th>
-                            <th>Amount</th>
-                            <th>Date</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for transaction in recent_transactions %}
-                        <tr>
-                            <td>{{ transaction.transaction_type }}</td>
-                            <td>K{{ transaction.amount }}</td>
-                            <td>{{ transaction.created_at|date:"Y-m-d" }}</td>
-                        </tr>
-                        {% empty %}
-                        <tr>
-                            <td colspan="3">No transactions yet.</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-        </div>
+    <h2>Recent Transactions</h2>
+    <div class="table-responsive">
+        <table>
+            <thead>
+                <tr>
+                    <th>Type</th>
+                    <th>Amount</th>
+                    <th>Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for transaction in recent_transactions %}
+                <tr>
+                    <td>{{ transaction.transaction_type }}</td>
+                    <td>K{{ transaction.amount }}</td>
+                    <td>{{ transaction.created_at|date:"Y-m-d" }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="3">No transactions yet.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <!-- Link to view all transactions -->
+    <a href="{% url 'transaction_list' %}" class="btn">View All Transactions</a>
+</div>
+
     </div>
 </div>
 {% endblock %}

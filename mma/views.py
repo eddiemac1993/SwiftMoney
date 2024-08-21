@@ -1,46 +1,65 @@
-from django.shortcuts import render, redirect
-from django.contrib.auth.decorators import login_required
-from .models import FloatRequest, CashRequest, Balance, Transaction
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth.decorators import login_required, user_passes_test
+from .models import FloatRequest, CustomUser, CashRequest, Balance, Transaction
 from .forms import FloatRequestForm, CashRequestForm, BalanceUpdateForm
 from django.db.models import Sum
 from decimal import Decimal
 from django.contrib.admin.views.decorators import staff_member_required
 from django.utils import timezone
 from datetime import timedelta
-from users.models import CustomUser
-from django.utils import timezone
-from datetime import timedelta
-from decimal import Decimal
-from .models import Balance, FloatRequest, CashRequest, Transaction
-from django.db.models import Sum
-from django.shortcuts import render, get_object_or_404
-from django.contrib.auth.decorators import login_required, user_passes_test
-from .models import Transaction, CustomUser, FloatRequest, CashRequest
 from .forms import ReportForm
+from django.template.loader import render_to_string
+from weasyprint import HTML
+from django.http import HttpResponse
+
+@login_required
+def download_receipt(request, transaction_id):
+    transaction = get_object_or_404(Transaction, id=transaction_id)
+    html_string = render_to_string('mma/receipt.html', {'transaction': transaction})
+    html = HTML(string=html_string)
+    pdf_file = html.write_pdf()
+
+    response = HttpResponse(pdf_file, content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename=receipt_{transaction_id}.pdf'
+    return response
+
+@login_required
+def download_invoice(request, transaction_id):
+    transaction = get_object_or_404(Transaction, id=transaction_id)
+    html_string = render_to_string('mma/invoice.html', {'transaction': transaction})
+    html = HTML(string=html_string)
+    pdf_file = html.write_pdf()
+
+    response = HttpResponse(pdf_file, content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename=invoice_{transaction_id}.pdf'
+    return response
 
 def is_admin(user):
     return user.is_staff
-
-# users/views.py
-from django.shortcuts import render
 
 def index(request):
     return render(request, 'mma/index.html')
 
 @login_required
 def receipt(request, transaction_id):
+    # Retrieve the transaction object or return a 404 error if not found
     transaction = get_object_or_404(Transaction, id=transaction_id)
+    # Pass the transaction object to the context dictionary
     context = {
         'transaction': transaction,
     }
+    # Render the 'receipt.html' template with the context data
     return render(request, 'mma/receipt.html', context)
 
 @login_required
 def invoice(request, transaction_id):
+    # Retrieve the transaction object or return a 404 error if not found
     transaction = get_object_or_404(Transaction, id=transaction_id)
+    # Pass the transaction object to the context dictionary
     context = {
         'transaction': transaction,
     }
+    # Render the 'invoice.html' template with the context data
     return render(request, 'mma/invoice.html', context)
 
 @user_passes_test(is_admin)
@@ -243,11 +262,6 @@ def approve_cash_request(request, request_id):
 
     return redirect('admin_approval')
 
-from django.utils import timezone
-from datetime import timedelta
-from decimal import Decimal
-from .models import Balance, FloatRequest, CashRequest, Transaction
-
 def calculate_interest():
     yesterday = timezone.now().date() - timedelta(days=1)
     balances = Balance.objects.all()
@@ -296,37 +310,23 @@ def cashout(request):
     }
     return render(request, 'mma/cashout.html', context)
 
-# mma/views.py
-
-from django.shortcuts import render
-from .models import Transaction  # Assuming you have a Transaction model
-
 def transaction_list(request):
     transactions = Transaction.objects.all()
     return render(request, 'mma/transaction_list.html', {'transactions': transactions})
-
-# mma/views.py
-
-from django.shortcuts import render, get_object_or_404
-from .models import Transaction  # Assuming you have a Transaction model
 
 def transaction_detail(request, id):
     transaction = get_object_or_404(Transaction, id=id)
     return render(request, 'mma/transaction_detail.html', {'transaction': transaction})
 
-
-# mma/views.py
-
-from django.shortcuts import render
-from .models import FloatRequest  # Assuming you have a FloatRequest model
-
 def float_request_list(request):
     float_requests = FloatRequest.objects.all()
     return render(request, 'mma/float_request_list.html', {'float_requests': float_requests})
 
-from django.shortcuts import render
-from .models import CashRequest  # Assuming you have a CashRequest model
-
 def cash_request_list(request):
     cash_requests = CashRequest.objects.all()
     return render(request, 'mma/cash_request_list.html', {'cash_requests': cash_requests})
+
+def float_request_detail(request, id):
+    float_request = get_object_or_404(FloatRequest, id=id)
+    return render(request, 'mma/float_request_detail.html', {'float_request': float_request})
+
