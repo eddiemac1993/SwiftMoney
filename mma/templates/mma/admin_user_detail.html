@@ -1,0 +1,24 @@
+{% extends 'mma/base.html' %}
+
+{% block title %}User Details{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <h1>User Details</h1>
+        <div class="card">
+            <p><strong>Username:</strong> {{ user.username }}</p>
+            <p><strong>Phone Number:</strong> {{ user.phone_number }}</p>
+            <p><strong>Full Name:</strong> {{ user.first_name }} {{ user.last_name }}</p>
+            <p><strong>Business Location:</strong> {{ user.business_location }}</p>
+            <p><strong>Approved:</strong> {{ user.is_approved }}</p>
+            <p><strong>Profile Picture:</strong></p>
+            {% if user.profile_pic %}
+                <img src="{{ user.profile_pic.url }}" alt="Profile Picture" width="200">
+            {% else %}
+                <p>No profile picture available</p>
+            {% endif %}
+        </div>
+        <a href="{% url 'a_user_list' %}" class="btn">Back to User List</a>
+        <a href="{% url 'a_dashboard' %}" class="btn">Back to Dashboard</a>
+    </div>
+{% endblock %}

@@ -1,0 +1,30 @@
+{% extends 'mma/base.html' %}
+
+{% block title %}Transaction List{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <h1>Transaction List</h1>
+        <table>
+            <thead>
+                <tr>
+                    <th>Transaction ID</th>
+                    <th>Amount</th>
+                    <th>Date</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for transaction in transactions %}
+                    <tr>
+                        <td>{{ transaction.id }}</td>
+                        <td>{{ transaction.amount }}</td>
+                        <td>{{ transaction.date }}</td>
+                        <td>{{ transaction.status }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <a href="{% url 'a_dashboard' %}" class="btn">Back to Dashboard</a>
+    </div>
+{% endblock %}

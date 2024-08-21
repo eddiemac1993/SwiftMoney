@@ -1,6 +1,6 @@
 {% extends "mma/base.html" %}
 
-{% block title %}Register{% endblock %}
+{% block title %}Request Cash{% endblock %}
 
 {% block extra_css %}
 <style>
@@ -20,10 +20,7 @@
         color: var(--secondary-text);
     }
 
-    input[type="text"],
-    input[type="email"],
-    input[type="password"],
-    input[type="file"] {
+    input[type="number"] {
         width: 100%;
         padding: 10px;
         border: 1px solid var(--secondary-text);
@@ -32,7 +29,7 @@
         color: var(--text-color);
     }
 
-    .btn-register {
+    .btn-submit {
         background-color: var(--primary-color);
         color: var(--text-color);
         border: none;
@@ -45,7 +42,7 @@
         width: 100%;
     }
 
-    .btn-register:hover {
+    .btn-submit:hover {
         background-color: #45a049;
         transform: translateY(-2px);
     }
@@ -55,35 +52,22 @@
         font-size: 0.9em;
         margin-top: 5px;
     }
-
-    .help-text {
-        font-size: 0.8em;
-        color: var(--secondary-text);
-        margin-top: 5px;
-    }
 </style>
 {% endblock %}
 
 {% block content %}
 <div class="form-container">
-    <h2 class="card-title">Register</h2>
-    <form method="post" enctype="multipart/form-data">
+    <h2 class="card-title">Request Cash</h2>
+    <form method="post">
         {% csrf_token %}
-        {% for field in form %}
-            <div class="form-group">
-                <label for="{{ field.id_for_label }}">{{ field.label }}</label>
-                {{ field }}
-                {% if field.help_text %}
-                    <p class="help-text">{{ field.help_text|safe }}</p>
-                {% endif %}
-                {% if field.errors %}
-                    {% for error in field.errors %}
-                        <p class="error-message">{{ error }}</p>
-                    {% endfor %}
-                {% endif %}
-            </div>
-        {% endfor %}
-        <button type="submit" class="btn-register">Register</button>
+        <div class="form-group">
+            <label for="{{ form.amount.id_for_label }}">Amount</label>
+            {{ form.amount }}
+            {% if form.amount.errors %}
+                <p class="error-message">{{ form.amount.errors.0 }}</p>
+            {% endif %}
+        </div>
+        <button type="submit" class="btn-submit">Submit Request</button>
     </form>
 </div>
 {% endblock %}

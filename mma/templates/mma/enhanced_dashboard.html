@@ -1,63 +1,204 @@
-{% extends 'mma/base.html' %}
+{% extends "mma/base.html" %}
+
+{% block title %}Enhanced Dashboard{% endblock %}
+
+{% block extra_css %}
+<style>
+    .dashboard-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 20px;
+        padding: 20px;
+    }
+
+    .card {
+        background-color: var(--card-background);
+        border-radius: 15px;
+        padding: 20px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .card-title {
+        font-size: 1.2rem;
+        color: var(--primary-color);
+        margin-bottom: 15px;
+    }
+
+    .stat-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+        gap: 15px;
+    }
+
+    .stat-item {
+        text-align: center;
+        padding: 10px;
+        background-color: rgba(255, 255, 255, 0.1);
+        border-radius: 10px;
+    }
+
+    .stat-label {
+        font-size: 0.9rem;
+        color: var(--secondary-text);
+        margin-bottom: 5px;
+    }
+
+    .stat-value {
+        font-size: 1.5rem;
+        color: var(--text-color);
+        font-weight: bold;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 15px;
+    }
+
+    th, td {
+        padding: 10px;
+        text-align: left;
+        border-bottom: 1px solid var(--secondary-text);
+    }
+
+    th {
+        color: var(--secondary-text);
+        font-weight: normal;
+    }
+
+    .status-pending {
+        color: #FFC107;
+    }
+
+    @media (max-width: 768px) {
+        .dashboard-container {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}
 
 {% block content %}
-<h1>Welcome, {{ user.username }}</h1>
+<div class="dashboard-container">
+    <div class="card">
+        <h2 class="card-title">Balance Overview</h2>
+        <div class="stat-grid">
+            <div class="stat-item">
+                <div class="stat-label">Cash</div>
+                <div class="stat-value">K{{ balance.cash }}</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-label">Float</div>
+                <div class="stat-value">K{{ balance.float }}</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-label">Interest</div>
+                <div class="stat-value">K{{ balance.interest }}</div>
+            </div>
+        </div>
+    </div>
 
-<div class="dashboard-summary">
-    <h2>Account Summary</h2>
-    <p>Cash Balance: {{ balance.cash }}</p>
-    <p>Float Balance: {{ balance.float }}</p>
-    <p>Interest Accrued: {{ balance.interest }}</p>
-</div>
+    <div class="card">
+        <h2 class="card-title">Today's Performance</h2>
+        <div class="stat-grid">
+            <div class="stat-item">
+                <div class="stat-label">Transactions</div>
+                <div class="stat-value">{{ total_transactions }}</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-label">Volume</div>
+                <div class="stat-value">K{{ total_volume }}</div>
+            </div>
+        </div>
+    </div>
 
-<div class="today-activity">
-    <h2>Today's Activity</h2>
-    <p>Total Transactions: {{ total_transactions }}</p>
-    <p>Total Volume: {{ total_volume }}</p>
-</div>
+    <div class="card">
+        <h2 class="card-title">This Week's Stats</h2>
+        <div class="stat-grid">
+            <div class="stat-item">
+                <div class="stat-label">Transactions</div>
+                <div class="stat-value">{{ week_stats.transaction_count }}</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-label">Volume</div>
+                <div class="stat-value">K{{ week_stats.transaction_volume }}</div>
+            </div>
+        </div>
+    </div>
 
-<div class="recent-transactions">
-    <h2>Recent Transactions</h2>
-    <ul>
-    {% for transaction in recent_transactions %}
-        <li>{{ transaction.created_at|date:"Y-m-d H:i" }} - {{ transaction.transaction_type }} - {{ transaction.amount }}</li>
-    {% empty %}
-        <li>No recent transactions.</li>
-    {% endfor %}
-    </ul>
-</div>
+    <div class="card">
+        <h2 class="card-title">Recent Transactions</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Type</th>
+                    <th>Amount</th>
+                    <th>Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for transaction in recent_transactions %}
+                <tr>
+                    <td>{{ transaction.transaction_type }}</td>
+                    <td>K{{ transaction.amount }}</td>
+                    <td>{{ transaction.created_at|date:"Y-m-d H:i" }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="3">No recent transactions.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 
-<div class="week-stats">
-    <h2>This Week's Stats</h2>
-    <p>Transaction Count: {{ week_stats.transaction_count }}</p>
-    <p>Transaction Volume: {{ week_stats.transaction_volume }}</p>
-</div>
+    <div class="card">
+        <h2 class="card-title">Pending Requests</h2>
+        <h3>Float Requests</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Amount</th>
+                    <th>Service</th>
+                    <th>Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for request in float_requests %}
+                <tr>
+                    <td>K{{ request.amount }}</td>
+                    <td>{{ request.get_service_display }}</td>
+                    <td>{{ request.created_at|date:"Y-m-d" }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="3">No pending float requests.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
 
-<div class="pending-requests">
-    <h2>Pending Requests</h2>
-    <h3>Float Requests</h3>
-    <ul>
-    {% for request in float_requests %}
-        <li>{{ request.created_at|date:"Y-m-d" }} - {{ request.service }} - {{ request.amount }}</li>
-    {% empty %}
-        <li>No pending float requests.</li>
-    {% endfor %}
-    </ul>
-    <h3>Cash Requests</h3>
-    <ul>
-    {% for request in cash_requests %}
-        <li>{{ request.created_at|date:"Y-m-d" }} - {{ request.amount }}</li>
-    {% empty %}
-        <li>No pending cash requests.</li>
-    {% endfor %}
-    </ul>
-</div>
-
-<div class="quick-actions">
-    <h2>Quick Actions</h2>
-    <a href="{% url 'request_float' %}" class="btn btn-primary">Request Float</a>
-    <a href="{% url 'request_cash' %}" class="btn btn-primary">Request Cash</a>
-    <a href="{% url 'update_balance' %}" class="btn btn-secondary">Update Balance</a>
-    <a href="{% url 'cashout' %}" class="btn btn-warning">Cash Out</a>
+        <h3>Cash Requests</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Amount</th>
+                    <th>Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for request in cash_requests %}
+                <tr>
+                    <td>K{{ request.amount }}</td>
+                    <td>{{ request.created_at|date:"Y-m-d" }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="2">No pending cash requests.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 </div>
 {% endblock %}

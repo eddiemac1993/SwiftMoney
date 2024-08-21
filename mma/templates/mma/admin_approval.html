@@ -1,0 +1,85 @@
+{% extends 'mma/base.html' %}
+
+{% block title %}Admin Approval{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <div class="card">
+            <h1>Admin Approval</h1>
+            
+            <h2>Pending Users</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Username</th>
+                        <th>Phone Number</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for user in pending_users %}
+                        <tr>
+                            <td>{{ user.username }}</td>
+                            <td>{{ user.phone_number }}</td>
+                            <td>
+                                <a href="{% url 'approve_user' user.id %}" class="btn">Approve</a>
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr><td colspan="3">No pending users</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+            <h2>Pending Float Requests</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Agent</th>
+                        <th>Amount</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for request in pending_float_requests %}
+                        <tr>
+                            <td>{{ request.agent }}</td>
+                            <td>{{ request.amount }}</td>
+                            <td>
+                                <a href="{% url 'approve_float_request' request.id %}" class="btn">Approve</a>
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr><td colspan="3">No pending float requests</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+            <h2>Pending Cash Requests</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Agent</th>
+                        <th>Amount</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for request in pending_cash_requests %}
+                        <tr>
+                            <td>{{ request.agent }}</td>
+                            <td>{{ request.amount }}</td>
+                            <td>
+                                <a href="{% url 'approve_cash_request' request.id %}" class="btn">Approve</a>
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr><td colspan="3">No pending cash requests</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            
+            <a href="{% url 'admin_dashboard' %}" class="btn">Back to Dashboard</a>
+        </div>
+    </div>
+{% endblock %}

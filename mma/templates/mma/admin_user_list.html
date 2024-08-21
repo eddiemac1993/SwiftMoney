@@ -1,0 +1,30 @@
+{% extends 'mma/base.html' %}
+
+{% block title %}User List{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <h1>User List</h1>
+        <table>
+            <thead>
+                <tr>
+                    <th>Username</th>
+                    <th>Phone Number</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for user in users %}
+                    <tr>
+                        <td>{{ user.username }}</td>
+                        <td>{{ user.phone_number }}</td>
+                        <td>
+                            <a href="{% url 'a_user_detail' user.id %}">View Details</a>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <a href="{% url 'a_dashboard' %}" class="btn">Back to Dashboard</a>
+    </div>
+{% endblock %}

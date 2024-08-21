@@ -1,0 +1,269 @@
+{% extends "mma/base.html" %}
+
+{% block title %}Agent Dashboard{% endblock %}
+
+{% block extra_css %}
+<style>
+    .dashboard-container {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .card {
+        background-color: var(--card-background);
+        border-radius: 15px;
+        padding: 20px;
+        margin-bottom: 20px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    h2 {
+        color: var(--text-color);
+        margin-bottom: 15px;
+        font-size: 1.2rem;
+    }
+
+    .balance-section {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        gap: 10px;
+    }
+
+    .balance-item {
+        flex: 1;
+        min-width: 200px; /* Adjust minimum width as needed */
+        text-align: center;
+        padding: 10px;
+        background-color: rgba(255, 255, 255, 0.1);
+        border-radius: 10px;
+        box-sizing: border-box; /* Ensure padding and border are included in width/height */
+    }
+
+    .balance-label {
+        color: var(--secondary-text);
+        font-size: 0.9em;
+        margin-bottom: 5px;
+    }
+
+    .balance-amount {
+        color: var(--primary-color);
+        font-size: 1.2em;
+        font-weight: bold;
+    }
+
+    .btn-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .btn {
+        flex: 1;
+        min-width: 120px;
+        text-align: center;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.9em;
+    }
+
+    th, td {
+        padding: 10px;
+        text-align: left;
+        border-bottom: 1px solid var(--secondary-text);
+    }
+
+    th {
+        color: var(--secondary-text);
+        font-weight: normal;
+    }
+
+    .status-approved {
+        color: #4CAF50;
+    }
+
+    .status-pending {
+        color: #FFC107;
+    }
+
+    @media (min-width: 768px) {
+        .dashboard-container {
+            flex-direction: row;
+        }
+
+        .left-column, .right-column {
+            flex: 1;
+        }
+
+        .left-column {
+            max-width: 300px;
+        }
+    }
+
+    @media (max-width: 767px) {
+        .balance-section {
+            flex-direction: column;
+        }
+
+        .balance-item {
+            width: 100%;
+        }
+
+        table {
+            font-size: 0.8em;
+        }
+
+        th, td {
+            padding: 8px 5px;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .balance-item {
+            min-width: auto; /* Ensure the item can shrink more on very small screens */
+            padding: 8px;
+        }
+
+        .balance-label {
+            font-size: 0.8em;
+        }
+
+        .balance-amount {
+            font-size: 1.1em;
+        }
+
+        h2 {
+            font-size: 1rem;
+        }
+    }
+</style>
+{% endblock %}
+
+
+{% block content %}
+<div class="dashboard-container">
+    <div class="left-column">
+        <div class="card">
+            <h2>Your Balance</h2>
+            <div class="balance-section">
+                <div class="balance-item">
+                    <div class="balance-label">Cash</div>
+                    <div class="balance-amount">K{{ balance.cash }}</div>
+                </div>
+                <div class="balance-item">
+                    <div class="balance-label">Float</div>
+                    <div class="balance-amount">K{{ balance.float }}</div>
+                </div>
+                <div class="balance-item">
+                    <div class="balance-label">Interest</div>
+                    <div class="balance-amount">K{{ balance.interest }}</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>Make a Request</h2>
+            <div class="btn-container">
+                <a href="{% url 'request_float' %}" class="btn">Request Float</a>
+                <a href="{% url 'request_cash' %}" class="btn btn-secondary">Request Cash</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="right-column">
+        <div class="card">
+            <h2>Your Float Requests</h2>
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Amount</th>
+                            <th>Service</th>
+                            <th>Status</th>
+                            <th>Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for request in float_requests %}
+                        <tr>
+                            <td>K{{ request.amount }}</td>
+                            <td>{{ request.get_service_display }}</td>
+                            <td class="{% if request.is_approved %}status-approved{% else %}status-pending{% endif %}">
+                                {% if request.is_approved %}Approved{% else %}Pending{% endif %}
+                            </td>
+                            <td>{{ request.created_at|date:"Y-m-d" }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="4">No float requests yet.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>Your Cash Requests</h2>
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Amount</th>
+                            <th>Status</th>
+                            <th>Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for request in cash_requests %}
+                        <tr>
+                            <td>K{{ request.amount }}</td>
+                            <td class="{% if request.is_approved %}status-approved{% else %}status-pending{% endif %}">
+                                {% if request.is_approved %}Approved{% else %}Pending{% endif %}
+                            </td>
+                            <td>{{ request.created_at|date:"Y-m-d" }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="3">No cash requests yet.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>Recent Transactions</h2>
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Type</th>
+                            <th>Amount</th>
+                            <th>Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for transaction in recent_transactions %}
+                        <tr>
+                            <td>{{ transaction.transaction_type }}</td>
+                            <td>K{{ transaction.amount }}</td>
+                            <td>{{ transaction.created_at|date:"Y-m-d" }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="3">No transactions yet.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

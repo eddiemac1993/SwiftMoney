@@ -92,40 +92,31 @@ def notification_detail(request, notification_id):
 
 @login_required
 def dashboard(request):
-    balance, created = Balance.objects.get_or_create(agent=request.user)
-    float_requests = FloatRequest.objects.filter(agent=request.user)
-    cash_requests = CashRequest.objects.filter(agent=request.user)
-    
     context = {
-        'balance': balance,
-        'float_requests': float_requests,
-        'cash_requests': cash_requests,
+        'balance': Balance.objects.get(agent=request.user),
+        'float_requests': FloatRequest.objects.filter(agent=request.user).order_by('-created_at')[:5],
+        'cash_requests': CashRequest.objects.filter(agent=request.user).order_by('-created_at')[:5],
+        'recent_transactions': Transaction.objects.filter(agent=request.user).order_by('-created_at')[:10],
     }
     return render(request, 'mma/dashboard.html', context)
-
-# mma/views.py
-
-from django.db.models import Sum, Count
-from django.utils import timezone
-from datetime import timedelta
 
 @login_required
 def enhanced_dashboard(request):
     agent = request.user
     balance = Balance.objects.get(agent=agent)
-    
+
     # Get today's transactions
     today = timezone.now().date()
     today_transactions = Transaction.objects.filter(agent=agent, created_at__date=today)
-    
+
     # Get this week's transactions
     week_start = today - timedelta(days=today.weekday())
     week_transactions = Transaction.objects.filter(agent=agent, created_at__date__gte=week_start)
-    
+
     # Calculate some metrics
     total_transactions = today_transactions.count()
     total_volume = today_transactions.aggregate(Sum('amount'))['amount__sum'] or 0
-    
+
     context = {
         'balance': balance,
         'total_transactions': total_transactions,
@@ -138,7 +129,7 @@ def enhanced_dashboard(request):
         'float_requests': FloatRequest.objects.filter(agent=agent, is_approved=False),
         'cash_requests': CashRequest.objects.filter(agent=agent, is_approved=False),
     }
-    
+
     return render(request, 'mma/enhanced_dashboard.html', context)
 
 @login_required
@@ -175,22 +166,22 @@ def update_balance(request):
             amount = form.cleaned_data['amount']
             transaction_type = form.cleaned_data['transaction_type']
             service = form.cleaned_data.get('service')
-            
+
             balance, created = Balance.objects.get_or_create(agent=request.user)
-            
+
             if transaction_type == 'cash':
                 balance.cash += amount
             else:
                 balance.float += amount
-            
+
             balance.save()
-            
+
             Transaction.objects.create(
                 agent=request.user,
                 amount=amount,
                 transaction_type=f'{transaction_type}_update',
             )
-            
+
             return redirect('dashboard')
     else:
         form = BalanceUpdateForm()
@@ -201,7 +192,7 @@ def admin_approval(request):
     pending_users = CustomUser.objects.filter(is_approved=False)
     pending_float_requests = FloatRequest.objects.filter(is_approved=False)
     pending_cash_requests = CashRequest.objects.filter(is_approved=False)
-    
+
     context = {
         'pending_users': pending_users,
         'pending_float_requests': pending_float_requests,
@@ -221,17 +212,17 @@ def approve_float_request(request, request_id):
     float_request = FloatRequest.objects.get(id=request_id)
     float_request.is_approved = True
     float_request.save()
-    
+
     balance, created = Balance.objects.get_or_create(agent=float_request.agent)
     balance.float += float_request.amount
     balance.save()
-    
+
     Transaction.objects.create(
         agent=float_request.agent,
         amount=float_request.amount,
         transaction_type='float_approved'
     )
-    
+
     return redirect('admin_approval')
 
 @staff_member_required
@@ -239,17 +230,17 @@ def approve_cash_request(request, request_id):
     cash_request = CashRequest.objects.get(id=request_id)
     cash_request.is_approved = True
     cash_request.save()
-    
+
     balance, created = Balance.objects.get_or_create(agent=cash_request.agent)
     balance.cash += cash_request.amount
     balance.save()
-    
+
     Transaction.objects.create(
         agent=cash_request.agent,
         amount=cash_request.amount,
         transaction_type='cash_approved'
     )
-    
+
     return redirect('admin_approval')
 
 from django.utils import timezone
@@ -284,24 +275,26 @@ def calculate_interest():
 
 @login_required
 def cashout(request):
+    balance = Balance.objects.get(agent=request.user)
+    total_amount = balance.cash + balance.float + balance.interest
+
     if request.method == 'POST':
-        balance = Balance.objects.get(agent=request.user)
-        total_amount = balance.cash + balance.float + balance.interest
-        
         Transaction.objects.create(
             agent=request.user,
             amount=total_amount,
             transaction_type='cashout'
         )
-        
         balance.cash = 0
         balance.float = 0
         balance.interest = 0
         balance.save()
-        
         return redirect('dashboard')
-    
-    return render(request, 'mma/cashout.html')
+
+    context = {
+        'balance': balance,
+        'total_amount': total_amount,
+    }
+    return render(request, 'mma/cashout.html', context)
 
 # mma/views.py
 
@@ -330,9 +323,6 @@ from .models import FloatRequest  # Assuming you have a FloatRequest model
 def float_request_list(request):
     float_requests = FloatRequest.objects.all()
     return render(request, 'mma/float_request_list.html', {'float_requests': float_requests})
-
-
-# mma/views.py
 
 from django.shortcuts import render
 from .models import CashRequest  # Assuming you have a CashRequest model

@@ -1,0 +1,53 @@
+{% extends 'mma/base.html' %}
+
+{% block title %}
+    Transaction List - SwiftMoney
+{% endblock %}
+
+{% block content %}
+    <header>
+        <h1>Welcome, {{ user.username }}</h1>
+        <nav>
+            <ul>
+                <li><a href="{% url 'dashboard' %}">Dashboard</a></li>
+                <li><a href="{% url 'request_float' %}">Request Float</a></li>
+                <li><a href="{% url 'request_cash' %}">Request Cash</a></li>
+                <li><a href="{% url 'cashout' %}">Cash Out</a></li>
+                <li><a href="{% url 'logout' %}">Logout</a></li>
+            </ul>
+        </nav>
+    </header>
+<div class="card">
+    <div class="card-header">
+        <h2>Transaction List</h2>
+    </div>
+    <div class="card-body">
+        {% if transactions %}
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Transaction ID</th>
+                        <th>Date</th>
+                        <th>Agent</th>
+                        <th>Amount</th>
+                        <th>Type</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for transaction in transactions %}
+                        <tr>
+                            <td>{{ transaction.id }}</td>
+                            <td>{{ transaction.date }}</td>
+                            <td>{{ transaction.agent.username }}</td>
+                            <td>{{ transaction.amount }}</td>
+                            <td>{{ transaction.transaction_type }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p>No transactions available.</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

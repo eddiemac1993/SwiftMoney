@@ -65,7 +65,7 @@ import os
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, 'templates')],
+        'DIRS': [],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -128,8 +128,17 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
 STATIC_URL = '/static/'
-STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+
+# Media files (User uploads)
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
+
+# If you have static files that are part of your app (like css, js, images)
+# and want to include them, you can add this:
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static'),
+]
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
@@ -137,4 +146,33 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # settings.py
-ADMIN_EMAIL = 'manjoloe800@gmail.com'
+
+DEFAULT_FROM_EMAIL = 'webmaster@localhost'
+ADMIN_EMAIL = 'manjoloe800@gmail.com'  # Add this line with the appropriate email address
+
+# Set the email backend to use SMTP
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST = "smtp.gmail.com"
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = "manjoloe800@gmail.com"
+EMAIL_HOST_PASSWORD = "dlihvdakwpyqkpzk"
+
+PWA_APP_NAME = 'Comagil'
+PWA_APP_DESCRIPTION = "Comagil's Spare Parts and Timber Supply"
+PWA_APP_THEME_COLOR = '#000000'
+PWA_APP_BACKGROUND_COLOR = '#ffffff'
+PWA_APP_ICONS = [
+    {'src': '/static/images/icons/icon-192x192.png', 'sizes': '192x192', 'type': 'image/png'},
+    {'src': '/static/images/icons/icon-512x512.png', 'sizes': '512x512', 'type': 'image/png'},
+]
+PWA_APP_MANIFEST = {
+    'name': 'Comagil',
+    'short_name': 'Comagil',
+    'start_url': '/',
+    'display': 'standalone',
+    'background_color': '#ffffff',
+    'theme_color': '#000000',
+}
+
+LOGOUT_REDIRECT_URL = '/'

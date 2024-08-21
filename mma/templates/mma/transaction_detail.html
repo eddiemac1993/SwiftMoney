@@ -1,0 +1,35 @@
+{% extends 'mma/base.html' %}
+
+{% block title %}
+    Transaction Details - SwiftMoney
+{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <h2>Transaction Details</h2>
+    </div>
+    <div class="card-body">
+        <dl class="row">
+            <dt class="col-sm-3">Transaction ID</dt>
+            <dd class="col-sm-9">{{ transaction.id }}</dd>
+
+            <dt class="col-sm-3">Date</dt>
+            <dd class="col-sm-9">{{ transaction.date }}</dd>
+
+            <dt class="col-sm-3">Agent</dt>
+            <dd class="col-sm-9">{{ transaction.agent.username }}</dd>
+
+            <dt class="col-sm-3">Amount</dt>
+            <dd class="col-sm-9">{{ transaction.amount }}</dd>
+
+            <dt class="col-sm-3">Transaction Type</dt>
+            <dd class="col-sm-9">{{ transaction.transaction_type }}</dd>
+
+            <dt class="col-sm-3">Description</dt>
+            <dd class="col-sm-9">{{ transaction.description }}</dd>
+        </dl>
+        <a href="{% url 'transaction_list' %}" class="btn btn-primary">Back to Transactions</a>
+    </div>
+</div>
+{% endblock %}

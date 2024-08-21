@@ -1,85 +1,223 @@
-{% extends 'mma/base.html' %}
+{% extends "mma/base.html" %}
+{% load static %}
 
 {% block title %}Profile{% endblock %}
 
-{% block content %}
-    <style>
-        .profile-container {
-            max-width: 400px;
-            margin: 50px auto;
-            padding: 20px;
-            background-color: #fff;
-            border-radius: 12px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            transition: background-color 0.3s, box-shadow 0.3s;
-        }
+{% block extra_css %}
+<style>
+    .profile-container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+    }
 
-        .profile-container h1 {
-            font-size: 24px;
-            margin-bottom: 20px;
-            color: #333;
-            text-align: center;
-        }
+    .profile-header {
+        display: flex;
+        align-items: center;
+        margin-bottom: 30px;
+        background-color: var(--card-background);
+        border-radius: 15px;
+        padding: 20px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        flex-wrap: wrap; /* Allows items to wrap on smaller screens */
+    }
 
-        .profile-content {
-            display: flex;
+    .profile-picture {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        object-fit: cover;
+        margin-right: 30px;
+        border: 4px solid var(--primary-color);
+    }
+
+    .profile-name {
+        font-size: 2rem;
+        color: var(--text-color);
+        margin-bottom: 5px;
+    }
+
+    .profile-username {
+        font-size: 1.1rem;
+        color: var(--secondary-text);
+    }
+
+    .profile-info {
+        background-color: var(--card-background);
+        border-radius: 15px;
+        padding: 30px;
+        margin-bottom: 20px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .info-group {
+        margin-bottom: 20px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        padding-bottom: 15px;
+        overflow: hidden; /* Prevents content from overflowing */
+    }
+
+    .info-group:last-child {
+        border-bottom: none;
+        margin-bottom: 0;
+        padding-bottom: 0;
+    }
+
+    .info-label {
+        font-size: 0.9rem;
+        color: var(--secondary-text);
+        margin-bottom: 5px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .info-value {
+        font-size: 1.2rem;
+        color: var(--text-color);
+        word-wrap: break-word; /* Ensures long words or URLs break to the next line */
+    }
+
+    .btn-edit-profile {
+        background-color: var(--primary-color);
+        color: var(--text-color);
+        border: none;
+        border-radius: 25px;
+        padding: 12px 25px;
+        cursor: pointer;
+        font-weight: 600;
+        text-decoration: none;
+        display: inline-block;
+        transition: background-color 0.3s, transform 0.3s;
+        font-size: 1rem;
+    }
+
+    .btn-edit-profile:hover {
+        background-color: #45a049;
+        transform: translateY(-2px);
+    }
+
+    form {
+        margin-top: 30px;
+    }
+
+    form p {
+        margin-bottom: 20px;
+    }
+
+    form label {
+        display: block;
+        margin-bottom: 5px;
+        color: var(--secondary-text);
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    form input[type="text"],
+    form input[type="email"],
+    form input[type="file"] {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 5px;
+        background-color: rgba(255, 255, 255, 0.05);
+        color: var(--text-color);
+        font-size: 1rem;
+        box-sizing: border-box; /* Includes padding and border in the element's total width and height */
+    }
+
+    form input[type="file"] {
+        padding: 5px;
+    }
+
+    /* Media queries for responsive design */
+    @media (max-width: 768px) {
+        .profile-header {
             flex-direction: column;
-            align-items: center;
+            align-items: flex-start;
         }
 
-        .profile-content p {
-            font-size: 18px;
-            margin-bottom: 20px;
-            text-align: center;
+        .profile-picture {
+            width: 100px;
+            height: 100px;
+            margin-right: 0;
+            margin-bottom: 15px;
         }
 
-        .btn-primary {
-            background-color: #5161ce;
-            color: #fff;
-            border: none;
-            padding: 12px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 16px;
-            transition: background-color 0.3s;
-            text-align: center;
-            display: block;
-            width: 100%;
+        .profile-name {
+            font-size: 1.5rem;
         }
 
-        .btn-primary:hover {
-            background-color: #4156b0;
+        .profile-username {
+            font-size: 1rem;
         }
 
-        /* Night Mode Styles */
-        .night-mode .profile-container {
-            background-color: #444;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        .profile-info {
+            padding: 20px;
         }
 
-        .night-mode .profile-container h1 {
-            color: #fff;
+        .info-group {
+            margin-bottom: 15px;
         }
 
-        .night-mode .profile-content p {
-            color: #fff;
+        .info-label {
+            font-size: 0.8rem;
         }
 
-        .night-mode .btn-primary {
-            background-color: #5161ce;
-            color: #fff;
+        .info-value {
+            font-size: 1rem;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .profile-name {
+            font-size: 1.2rem;
         }
 
-        .night-mode .btn-primary:hover {
-            background-color: #4156b0;
+        .profile-username {
+            font-size: 0.9rem;
         }
-    </style>
 
-    <div class="profile-container">
-        <h1>Profile</h1>
-        <div class="profile-content">
-            <p>Welcome, <strong>{{ user.username }}</strong>!</p>
-            <a href="{% url 'logout' %}" class="btn-primary">Logout</a>
+        .info-value {
+            font-size: 0.9rem;
+        }
+    }
+</style>
+{% endblock %}
+
+
+{% block content %}
+<div class="profile-container">
+    <div class="profile-header">
+        {% if user.profile_pic %}
+    <img src="{{ user.profile_pic.url }}" alt="Profile Picture" class="profile-picture">
+{% else %}
+    <p>No profile picture available.</p>
+{% endif %}
+
+        <div>
+            <h2 class="profile-name">{{ user.get_full_name }}</h2>
+            <p class="profile-username">@{{ user.username }}</p>
         </div>
     </div>
+    <div class="profile-info">
+        <div class="info-group">
+            <p class="info-label">Email</p>
+            <p class="info-value">{{ user.email }}</p>
+        </div>
+        <div class="info-group">
+            <p class="info-label">Phone Number</p>
+            <p class="info-value">{{ user.phone_number|default:"Not provided" }}</p>
+        </div>
+        <div class="info-group">
+            <p class="info-label">Date Joined</p>
+            <p class="info-value">{{ user.date_joined|date:"F d, Y" }}</p>
+        </div>
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="btn-edit-profile">Update Profile</button>
+        </form>
+    </div>
+</div>
 {% endblock %}

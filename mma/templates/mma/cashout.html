@@ -1,0 +1,106 @@
+{% extends "mma/base.html" %}
+
+{% block title %}Cash Out{% endblock %}
+
+{% block extra_css %}
+<style>
+    .cashout-container {
+        max-width: 500px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+
+    .card {
+        background-color: var(--card-background);
+        border-radius: 15px;
+        padding: 20px;
+        margin-bottom: 20px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .balance-overview {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 15px;
+        margin-bottom: 20px;
+    }
+
+    .balance-item {
+        text-align: center;
+    }
+
+    .balance-label {
+        font-size: 0.9rem;
+        color: var(--secondary-text);
+        margin-bottom: 5px;
+    }
+
+    .balance-value {
+        font-size: 1.2rem;
+        color: var(--text-color);
+        font-weight: bold;
+    }
+
+    .total-amount {
+        font-size: 1.5rem;
+        color: var(--primary-color);
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    .btn-cashout {
+        background-color: var(--primary-color);
+        color: var(--text-color);
+        border: none;
+        border-radius: 25px;
+        padding: 10px 20px;
+        cursor: pointer;
+        font-weight: 600;
+        transition: background-color 0.3s, transform 0.3s;
+        display: block;
+        width: 100%;
+    }
+
+    .btn-cashout:hover {
+        background-color: #45a049;
+        transform: translateY(-2px);
+    }
+
+    .warning-text {
+        color: #ff6b6b;
+        text-align: center;
+        margin-top: 10px;
+        font-size: 0.9rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="cashout-container">
+    <h2 class="card-title">Cash Out</h2>
+    <div class="card">
+        <div class="balance-overview">
+            <div class="balance-item">
+                <div class="balance-label">Cash</div>
+                <div class="balance-value">K{{ balance.cash }}</div>
+            </div>
+            <div class="balance-item">
+                <div class="balance-label">Float</div>
+                <div class="balance-value">K{{ balance.float }}</div>
+            </div>
+            <div class="balance-item">
+                <div class="balance-label">Interest</div>
+                <div class="balance-value">K{{ balance.interest }}</div>
+            </div>
+        </div>
+        <div class="total-amount">
+            Total Amount: K{{ total_amount }}
+        </div>
+        <form method="post">
+            {% csrf_token %}
+            <button type="submit" class="btn-cashout">Cash Out</button>
+        </form>
+        <p class="warning-text">Warning: This action will reset all your balances to zero.</p>
+    </div>
+</div>
+{% endblock %}

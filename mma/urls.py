@@ -2,6 +2,7 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
+    path('', views.index, name='home'),
     path('dashboard/', views.dashboard, name='dashboard'),
     path('enhanced-dashboard/', views.enhanced_dashboard, name='enhanced_dashboard'),  # Added enhanced dashboard
 
@@ -27,11 +28,16 @@ urlpatterns = [
 
     # Admin URLs
     path('admin/dashboard/', views.admin_dashboard, name='admin_dashboard'),
-    path('admin/users/', views.admin_user_list, name='admin_user_list'),
-    path('admin/users/<int:user_id>/', views.admin_user_detail, name='admin_user_detail'),
-    path('admin/transactions/', views.admin_transaction_list, name='admin_transaction_list'),
-    path('admin/report/', views.admin_report, name='admin_report'),
+    path('adashboard/', views.admin_dashboard, name='a_dashboard'),
+    path('a/users/', views.admin_user_list, name='a_user_list'),
+    path('a/users/<int:user_id>/', views.admin_user_detail, name='a_user_detail'),
+    path('a/transactions/', views.admin_transaction_list, name='a_transaction_list'),
+    path('a/report/', views.admin_report, name='a_report'),
 
+    path('a/approval/', views.admin_approval, name='a_approval'),
+    path('a/approve_user/<int:user_id>/', views.approve_user, name='approve_user'),
+    path('a/approve_float_request/<int:request_id>/', views.approve_float_request, name='approve_float_request'),
+    path('a/approve_cash_request/<int:request_id>/', views.approve_cash_request, name='approve_cash_request'),
     # Notifications URLs
     path('notifications/', views.notification_list, name='notification_list'),
     path('notifications/<int:notification_id>/', views.notification_detail, name='notification_detail'),

@@ -4,6 +4,8 @@ from django.contrib.auth.decorators import login_required
 from .forms import CustomUserCreationForm
 from django.core.mail import send_mail
 from django.conf import settings
+from .forms import ProfileForm  # Assuming you have a form for updating profiles
+from .models import CustomUser
 
 def register(request):
     if request.method == 'POST':
@@ -29,4 +31,13 @@ def welcome(request):
 
 @login_required
 def profile(request):
-    return render(request, 'users/profile.html')
+    user = request.user
+    if request.method == 'POST':
+        form = ProfileForm(request.POST, request.FILES, instance=user)
+        if form.is_valid():
+            form.save()
+            return redirect('profile')  # Redirect to the profile page after successful update
+    else:
+        form = ProfileForm(instance=user)
+
+    return render(request, 'users/profile.html', {'form': form})

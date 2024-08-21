@@ -1,0 +1,40 @@
+{% extends 'mma/base.html' %}
+
+{% block title %}
+    Float Request List - SwiftMoney
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h2>Float Requests</h2>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Agent</th>
+                <th>Amount Requested</th>
+                <th>Date Requested</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for request in float_requests %}
+            <tr>
+                <td>{{ request.id }}</td>
+                <td>{{ request.agent.username }}</td>
+                <td>{{ request.amount_requested }}</td>
+                <td>{{ request.date_requested }}</td>
+                <td>{{ request.status }}</td>
+                <td>
+                    <a href="{% url 'float_request_detail' request.id %}" class="btn btn-info btn-sm">View Details</a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="6" class="text-center">No float requests found.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
