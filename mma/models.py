@@ -1,5 +1,8 @@
 from django.db import models
 from users.models import CustomUser
+from django.db import models
+from django.utils import timezone
+from decimal import Decimal
 
 class FloatRequest(models.Model):
     SERVICES = [
@@ -22,9 +25,15 @@ class CashRequest(models.Model):
     is_approved = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
 
-from django.db import models
-from django.utils import timezone
-from decimal import Decimal
+class CashoutRequest(models.Model):
+    agent = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    amount = models.DecimalField(max_digits=10, decimal_places=2)
+    is_approved = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    approved_at = models.DateTimeField(null=True, blank=True)
+
+    def __str__(self):
+        return f"Cashout Request {self.id} by {self.agent.username}"
 
 class Balance(models.Model):
     agent = models.OneToOneField(CustomUser, on_delete=models.CASCADE)

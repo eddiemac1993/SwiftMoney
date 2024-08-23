@@ -5,15 +5,15 @@
 {% block extra_css %}
 <style>
     .transaction-table {
-        width: 100%;
+        width: 100%; /* Set to 100% for full-width on smaller screens */
+        margin: 20px 0; /* Adjusted margin */
+        font-size: 0.9rem;
         border-collapse: collapse;
-        margin: 20px 0;
-        font-size: 1rem;
     }
 
     .transaction-table th,
     .transaction-table td {
-        padding: 12px 15px;
+        padding: 8px 10px;
         text-align: left;
         border-bottom: 1px solid var(--secondary-text);
     }
@@ -47,8 +47,42 @@
         padding: 20px;
         color: var(--secondary-text);
     }
+
+    /* Responsive adjustments for smaller screens */
+    @media (max-width: 768px) {
+        .transaction-table {
+            font-size: 0.8rem; /* Make the font smaller for mobile */
+        }
+
+        .transaction-table th,
+        .transaction-table td {
+            padding: 6px 8px; /* Reduce padding for smaller screens */
+        }
+
+        .transaction-table td a {
+            flex-direction: column; /* Stack icon and text vertically */
+            align-items: flex-start;
+        }
+
+        .transaction-table td i {
+            margin-right: 0;
+            margin-bottom: 4px; /* Adjust spacing */
+        }
+    }
+
+    @media (max-width: 480px) {
+        .transaction-table {
+            font-size: 0.7rem; /* Even smaller font for very small screens */
+        }
+
+        .transaction-table th,
+        .transaction-table td {
+            padding: 4px 6px; /* Further reduce padding */
+        }
+    }
 </style>
 {% endblock %}
+
 
 {% block content %}
 <div class="container">
@@ -66,19 +100,25 @@
                     <th>Invoice</th>
                 </tr>
             </thead>
-            <tbody>
-                {% for transaction in transactions %}
-                <tr>
-                    <td>{{ transaction.id }}</td>
-                    <td>{{ transaction.transaction_type }}</td>
-                    <td>K{{ transaction.amount }}</td>
-                    <td>{{ transaction.created_at|date:"Y-m-d" }}</td>
-                    <td><a href="{% url 'transaction_detail' transaction.id %}">View Details</a></td>
-                    <td><a href="{% url 'download_receipt' transaction_id=transaction.id %}"><i class="fas fa-receipt"></i> Receipt</a></td>
-                    <td><a href="{% url 'download_invoice' transaction_id=transaction.id %}"><i class="fas fa-file-invoice"></i> Invoice</a></td>
-                </tr>
-                {% endfor %}
-            </tbody>
+<tbody>
+    {% for transaction in transactions %}
+    <tr>
+        <td>{{ transaction.id }}</td>
+        <td>{{ transaction.transaction_type }}</td>
+        <td>K{{ transaction.amount }}</td>
+        <td>{{ transaction.created_at|date:"Y-m-d" }}</td>
+        <td><a href="{% url 'transaction_detail' transaction.id %}">View Details</a></td>
+        {% if request.user.is_staff %}
+            <td><a href="{% url 'download_receipt' transaction_id=transaction.id %}"><i class="fas fa-receipt"></i> Receipt</a></td>
+            <td><a href="{% url 'download_invoice' transaction_id=transaction.id %}"><i class="fas fa-file-invoice"></i> Invoice</a></td>
+        {% else %}
+            <td>N/A</td>
+            <td>N/A</td>
+        {% endif %}
+    </tr>
+    {% endfor %}
+</tbody>
+
         </table>
     {% else %}
         <p class="no-transactions">No transactions found.</p>

@@ -1,0 +1,32 @@
+{% extends "mma/base.html" %}
+
+{% block content %}
+<h2>Pending Cashout Requests</h2>
+{% if pending_requests %}
+    <table>
+        <tr>
+            <th>Agent</th>
+            <th>Amount</th>
+            <th>Requested At</th>
+            <th>Action</th>
+        </tr>
+        {% for request in pending_requests %}
+        <tr>
+            <td>{{ request.agent.username }}</td>
+            <td>{{ request.amount }}</td>
+            <td>{{ request.created_at }}</td>
+            <td>
+                <form method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="cashout_id" value="{{ request.id }}">
+                    <button type="submit" name="action" value="approve">Approve</button>
+                    <button type="submit" name="action" value="reject">Reject</button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+{% else %}
+    <p>No pending cashout requests.</p>
+{% endif %}
+{% endblock %}

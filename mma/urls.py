@@ -12,6 +12,7 @@ urlpatterns = [
     path('update-balance/', views.update_balance, name='update_balance'),
 
     path('admin-approval/', views.admin_approval, name='admin_approval'),
+    path('admin-approve-cashout/', views.approve_cashout, name='approve_cashout'),
     path('approve-user/<int:user_id>/', views.approve_user, name='approve_user'),
     path('approve-float-request/<int:request_id>/', views.approve_float_request, name='approve_float_request'),
     path('approve-cash-request/<int:request_id>/', views.approve_cash_request, name='approve_cash_request'),

@@ -17,6 +17,61 @@ from django.contrib.auth import logout
 from django.contrib import messages
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+from django.shortcuts import render, redirect
+from django.contrib.admin.views.decorators import staff_member_required
+from django.utils import timezone
+from .models import CashoutRequest, Balance, Transaction
+
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.admin.views.decorators import staff_member_required
+from django.utils import timezone
+from django.contrib import messages
+from .models import CashoutRequest, Balance, Transaction
+
+from django.contrib.admin.views.decorators import staff_member_required
+from django.shortcuts import render, redirect, get_object_or_404
+from django.utils import timezone
+from .models import CashoutRequest, Balance, Transaction
+
+@staff_member_required
+def approve_cashout(request):
+    if request.method == 'POST':
+        cashout_id = request.POST.get('cashout_id')
+        action = request.POST.get('action')
+
+        cashout_request = get_object_or_404(CashoutRequest, id=cashout_id)
+
+        if action == 'approve':
+            cashout_request.is_approved = True
+            cashout_request.approved_at = timezone.now()
+            cashout_request.save()
+
+            # Update agent's balance
+            balance = Balance.objects.get(agent=cashout_request.agent)
+
+            # Create a transaction for the approved cashout
+            Transaction.objects.create(
+                agent=cashout_request.agent,
+                amount=cashout_request.amount,
+                transaction_type='cashout'
+            )
+
+            # Update the balance
+            balance.cash = 0
+            balance.float = 0
+            balance.last_cashout = timezone.now().date()
+            balance.save()
+
+            messages.success(request, f"Cashout request {cashout_id} approved successfully.")
+
+        elif action == 'reject':
+            cashout_request.delete()
+            messages.success(request, f"Cashout request {cashout_id} rejected and deleted.")
+
+        return redirect('approve_cashout')
+
+    pending_requests = CashoutRequest.objects.filter(is_approved=False).order_by('created_at')
+    return render(request, 'mma/approve_cashout.html', {'pending_requests': pending_requests})
 
 def custom_logout(request):
     logout(request)
@@ -27,6 +82,12 @@ def custom_logout(request):
 def create_balance(sender, instance, created, **kwargs):
     if created:
         Balance.objects.create(agent=instance)
+
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import render, redirect
+from django.contrib import messages
+from .models import Balance, CashoutRequest
+from decimal import Decimal
 
 @login_required
 def cashout(request):
@@ -45,18 +106,13 @@ def cashout(request):
     total_amount = total_requested + interest
 
     if request.method == 'POST':
-        # Create a transaction for cashout
-        Transaction.objects.create(
+        # Create a cashout request
+        CashoutRequest.objects.create(
             agent=request.user,
-            amount=total_amount,
-            transaction_type='cashout'
+            amount=total_amount
         )
 
-        # Set cash, float, and interest to zero after cashout
-        balance.cash = 0
-        balance.float = 0
-        balance.interest = 0
-        balance.save()
+        messages.success(request, f"Cashout request for {total_amount} has been submitted for approval.")
 
         return redirect('dashboard')
 
