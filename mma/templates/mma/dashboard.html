@@ -147,23 +147,32 @@
 {% block content %}
 <div class="dashboard-container">
     <div class="left-column">
-        <div class="card">
-            <h2>Your Balance</h2>
-            <div class="balance-section">
-                <div class="balance-item">
-                    <div class="balance-label">Cash</div>
-                    <div class="balance-amount">K{{ balance.cash }}</div>
-                </div>
-                <div class="balance-item">
-                    <div class="balance-label">Float</div>
-                    <div class="balance-amount">K{{ balance.float }}</div>
-                </div>
-                <div class="balance-item">
-                    <div class="balance-label">Interest</div>
-                    <div class="balance-amount">K{{ balance.interest }}</div>
-                </div>
-            </div>
+<div class="card">
+    <h2>Your Balance</h2>
+    <div class="balance-section">
+        <div class="balance-item">
+            <div class="balance-label">Cash</div>
+            <div class="balance-amount">K{{ balance.cash|floatformat:2 }}</div>
         </div>
+        <div class="balance-item">
+            <div class="balance-label">Float</div>
+            <div class="balance-amount">K{{ balance.float|floatformat:2 }}</div>
+        </div>
+        <div class="balance-item">
+            <div class="balance-label">Cash Interest</div>
+            <div class="balance-amount">K{{ cash_interest|floatformat:2 }}</div>
+        </div>
+        <div class="balance-item">
+            <div class="balance-label">Float Interest</div>
+            <div class="balance-amount">K{{ float_interest|floatformat:2 }}</div>
+        </div>
+        <div class="balance-item">
+            <div class="balance-label">Total Interest</div>
+            <div class="balance-amount">K{{ total_interest|floatformat:2 }}</div>
+        </div>
+    </div>
+</div>
+
 
         <div class="card">
             <h2>Make a Request</h2>
@@ -173,7 +182,11 @@
             </div>
         </div>
     </div>
-
+{% if last_cashout %}
+  <p>Last Cashout: {{ last_cashout|date:"Y-m-d" }}</p>
+{% else %}
+  <p>No Cashout Yet</p>
+{% endif %}
     <div class="right-column">
         <div class="card">
             <h2>Your Float Requests</h2>

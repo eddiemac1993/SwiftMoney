@@ -255,23 +255,31 @@
     {% block extra_css %}{% endblock %}
 </head>
 <body>
-    <header>
-        <a href="{% url 'home' %}" class="logo">swiftMoney</a>
-        <nav class="top-nav">
-            {% if user.is_authenticated %}
-                {% if user.username == 'mobilemoney' %}
-                    <a href="{% url 'a_dashboard' %}" class="top-nav-item {% if request.resolver_match.url_name == 'a_dashboard' %}active-page{% endif %}">Admin</a>
-                {% endif %}
-            {% else %}
-                <a href="{% url 'login' %}" class="top-nav-item {% if request.resolver_match.url_name == 'login' %}active-page{% endif %}">Login</a>
-                <a href="{% url 'register' %}" class="top-nav-item {% if request.resolver_match.url_name == 'register' %}active-page{% endif %}">Register</a>
+<header>
+    <a href="{% url 'home' %}" class="logo">swiftMoney</a>
+    <nav class="top-nav">
+        {% if user.is_authenticated %}
+            {% if user.username == 'mobilemoney' %}
+                <a href="{% url 'a_dashboard' %}" class="top-nav-item {% if request.resolver_match.url_name == 'a_dashboard' %}active-page{% endif %}">Admin</a>
             {% endif %}
             <a href="{% url 'cashout' %}" class="icon-btn {% if request.resolver_match.url_name == 'cashout' %}active-page{% endif %}" title="Cash Out">
                 <span class="icon"><i class="fas fa-hand-holding-usd"></i></span>
-                <span class="icon-text">Cash Out</span>
             </a>
-        </nav>
-    </header>
+            <a href="{% url 'custom_logout' %}" class="icon-btn" title="Logout">
+                <span class="icon"><i class="fas fa-sign-out-alt"></i></span>
+            </a>
+        {% else %}
+            <a href="{% url 'login' %}" class="icon-btn {% if request.resolver_match.url_name == 'login' %}active-page{% endif %}" title="Login">
+                <span class="icon"><i class="fas fa-sign-in-alt"></i></span>
+            </a>
+            <a href="{% url 'register' %}" class="icon-btn {% if request.resolver_match.url_name == 'register' %}active-page{% endif %}" title="Register">
+                <span class="icon"><i class="fas fa-user-plus"></i></span>
+            </a>
+        {% endif %}
+    </nav>
+</header>
+
+
 
     <div class="container">
         {% if user.is_authenticated %}

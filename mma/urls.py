@@ -3,6 +3,7 @@ from . import views
 
 urlpatterns = [
     path('', views.index, name='home'),
+    path('logout/', views.custom_logout, name='custom_logout'),
     path('dashboard/', views.dashboard, name='dashboard'),
     path('enhanced-dashboard/', views.enhanced_dashboard, name='enhanced_dashboard'),  # Added enhanced dashboard
 

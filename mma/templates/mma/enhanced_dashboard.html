@@ -79,6 +79,11 @@
 {% endblock %}
 
 {% block content %}
+{% if last_cashout %}
+  <p>Last Cashout: {{ last_cashout|date:"Y-m-d" }}</p>
+{% else %}
+  <p>No Cashout Yet</p>
+{% endif %}
 <div class="dashboard-container">
     <div class="card">
         <h2 class="card-title">Balance Overview</h2>

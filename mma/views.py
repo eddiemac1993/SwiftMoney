@@ -11,6 +11,61 @@ from .forms import ReportForm
 from django.template.loader import render_to_string
 from weasyprint import HTML
 from django.http import HttpResponse
+from django.core.exceptions import ObjectDoesNotExist
+from django.shortcuts import redirect
+from django.contrib.auth import logout
+from django.contrib import messages
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+
+def custom_logout(request):
+    logout(request)
+    messages.success(request, "You have been logged out successfully.")
+    return redirect('home')  # Redirect to the homepage or any other page
+
+@receiver(post_save, sender=CustomUser)
+def create_balance(sender, instance, created, **kwargs):
+    if created:
+        Balance.objects.create(agent=instance)
+
+@login_required
+def cashout(request):
+    # Get the user's balance or create it if it doesn't exist
+    balance, created = Balance.objects.get_or_create(agent=request.user)
+
+    # Calculate the total amount (cash + float)
+    requested_cash = balance.cash
+    requested_float = balance.float
+    total_requested = requested_cash + requested_float
+
+    # Calculate 20% interest on the total requested amount
+    interest = total_requested * Decimal('0.20')
+
+    # Calculate the total cashout amount (requested + interest)
+    total_amount = total_requested + interest
+
+    if request.method == 'POST':
+        # Create a transaction for cashout
+        Transaction.objects.create(
+            agent=request.user,
+            amount=total_amount,
+            transaction_type='cashout'
+        )
+
+        # Set cash, float, and interest to zero after cashout
+        balance.cash = 0
+        balance.float = 0
+        balance.interest = 0
+        balance.save()
+
+        return redirect('dashboard')
+
+    context = {
+        'balance': balance,
+        'total_amount': total_amount,
+        'interest': interest,  # Pass the calculated interest to the template
+    }
+    return render(request, 'mma/cashout.html', context)
 
 @login_required
 def download_receipt(request, transaction_id):
@@ -111,11 +166,28 @@ def notification_detail(request, notification_id):
 
 @login_required
 def dashboard(request):
+    agent = request.user
+    balance = Balance.objects.get(agent=agent)
+
+    # Assuming you want to calculate interest on both cash and float
+    total_requested_cash = balance.cash
+    total_requested_float = balance.float
+
+    # Calculate interest for both cash and float
+    cash_interest = calculate_interest(total_requested_cash)
+    float_interest = calculate_interest(total_requested_float)
+
+    # Combine the interests if needed or display separately
+    total_interest = cash_interest + float_interest
+
     context = {
-        'balance': Balance.objects.get(agent=request.user),
-        'float_requests': FloatRequest.objects.filter(agent=request.user).order_by('-created_at')[:5],
-        'cash_requests': CashRequest.objects.filter(agent=request.user).order_by('-created_at')[:5],
-        'recent_transactions': Transaction.objects.filter(agent=request.user).order_by('-created_at')[:10],
+        'balance': balance,
+        'float_requests': FloatRequest.objects.filter(agent=agent).order_by('-created_at')[:5],
+        'cash_requests': CashRequest.objects.filter(agent=agent).order_by('-created_at')[:5],
+        'recent_transactions': Transaction.objects.filter(agent=agent).order_by('-created_at')[:10],
+        'cash_interest': cash_interest,
+        'float_interest': float_interest,
+        'total_interest': total_interest,
     }
     return render(request, 'mma/dashboard.html', context)
 
@@ -123,6 +195,9 @@ def dashboard(request):
 def enhanced_dashboard(request):
     agent = request.user
     balance = Balance.objects.get(agent=agent)
+
+    # Get the last cashout date
+    last_cashout = balance.last_cashout
 
     # Get today's transactions
     today = timezone.now().date()
@@ -147,6 +222,7 @@ def enhanced_dashboard(request):
         },
         'float_requests': FloatRequest.objects.filter(agent=agent, is_approved=False),
         'cash_requests': CashRequest.objects.filter(agent=agent, is_approved=False),
+        'last_cashout': last_cashout,
     }
 
     return render(request, 'mma/enhanced_dashboard.html', context)
@@ -234,7 +310,7 @@ def approve_float_request(request, request_id):
 
     balance, created = Balance.objects.get_or_create(agent=float_request.agent)
     balance.float += float_request.amount
-    balance.save()
+    balance.calculate_interest()
 
     Transaction.objects.create(
         agent=float_request.agent,
@@ -252,7 +328,7 @@ def approve_cash_request(request, request_id):
 
     balance, created = Balance.objects.get_or_create(agent=cash_request.agent)
     balance.cash += cash_request.amount
-    balance.save()
+    balance.calculate_interest()
 
     Transaction.objects.create(
         agent=cash_request.agent,
@@ -262,53 +338,9 @@ def approve_cash_request(request, request_id):
 
     return redirect('admin_approval')
 
-def calculate_interest():
-    yesterday = timezone.now().date() - timedelta(days=1)
-    balances = Balance.objects.all()
-
-    for balance in balances:
-        agent_amount = balance.cash + balance.float
-        requested_amount = FloatRequest.objects.filter(agent=balance.agent, is_approved=True, created_at__date=yesterday).aggregate(Sum('amount'))['amount__sum'] or 0
-        requested_amount += CashRequest.objects.filter(agent=balance.agent, is_approved=True, created_at__date=yesterday).aggregate(Sum('amount'))['amount__sum'] or 0
-
-        agent_interest = agent_amount * Decimal('0.03')
-        requested_interest = requested_amount * Decimal('0.15')
-        total_interest = agent_interest + requested_interest
-
-        balance.interest += total_interest
-        balance.save()
-
-        Transaction.objects.create(
-            agent=balance.agent,
-            amount=total_interest,
-            transaction_type='interest_added'
-        )
-
-    print(f"Interest calculated for {timezone.now().date()}")
-
-
-@login_required
-def cashout(request):
-    balance = Balance.objects.get(agent=request.user)
-    total_amount = balance.cash + balance.float + balance.interest
-
-    if request.method == 'POST':
-        Transaction.objects.create(
-            agent=request.user,
-            amount=total_amount,
-            transaction_type='cashout'
-        )
-        balance.cash = 0
-        balance.float = 0
-        balance.interest = 0
-        balance.save()
-        return redirect('dashboard')
-
-    context = {
-        'balance': balance,
-        'total_amount': total_amount,
-    }
-    return render(request, 'mma/cashout.html', context)
+def calculate_interest(total_requested):
+    # Calculate 20% interest
+    return total_requested * Decimal('0.20')
 
 def transaction_list(request):
     transactions = Transaction.objects.all()
