@@ -5,17 +5,12 @@ self.addEventListener('install', function(event) {
         '/',
         '/static/css/styles.css',
         '/static/js/main.js',
-        '/static/icons/icon-192x192.png',
-        '/static/icons/icon-512x512.png',
-      ]);
-    })
-  );
-});
-
-self.addEventListener('fetch', function(event) {
-  event.respondWith(
-    caches.match(event.request).then(function(response) {
-      return response || fetch(event.request);
+        '/static/icons/android-chrome-192x192.png',
+        '/static/icons/android-chrome-512x512.png',
+      ]).catch(function(error) {
+        console.error('Failed to cache resources:', error);
+        // Log which resources failed to cache
+      });
     })
   );
 });

@@ -1,7 +1,5 @@
 {% extends "mma/base.html" %}
-
 {% block title %}Request Cash{% endblock %}
-
 {% block extra_css %}
 <style>
     .form-container {
@@ -9,17 +7,14 @@
         margin: 0 auto;
         padding: 20px;
     }
-
     .form-group {
         margin-bottom: 20px;
     }
-
     label {
         display: block;
         margin-bottom: 5px;
         color: var(--secondary-text);
     }
-
     input[type="number"] {
         width: 100%;
         padding: 10px;
@@ -28,7 +23,6 @@
         background-color: var(--card-background);
         color: var(--text-color);
     }
-
     .btn-submit {
         background-color: var(--primary-color);
         color: var(--text-color);
@@ -41,20 +35,23 @@
         display: block;
         width: 100%;
     }
-
     .btn-submit:hover {
         background-color: #45a049;
         transform: translateY(-2px);
     }
-
     .error-message {
         color: #ff6b6b;
         font-size: 0.9em;
         margin-top: 5px;
     }
+    .info-message {
+        color: var(--secondary-text);
+        font-size: 0.9em;
+        margin-top: 10px;
+        margin-bottom: 15px;
+    }
 </style>
 {% endblock %}
-
 {% block content %}
 <div class="form-container">
     <a href="{% url 'cash_request_list' %}" class="icon-btn {% if request.resolver_match.url_name == 'cash_request_list' %}active-page{% endif %}" title="Cash Requests">
@@ -62,11 +59,17 @@
             <span class="icon-text">Cash Requests</span>
         </a>
     <h2 class="card-title">Request Cash</h2>
+    <div class="info-message">
+        <p>Current request limit: K{{ request_limit }}</p>
+        <p>Remaining limit: K{{ remaining_limit }}</p>
+    </div>
     <form method="post">
         {% csrf_token %}
         <div class="form-group">
             <label for="{{ form.amount.id_for_label }}">Amount</label>
-            {{ form.amount }}
+            <input type="number" name="{{ form.amount.name }}" id="{{ form.amount.id_for_label }}"
+                   min="1" max="{{ remaining_limit }}" step="0.01" required
+                   placeholder="Enter amount (K1 - K{{ remaining_limit }})">
             {% if form.amount.errors %}
                 <p class="error-message">{{ form.amount.errors.0 }}</p>
             {% endif %}

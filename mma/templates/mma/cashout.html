@@ -90,11 +90,11 @@
             </div>
             <div class="balance-item">
                 <div class="balance-label"> + Interest</div>
-                <div class="balance-value">K{{ total_amount }}</div>
+                <div class="balance-value">K{{ total_amount|floatformat:2 }}</div>
             </div>
         </div>
         <div class="total-amount">
-            Total Amount: K{{ total_amount }}
+            Total Amount: K{{ total_amount|floatformat:2 }}
         </div>
         <form method="post">
             {% csrf_token %}

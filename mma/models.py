@@ -37,10 +37,15 @@ class CashoutRequest(models.Model):
 
 class Balance(models.Model):
     agent = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
+    request_limit = models.DecimalField(max_digits=10, decimal_places=2, default=500)
     cash = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     last_cashout = models.DateField(null=True, blank=True)
     float = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     interest = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+
+    def update_request_limit(self):
+        self.request_limit = self.request_limit * Decimal('1.5')
+        self.save()
 
     def update_balance(self, transaction):
         if transaction.transaction_type == 'float_request':

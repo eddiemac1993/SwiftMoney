@@ -60,6 +60,7 @@ def approve_cashout(request):
             balance.cash = 0
             balance.float = 0
             balance.last_cashout = timezone.now().date()
+            balance.update_request_limit()  # Update the request limit
             balance.save()
 
             messages.success(request, f"Cashout request {cashout_id} approved successfully.")
@@ -285,29 +286,74 @@ def enhanced_dashboard(request):
 
 @login_required
 def request_float(request):
+    balance, created = Balance.objects.get_or_create(agent=request.user)
+
     if request.method == 'POST':
         form = FloatRequestForm(request.POST)
         if form.is_valid():
-            float_request = form.save(commit=False)
-            float_request.agent = request.user
-            float_request.save()
-            return redirect('dashboard')
+            amount = form.cleaned_data['amount']
+
+            # Check if the amount is within the allowed range
+            if Decimal('1') <= amount <= balance.request_limit:
+                float_request = form.save(commit=False)
+                float_request.agent = request.user
+                float_request.save()
+
+                messages.success(request, f"Float request for {amount} has been submitted.")
+                return redirect('dashboard')
+            else:
+                messages.error(request, f"Amount must be between 1 and {balance.request_limit}.")
     else:
         form = FloatRequestForm()
-    return render(request, 'mma/request_float.html', {'form': form})
+
+    # Calculate remaining limit for cash requests
+    total_float_requests = FloatRequest.objects.filter(agent=request.user, is_approved=False).aggregate(Sum('amount'))['amount__sum'] or 0
+    remaining_limit = balance.request_limit - total_float_requests
+
+    context = {
+        'form': form,
+        'request_limit': balance.request_limit,
+        'remaining_limit': remaining_limit,
+    }
+    return render(request, 'mma/request_float.html', context)
 
 @login_required
 def request_cash(request):
+    balance, created = Balance.objects.get_or_create(agent=request.user)
+
     if request.method == 'POST':
         form = CashRequestForm(request.POST)
         if form.is_valid():
-            cash_request = form.save(commit=False)
-            cash_request.agent = request.user
-            cash_request.save()
-            return redirect('dashboard')
+            amount = form.cleaned_data['amount']
+
+            # Calculate remaining limit
+            total_requests = FloatRequest.objects.filter(agent=request.user, is_approved=False).aggregate(Sum('amount'))['amount__sum'] or 0
+            total_requests += CashRequest.objects.filter(agent=request.user, is_approved=False).aggregate(Sum('amount'))['amount__sum'] or 0
+            remaining_limit = balance.request_limit - total_requests
+
+            if Decimal('1') <= amount <= remaining_limit:
+                cash_request = form.save(commit=False)
+                cash_request.agent = request.user
+                cash_request.save()
+
+                messages.success(request, f"Cash request for {amount} has been submitted.")
+                return redirect('dashboard')
+            else:
+                messages.error(request, f"Amount must be between 1 and {remaining_limit}.")
     else:
         form = CashRequestForm()
-    return render(request, 'mma/request_cash.html', {'form': form})
+
+    # Calculate remaining limit for cash requests
+    total_requests = FloatRequest.objects.filter(agent=request.user, is_approved=False).aggregate(Sum('amount'))['amount__sum'] or 0
+    total_requests += CashRequest.objects.filter(agent=request.user, is_approved=False).aggregate(Sum('amount'))['amount__sum'] or 0
+    remaining_limit = balance.request_limit - total_requests
+
+    context = {
+        'form': form,
+        'request_limit': balance.request_limit,
+        'remaining_limit': remaining_limit,
+    }
+    return render(request, 'mma/request_cash.html', context)
 
 @login_required
 def update_balance(request):
