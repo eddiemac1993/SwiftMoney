@@ -44,9 +44,6 @@ urlpatterns = [
     path('a/approve_user/<int:user_id>/', views.approve_user, name='approve_user'),
     path('a/approve_float_request/<int:request_id>/', views.approve_float_request, name='approve_float_request'),
     path('a/approve_cash_request/<int:request_id>/', views.approve_cash_request, name='approve_cash_request'),
-    # Notifications URLs
-    path('notifications/', views.notification_list, name='notification_list'),
-    path('notifications/<int:notification_id>/', views.notification_detail, name='notification_detail'),
 
     # Error Pages (handled automatically by Django, add custom templates in your templates folder)
     # path('404/', views.custom_404_view, name='custom_404'),  # Custom 404 view (optional)

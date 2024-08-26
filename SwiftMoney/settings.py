@@ -137,7 +137,7 @@ MEDIA_ROOT = BASE_DIR / 'media'
 # If you have static files that are part of your app (like css, js, images)
 # and want to include them, you can add this:
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'static'),
+    os.path.join(BASE_DIR, 'mma/static'),
 ]
 
 # Default primary key field type

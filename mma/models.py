@@ -1,8 +1,15 @@
 from django.db import models
 from users.models import CustomUser
-from django.db import models
 from django.utils import timezone
 from decimal import Decimal
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+from django.contrib.auth import get_user_model
+
+@receiver(post_save, sender=get_user_model())
+def create_user_balance(sender, instance, created, **kwargs):
+    if created:
+        Balance.objects.create(agent=instance)
 
 class FloatRequest(models.Model):
     SERVICES = [

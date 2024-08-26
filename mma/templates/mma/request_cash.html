@@ -70,7 +70,7 @@
             <label for="{{ form.amount.id_for_label }}">Amount</label>
             <input type="number" name="{{ form.amount.name }}" id="{{ form.amount.id_for_label }}"
                    min="1" max="{{ remaining_limit }}" step="0.01" required
-                   placeholder="Enter amount (K1 - K{{ remaining_limit }})">
+                   placeholder="Enter amount (K100 - K{{ remaining_limit }})">
             {% if form.amount.errors %}
                 <p class="error-message">{{ form.amount.errors.0 }}</p>
             {% endif %}

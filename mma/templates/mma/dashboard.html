@@ -146,7 +146,8 @@
 {% block content %}
 <div class="dashboard-container">
     <div class="left-column">
-                <div class="card">
+
+        <div class="card">
             <h2>Latest Cashout</h2>
             <div class="stat-grid">
                 <div class="stat-item">
@@ -159,21 +160,43 @@
                         {% endif %}
                     </div>
                 </div>
+                <div class="stat-item">
+                    <div class="stat-label">Amount</div>
+                    <div class="stat-value">
+                        {% if latest_cashout %}
+                            K{{ latest_cashout.amount|floatformat:2 }}
+                        {% else %}
+                            N/A
+                        {% endif %}
+                    </div>
+                </div>
             </div>
         </div>
+
         <div class="card">
-            <h3>Approved Cash Requests</h3>
-            {% for cash_request in approved_cash_requests %}
-                <div class="cash-request">
-                    
-                    {% if cash_request.expiration_date %}
-                        <p>Days until expiration: {{ cash_request.days_until_expiration }}</p>
-                    {% endif %}
-                </div>
-            {% empty %}
-                <p>No approved cash requests.</p>
-            {% endfor %}
+            <h2>Next Available Request Amount</h2>
+            <div class="balance-amount">K{{ balance.request_limit|floatformat:2 }}</div>
         </div>
+
+<div class="card">
+    <h3>Current Cash Request</h3>
+    {% if current_cash_request %}
+        <div class="cash-request">
+            <p>Amount: K{{ current_cash_request.amount|floatformat:2 }}</p>
+            {% if current_cash_request.is_approved %}
+                {% if days_until_expiration is not None %}
+                    <p>Days until expiration: {{ days_until_expiration }}</p>
+                {% else %}
+                    <p>Expiration date not set</p>
+                {% endif %}
+            {% else %}
+                <p>Status: Pending approval</p>
+            {% endif %}
+        </div>
+    {% else %}
+        <p>No current cash request.</p>
+    {% endif %}
+</div>
 
         <div class="card">
             <h2>Your Balance</h2>
@@ -182,21 +205,13 @@
                     <div class="balance-label">Cash</div>
                     <div class="balance-amount">K{{ balance.cash|floatformat:2 }}</div>
                 </div>
-                <!--<div class="balance-item">
-                    <div class="balance-label">Float</div>
-                    <div class="balance-amount">K{{ balance.float|floatformat:2 }}</div>
-                </div>-->
                 <div class="balance-item">
                     <div class="balance-label">Cash Interest</div>
                     <div class="balance-amount">K{{ cash_interest|floatformat:2 }}</div>
                 </div>
-                <!--<div class="balance-item">
-                    <div class="balance-label">Float Interest</div>
-                    <div class="balance-amount">K{{ float_interest|floatformat:2 }}</div>
-                </div>-->
                 <div class="balance-item">
-                    <div class="balance-label">Total Amounts</div>
-                    <div class="balance-amount">K{{ total_interest|floatformat:2 }} + K{{ balance.cash|floatformat:2 }}</div>
+                    <div class="balance-label">Total Amount</div>
+                    <div class="balance-amount">K{{ total_amount|floatformat:2 }}</div>
                 </div>
             </div>
         </div>
@@ -204,7 +219,6 @@
         <div class="card">
             <h2>Make a Request</h2>
             <div class="btn-container">
-                <!--<a href="{% url 'request_float' %}" class="btn">Request Float</a>-->
                 <a href="{% url 'request_cash' %}" class="btn btn-secondary">Request Cash</a>
             </div>
         </div>
@@ -269,8 +283,6 @@
                     </tbody>
                 </table>
             </div>
-            <!-- Link to view all transactions -->
-            <a href="{% url 'transaction_list' %}" class="btn">View All Transactions</a>
         </div>
     </div>
 </div>
