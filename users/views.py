@@ -21,7 +21,7 @@ def register(request):
                 [settings.ADMIN_EMAIL],
                 fail_silently=False,
             )
-            return redirect('welcome')
+            return redirect('login')
     else:
         form = CustomUserCreationForm()
     return render(request, 'users/register.html', {'form': form})

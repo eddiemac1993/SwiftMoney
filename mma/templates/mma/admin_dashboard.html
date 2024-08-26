@@ -3,33 +3,27 @@
 {% block title %}Admin Dashboard{% endblock %}
 
 {% block content %}
-    <div class="container">
-        <h1 class="page-title">Admin Dashboard</h1>
+    <h1 class="page-title">Admin Dashboard</h1>
+    <div class="card-container">
+        <div class="card">
+            <h2 class="card-title"><i class="fas fa-users"></i> Total Users</h2>
+            <p class="card-content">{{ total_users }}</p>
+        </div>
+        <div class="card">
+            <h2 class="card-title"><i class="fas fa-exchange-alt"></i> Total Transactions</h2>
+            <p class="card-content">{{ total_transactions }}</p>
+        </div>
+        <div class="card">
+            <h2 class="card-title"><i class="fas fa-money-bill-wave"></i> Pending Cash Requests</h2>
+            <p class="card-content pending">{{ pending_cash_requests }}</p>
+        </div>
+    </div>
 
-        <div class="card-container">
-            <div class="card">
-                <h2 class="card-title">Total Users</h2>
-                <p class="card-content">{{ total_users }}</p>
-            </div>
-            <div class="card">
-                <h2 class="card-title">Total Transactions</h2>
-                <p class="card-content">{{ total_transactions }}</p>
-            </div>
-            <div class="card">
-                <h2 class="card-title">Pending Float Requests</h2>
-                <p class="card-content">{{ pending_float_requests }}</p>
-            </div>
-            <div class="card">
-                <h2 class="card-title">Pending Cash Requests</h2>
-                <p class="card-content">{{ pending_cash_requests }}</p>
-            </div>
-        </div>
-        <div class="button-group">
-            <a href="{% url 'approve_cashout' %}" class="btn">Cash out Approvals</a>
-            <a href="{% url 'a_approval' %}" class="btn">Manage Approvals</a>
-            <a href="{% url 'a_user_list' %}" class="btn">View Users</a>
-            <a href="{% url 'a_transaction_list' %}" class="btn">View Transactions</a>
-            <a href="{% url 'a_report' %}" class="btn">Generate Report</a>
-        </div>
+    <div class="button-group">
+        <a href="{% url 'approve_cashout' %}" class="btn">Cash Approvals</a>
+        <a href="{% url 'a_approval' %}" class="btn">Manage Approvals</a>
+        <a href="{% url 'a_user_list' %}" class="btn">View Users</a>
+        <a href="{% url 'a_transaction_list' %}" class="btn">View Transactions</a>
+        <a href="{% url 'a_report' %}" class="btn">Generate Reports</a>
     </div>
 {% endblock %}

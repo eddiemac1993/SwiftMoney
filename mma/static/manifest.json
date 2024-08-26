@@ -1,7 +1,7 @@
 {
   "name": "SWIFTMONEY",
   "short_name": "SM",
-  "description": "Your App Description",
+  "description": "Money Instantly",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",

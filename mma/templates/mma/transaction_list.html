@@ -103,7 +103,7 @@
 <tbody>
     {% for transaction in transactions %}
     <tr>
-        <td>{{ transaction.id }}</td>
+        <td>{{ transaction.agent }}</td>
         <td>{{ transaction.transaction_type }}</td>
         <td>K{{ transaction.amount }}</td>
         <td>{{ transaction.created_at|date:"Y-m-d" }}</td>

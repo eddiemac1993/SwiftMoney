@@ -4,63 +4,71 @@
 
 {% block extra_css %}
 <style>
-    .form-container {
-        max-width: 500px;
-        margin: 0 auto;
-        padding: 20px;
-    }
+.form-container {
+    max-width: 500px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: var(--card-background);
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
 
-    .form-group {
-        margin-bottom: 20px;
-    }
+.form-container h2.card-title {
+    font-size: 1.5rem;
+    color: var(--primary-color);
+    margin-bottom: 20px;
+    text-align: center;
+}
 
-    label {
-        display: block;
-        margin-bottom: 5px;
-        color: var(--secondary-text);
-    }
+.form-group {
+    margin-bottom: 15px;
+}
 
-    input[type="text"],
-    input[type="email"],
-    input[type="password"],
-    input[type="file"] {
-        width: 100%;
-        padding: 10px;
-        border: 1px solid var(--secondary-text);
-        border-radius: 5px;
-        background-color: var(--card-background);
-        color: var(--text-color);
-    }
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+    color: var(--text-color);
+}
 
-    .btn-register {
-        background-color: var(--primary-color);
-        color: var(--text-color);
-        border: none;
-        border-radius: 25px;
-        padding: 10px 20px;
-        cursor: pointer;
-        font-weight: 600;
-        transition: background-color 0.3s, transform 0.3s;
-        display: block;
-        width: 100%;
-    }
+.form-group input,
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid var(--secondary-text);
+    border-radius: 5px;
+    box-sizing: border-box; /* Ensures padding is included in width */
+}
 
-    .btn-register:hover {
-        background-color: #45a049;
-        transform: translateY(-2px);
-    }
+.form-group .help-text {
+    font-size: 0.9em;
+    color: var(--secondary-text);
+    margin-top: 5px;
+}
 
-    .error-message {
-        color: #ff6b6b;
-        font-size: 0.9em;
-        margin-top: 5px;
-    }
+.form-group .error-message {
+    font-size: 0.9em;
+    color: #D32F2F;
+    margin-top: 5px;
+}
 
-    .help-text {
-        font-size: 0.8em;
-        color: var(--secondary-text);
-        margin-top: 5px;
-    }
+.btn-register {
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 5px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    width: 100%;
+}
+
+.btn-register:hover {
+    background-color: darken(var(--primary-color), 10%);
+}
+
 </style>
 {% endblock %}
 

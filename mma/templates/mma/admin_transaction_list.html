@@ -17,10 +17,10 @@
             <tbody>
                 {% for transaction in transactions %}
                     <tr>
-                        <td>{{ transaction.id }}</td>
+                        <td>{{ transaction.agent }}</td>
                         <td>{{ transaction.amount }}</td>
-                        <td>{{ transaction.date }}</td>
-                        <td>{{ transaction.status }}</td>
+                        <td>{{ transaction.created_at|date:"Y-m-d" }}</td>
+                        <td>{{ transaction.transaction_type }}</td>
                     </tr>
                 {% endfor %}
             </tbody>

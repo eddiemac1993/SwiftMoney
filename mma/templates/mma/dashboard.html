@@ -33,12 +33,12 @@
 
     .balance-item {
         flex: 1;
-        min-width: 200px; /* Adjust minimum width as needed */
+        min-width: 200px;
         text-align: center;
         padding: 10px;
         background-color: rgba(255, 255, 255, 0.1);
         border-radius: 10px;
-        box-sizing: border-box; /* Ensure padding and border are included in width/height */
+        box-sizing: border-box;
     }
 
     .balance-label {
@@ -124,7 +124,7 @@
 
     @media (max-width: 480px) {
         .balance-item {
-            min-width: auto; /* Ensure the item can shrink more on very small screens */
+            min-width: auto;
             padding: 8px;
         }
 
@@ -143,78 +143,75 @@
 </style>
 {% endblock %}
 
-
 {% block content %}
 <div class="dashboard-container">
     <div class="left-column">
-<div class="card">
-    <h2>Your Balance</h2>
-    <div class="balance-section">
-        <div class="balance-item">
-            <div class="balance-label">Cash</div>
-            <div class="balance-amount">K{{ balance.cash|floatformat:2 }}</div>
+                <div class="card">
+            <h2>Latest Cashout</h2>
+            <div class="stat-grid">
+                <div class="stat-item">
+                    <div class="stat-label">Date</div>
+                    <div class="stat-value">
+                        {% if latest_cashout %}
+                            {{ latest_cashout.created_at|date:"Y-m-d" }}
+                        {% else %}
+                            No Cashout Yet
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
         </div>
-        <div class="balance-item">
-            <div class="balance-label">Float</div>
-            <div class="balance-amount">K{{ balance.float|floatformat:2 }}</div>
+        <div class="card">
+            <h3>Approved Cash Requests</h3>
+            {% for cash_request in approved_cash_requests %}
+                <div class="cash-request">
+                    
+                    {% if cash_request.expiration_date %}
+                        <p>Days until expiration: {{ cash_request.days_until_expiration }}</p>
+                    {% endif %}
+                </div>
+            {% empty %}
+                <p>No approved cash requests.</p>
+            {% endfor %}
         </div>
-        <div class="balance-item">
-            <div class="balance-label">Cash Interest</div>
-            <div class="balance-amount">K{{ cash_interest|floatformat:2 }}</div>
-        </div>
-        <div class="balance-item">
-            <div class="balance-label">Float Interest</div>
-            <div class="balance-amount">K{{ float_interest|floatformat:2 }}</div>
-        </div>
-        <div class="balance-item">
-            <div class="balance-label">Total Interest</div>
-            <div class="balance-amount">K{{ total_interest|floatformat:2 }}</div>
-        </div>
-    </div>
-</div>
 
+        <div class="card">
+            <h2>Your Balance</h2>
+            <div class="balance-section">
+                <div class="balance-item">
+                    <div class="balance-label">Cash</div>
+                    <div class="balance-amount">K{{ balance.cash|floatformat:2 }}</div>
+                </div>
+                <!--<div class="balance-item">
+                    <div class="balance-label">Float</div>
+                    <div class="balance-amount">K{{ balance.float|floatformat:2 }}</div>
+                </div>-->
+                <div class="balance-item">
+                    <div class="balance-label">Cash Interest</div>
+                    <div class="balance-amount">K{{ cash_interest|floatformat:2 }}</div>
+                </div>
+                <!--<div class="balance-item">
+                    <div class="balance-label">Float Interest</div>
+                    <div class="balance-amount">K{{ float_interest|floatformat:2 }}</div>
+                </div>-->
+                <div class="balance-item">
+                    <div class="balance-label">Total Amounts</div>
+                    <div class="balance-amount">K{{ total_interest|floatformat:2 }} + K{{ balance.cash|floatformat:2 }}</div>
+                </div>
+            </div>
+        </div>
 
         <div class="card">
             <h2>Make a Request</h2>
             <div class="btn-container">
-                <a href="{% url 'request_float' %}" class="btn">Request Float</a>
+                <!--<a href="{% url 'request_float' %}" class="btn">Request Float</a>-->
                 <a href="{% url 'request_cash' %}" class="btn btn-secondary">Request Cash</a>
             </div>
         </div>
     </div>
 
     <div class="right-column">
-        <div class="card">
-            <h2>Your Float Requests</h2>
-            <div class="table-responsive">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Amount</th>
-                            <th>Service</th>
-                            <th>Status</th>
-                            <th>Date</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for request in float_requests %}
-                        <tr>
-                            <td>K{{ request.amount }}</td>
-                            <td>{{ request.get_service_display }}</td>
-                            <td class="{% if request.is_approved %}status-approved{% else %}status-pending{% endif %}">
-                                {% if request.is_approved %}Approved{% else %}Pending{% endif %}
-                            </td>
-                            <td>{{ request.created_at|date:"Y-m-d" }}</td>
-                        </tr>
-                        {% empty %}
-                        <tr>
-                            <td colspan="4">No float requests yet.</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-        </div>
+
 
         <div class="card">
             <h2>Your Cash Requests</h2>
@@ -247,35 +244,34 @@
         </div>
 
         <div class="card">
-    <h2>Recent Transactions</h2>
-    <div class="table-responsive">
-        <table>
-            <thead>
-                <tr>
-                    <th>Type</th>
-                    <th>Amount</th>
-                    <th>Date</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for transaction in recent_transactions %}
-                <tr>
-                    <td>{{ transaction.transaction_type }}</td>
-                    <td>K{{ transaction.amount }}</td>
-                    <td>{{ transaction.created_at|date:"Y-m-d" }}</td>
-                </tr>
-                {% empty %}
-                <tr>
-                    <td colspan="3">No transactions yet.</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
-    <!-- Link to view all transactions -->
-    <a href="{% url 'transaction_list' %}" class="btn">View All Transactions</a>
-</div>
-
+            <h2>Recent Transactions</h2>
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Type</th>
+                            <th>Amount</th>
+                            <th>Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for transaction in recent_transactions %}
+                        <tr>
+                            <td>{{ transaction.transaction_type }}</td>
+                            <td>K{{ transaction.amount }}</td>
+                            <td>{{ transaction.created_at|date:"Y-m-d" }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="3">No transactions yet.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <!-- Link to view all transactions -->
+            <a href="{% url 'transaction_list' %}" class="btn">View All Transactions</a>
+        </div>
     </div>
 </div>
 {% endblock %}

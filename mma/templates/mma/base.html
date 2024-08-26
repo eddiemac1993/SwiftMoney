@@ -287,10 +287,10 @@
     <nav class="top-nav">
         {% if user.is_authenticated %}
             {% if user.username == 'mobilemoney' %}
-                <a href="{% url 'a_dashboard' %}" class="top-nav-item {% if request.resolver_match.url_name == 'a_dashboard' %}active-page{% endif %}">Admin</a>
+                <a href="{% url 'a_dashboard' %}" class="top-nav-item {% if request.resolver_match.url_name == 'a_dashboard' %}active-page{% endif %}"><i class="fas fa-user-shield"></i></a>
             {% endif %}
-            <a href="{% url 'cashout' %}" class="icon-btn {% if request.resolver_match.url_name == 'cashout' %}active-page{% endif %}" title="Cash Out">
-                <span class="icon"><i class="fas fa-hand-holding-usd"></i></span>
+            <a href="{% url 'profile' %}" class="icon-btn" title="Profile">
+                <span class="icon"><i class="fas fa-user"></i></span>
             </a>
             <a href="{% url 'custom_logout' %}" class="icon-btn" title="Logout">
                 <span class="icon"><i class="fas fa-sign-out-alt"></i></span>
@@ -311,13 +311,6 @@
     <div class="container">
 
         <main>
-            {% if user.is_authenticated %}
-<a href="{% url 'profile' %}" class="top-nav-item profile-btn {% if request.resolver_match.url_name == 'profile' %}active-page{% endif %}">
-    <span class="icon"><i class="fas fa-user"></i></span>
-    Hi! {{ user.username }}
-</a>
-
-        {% endif %}
             {% block content %}{% endblock %}
         </main>
     </div>
@@ -332,14 +325,15 @@
                 <span class="icon"><i class="fas fa-chart-line"></i></span>
                 <span class="icon-text">Enhanced</span>
             </a>
-            <a href="{% url 'request_float' %}" class="icon-btn {% if request.resolver_match.url_name == 'request_float' %}active-page{% endif %}" title="Request Float">
-                <span class="icon"><i class="fas fa-sync-alt"></i></span>
-                <span class="icon-text">Float</span>
-            </a>
             <a href="{% url 'request_cash' %}" class="icon-btn {% if request.resolver_match.url_name == 'request_cash' %}active-page{% endif %}" title="Request Cash">
                 <span class="icon"><i class="fas fa-money-bill-wave"></i></span>
                 <span class="icon-text">Cash</span>
             </a>
+            <a href="{% url 'cashout' %}" class="icon-btn {% if request.resolver_match.url_name == 'cashout' %}active-page{% endif %}" title="Cash Out">
+                <span class="icon"><i class="fas fa-hand-holding-usd"></i></span>
+                <span class="icon-text">CashOut</span>
+            </a>
+
         {% endif %}
     </nav>
 

@@ -66,6 +66,11 @@
         transform: translateY(-2px);
     }
 
+    .btn-cashout:disabled {
+        background-color: gray;
+        cursor: not-allowed;
+    }
+
     .warning-text {
         color: #ff6b6b;
         text-align: center;
@@ -85,10 +90,6 @@
                 <div class="balance-value">K{{ balance.cash }}</div>
             </div>
             <div class="balance-item">
-                <div class="balance-label">Float</div>
-                <div class="balance-value">K{{ balance.float }}</div>
-            </div>
-            <div class="balance-item">
                 <div class="balance-label"> + Interest</div>
                 <div class="balance-value">K{{ total_amount|floatformat:2 }}</div>
             </div>
@@ -96,9 +97,9 @@
         <div class="total-amount">
             Total Amount: K{{ total_amount|floatformat:2 }}
         </div>
-        <form method="post">
+        <form method="post" id="cashout-form">
             {% csrf_token %}
-            <button type="submit" class="btn-cashout">Cash Out</button>
+            <button type="submit" class="btn-cashout" id="cashout-button">Cash Out</button>
         </form>
         <p class="warning-text">Warning: This action will reset all your balances to zero.</p>
     </div>

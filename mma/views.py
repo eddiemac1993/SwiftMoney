@@ -12,26 +12,11 @@ from django.template.loader import render_to_string
 from weasyprint import HTML
 from django.http import HttpResponse
 from django.core.exceptions import ObjectDoesNotExist
-from django.shortcuts import redirect
 from django.contrib.auth import logout
 from django.contrib import messages
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from django.shortcuts import render, redirect
-from django.contrib.admin.views.decorators import staff_member_required
-from django.utils import timezone
-from .models import CashoutRequest, Balance, Transaction
-
-from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.admin.views.decorators import staff_member_required
-from django.utils import timezone
-from django.contrib import messages
-from .models import CashoutRequest, Balance, Transaction
-
-from django.contrib.admin.views.decorators import staff_member_required
-from django.shortcuts import render, redirect, get_object_or_404
-from django.utils import timezone
-from .models import CashoutRequest, Balance, Transaction
+from .models import CashoutRequest
 
 @staff_member_required
 def approve_cashout(request):
@@ -84,16 +69,12 @@ def create_balance(sender, instance, created, **kwargs):
     if created:
         Balance.objects.create(agent=instance)
 
-from django.contrib.auth.decorators import login_required
-from django.shortcuts import render, redirect
-from django.contrib import messages
-from .models import Balance, CashoutRequest
-from decimal import Decimal
-
 @login_required
 def cashout(request):
-    # Get the user's balance or create it if it doesn't exist
     balance, created = Balance.objects.get_or_create(agent=request.user)
+
+    # Check if the user already has a pending cashout request
+    has_pending_request = CashoutRequest.objects.filter(agent=request.user, status='pending').exists()
 
     # Calculate the total amount (cash + float)
     requested_cash = balance.cash
@@ -101,28 +82,39 @@ def cashout(request):
     total_requested = requested_cash + requested_float
 
     # Calculate 20% interest on the total requested amount
-    interest = total_requested * Decimal('0.20')
+    interest = total_requested * Decimal('0.2')
 
     # Calculate the total cashout amount (requested + interest)
     total_amount = total_requested + interest
 
     if request.method == 'POST':
-        # Create a cashout request
+        # Create a new cashout request
         CashoutRequest.objects.create(
             agent=request.user,
-            amount=total_amount
+            amount=total_amount,
+            status='pending'
+        )
+
+        # Send notification email to admin
+        send_mail(
+            'Cashout Request Submitted',
+            f"User {request.user.username} has requested a cashout of {total_amount} (including 20% interest).",
+            settings.DEFAULT_FROM_EMAIL,
+            [settings.ADMIN_EMAIL],
+            fail_silently=False,
         )
 
         messages.success(request, f"Cashout request for {total_amount} has been submitted for approval.")
-
         return redirect('dashboard')
 
     context = {
         'balance': balance,
         'total_amount': total_amount,
-        'interest': interest,  # Pass the calculated interest to the template
+        'interest': interest,
+        'has_pending_request': has_pending_request,
     }
     return render(request, 'mma/cashout.html', context)
+
 
 @login_required
 def download_receipt(request, transaction_id):
@@ -226,27 +218,32 @@ def dashboard(request):
     agent = request.user
     balance = Balance.objects.get(agent=agent)
 
-    # Assuming you want to calculate interest on both cash and float
+    # Fetch the latest cashout
+    latest_cashout = CashoutRequest.objects.filter(agent=agent).order_by('-created_at').first()
+
+    # Calculate interest on both cash and float
     total_requested_cash = balance.cash
     total_requested_float = balance.float
 
-    # Calculate interest for both cash and float
     cash_interest = calculate_interest(total_requested_cash)
     float_interest = calculate_interest(total_requested_float)
+    approved_cash_requests = CashRequest.objects.filter(agent=agent, is_approved=True)
 
-    # Combine the interests if needed or display separately
     total_interest = cash_interest + float_interest
 
     context = {
         'balance': balance,
+        'latest_cashout': latest_cashout,
         'float_requests': FloatRequest.objects.filter(agent=agent).order_by('-created_at')[:5],
         'cash_requests': CashRequest.objects.filter(agent=agent).order_by('-created_at')[:5],
         'recent_transactions': Transaction.objects.filter(agent=agent).order_by('-created_at')[:10],
         'cash_interest': cash_interest,
         'float_interest': float_interest,
         'total_interest': total_interest,
+        'approved_cash_requests': approved_cash_requests,
     }
     return render(request, 'mma/dashboard.html', context)
+
 
 @login_required
 def enhanced_dashboard(request):
@@ -259,7 +256,7 @@ def enhanced_dashboard(request):
     # Get today's transactions
     today = timezone.now().date()
     today_transactions = Transaction.objects.filter(agent=agent, created_at__date=today)
-
+    approved_cash_requests = CashRequest.objects.filter(agent=agent, is_approved=True)
     # Get this week's transactions
     week_start = today - timedelta(days=today.weekday())
     week_transactions = Transaction.objects.filter(agent=agent, created_at__date__gte=week_start)
@@ -280,6 +277,7 @@ def enhanced_dashboard(request):
         'float_requests': FloatRequest.objects.filter(agent=agent, is_approved=False),
         'cash_requests': CashRequest.objects.filter(agent=agent, is_approved=False),
         'last_cashout': last_cashout,
+        'approved_cash_requests': approved_cash_requests,
     }
 
     return render(request, 'mma/enhanced_dashboard.html', context)
@@ -317,6 +315,13 @@ def request_float(request):
     }
     return render(request, 'mma/request_float.html', context)
 
+from django.core.mail import send_mail
+from django.conf import settings
+from django.contrib.auth.decorators import login_required
+from django.db.models import Sum
+from decimal import Decimal
+from django.contrib import messages
+
 @login_required
 def request_cash(request):
     balance, created = Balance.objects.get_or_create(agent=request.user)
@@ -335,6 +340,15 @@ def request_cash(request):
                 cash_request = form.save(commit=False)
                 cash_request.agent = request.user
                 cash_request.save()
+
+                # Send notification email to admin
+                send_mail(
+                    'New Cash Request',
+                    f'User {request.user.username} has submitted a cash request for {amount}.',
+                    settings.DEFAULT_FROM_EMAIL,
+                    [settings.ADMIN_EMAIL],
+                    fail_silently=False,
+                )
 
                 messages.success(request, f"Cash request for {amount} has been submitted.")
                 return redirect('dashboard')
@@ -426,6 +440,7 @@ def approve_float_request(request, request_id):
 def approve_cash_request(request, request_id):
     cash_request = CashRequest.objects.get(id=request_id)
     cash_request.is_approved = True
+    cash_request.expiration_date = timezone.now() + timedelta(days=30)
     cash_request.save()
 
     balance, created = Balance.objects.get_or_create(agent=cash_request.agent)
