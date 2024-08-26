@@ -1,35 +1,129 @@
 {% extends "mma/base.html" %}
 
-{% block content %}
-<h2>Pending Cashout Requests</h2>
-{% if pending_requests %}
-    <table>
-        <tr>
-            <th>ID</th> <!-- Add a new header for ID -->
-            <th>Agent</th>
-            <th>Amount</th>
-            <th>Requested At</th>
-            <th>Action</th>
-        </tr>
-        {% for request in pending_requests %}
-        <tr>
-            <td>{{ request.id }}</td> <!-- Display the ID -->
-            <td>{{ request.agent.username }}</td>
-            <td>{{ request.amount }}</td>
-            <td>{{ request.created_at }}</td>
-            <td>
-                <form method="post">
-                    {% csrf_token %}
-                    <input type="hidden" name="cashout_id" value="{{ request.id }}">
-                    <button type="submit" name="action" value="approve" aria-label="Approve">Approve</button>
-<button type="submit" name="action" value="reject" aria-label="Reject">Reject</button>
+{% block extra_css %}
+<style>
+    h2 {
+        color: var(--text-color);
+        margin-bottom: 15px;
+        font-size: 1.2rem;
+    }
 
-                </form>
-            </td>
-        </tr>
-        {% endfor %}
-    </table>
-{% else %}
-    <p>No pending cashout requests.</p>
-{% endif %}
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 15px;
+        background-color: var(--card-background-light);
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    th, td {
+        padding: 8px;
+        text-align: left;
+        border-bottom: 1px solid var(--secondary-text);
+        font-size: 0.9rem;
+    }
+
+    th {
+        color: var(--secondary-text);
+        background-color: var(--primary-color-light);
+    }
+
+    tr:nth-child(even) {
+        background-color: var(--card-background-light);
+    }
+
+    tr:hover {
+        background-color: var(--primary-color-hover-light);
+    }
+
+    button {
+        padding: 6px 10px;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 0.8rem;
+        color: white;
+        background-color: var(--primary-color);
+        transition: background-color 0.3s ease;
+    }
+
+    button:hover {
+        background-color: var(--primary-color-hover);
+    }
+
+    .approve-btn {
+        background-color: #28a745; /* Green */
+    }
+
+    .approve-btn:hover {
+        background-color: #218838; /* Darker Green */
+    }
+
+    .reject-btn {
+        background-color: #dc3545; /* Red */
+    }
+
+    .reject-btn:hover {
+        background-color: #c82333; /* Darker Red */
+    }
+
+    @media (max-width: 767px) {
+        table {
+            font-size: 0.3rem;
+        }
+
+        th, td {
+            padding: 6px;
+        }
+
+        button {
+            font-size: 0.8rem;
+            padding: 5px 8px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <h2>Pending Cashout Requests</h2>
+        {% if pending_requests %}
+            <table>
+                <thead>
+                    <tr>
+                        
+                        <th>Agent</th>
+                        <th>Amount</th>
+                        <th>Requested At</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for request in pending_requests %}
+                        <tr>
+                            
+                            <td>{{ request.agent.username }}</td>
+                            <td>{{ request.amount }}</td>
+                            <td>{{ request.created_at|date:"Y-m-d H:i" }}</td>
+                            <td>
+                                <form method="post">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="cashout_id" value="{{ request.id }}">
+                                    <button type="submit" name="action" value="approve" class="approve-btn" aria-label="Approve">
+                                        <i class="fas fa-check"></i> 
+                                    </button>
+                                    <button type="submit" name="action" value="reject" class="reject-btn" aria-label="Reject">
+                                        <i class="fas fa-times"></i> 
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p>No pending cashout requests.</p>
+        {% endif %}
+    </div>
 {% endblock %}

@@ -190,6 +190,7 @@ def admin_dashboard(request):
         'total_transactions': Transaction.objects.count(),
         'pending_float_requests': FloatRequest.objects.filter(is_approved=False).count(),
         'pending_cash_requests': CashRequest.objects.filter(is_approved=False).count(),
+        'pending_cashout_requests': CashoutRequest.objects.filter(is_approved=False).count(),  # Added this line
     }
     return render(request, 'mma/admin_dashboard.html', context)
 
@@ -272,43 +273,6 @@ def dashboard(request):
         'total_amount': total_amount,
     }
     return render(request, 'mma/dashboard.html', context)
-
-@login_required
-def enhanced_dashboard(request):
-    agent = request.user
-    balance = Balance.objects.get(agent=agent)
-
-    # Get the last cashout date
-    last_cashout = balance.last_cashout
-
-    # Get today's transactions
-    today = timezone.now().date()
-    today_transactions = Transaction.objects.filter(agent=agent, created_at__date=today)
-    approved_cash_requests = CashRequest.objects.filter(agent=agent, is_approved=True)
-    # Get this week's transactions
-    week_start = today - timedelta(days=today.weekday())
-    week_transactions = Transaction.objects.filter(agent=agent, created_at__date__gte=week_start)
-
-    # Calculate some metrics
-    total_transactions = today_transactions.count()
-    total_volume = today_transactions.aggregate(Sum('amount'))['amount__sum'] or 0
-
-    context = {
-        'balance': balance,
-        'total_transactions': total_transactions,
-        'total_volume': total_volume,
-        'recent_transactions': today_transactions.order_by('-created_at')[:5],
-        'week_stats': {
-            'transaction_count': week_transactions.count(),
-            'transaction_volume': week_transactions.aggregate(Sum('amount'))['amount__sum'] or 0,
-        },
-        'float_requests': FloatRequest.objects.filter(agent=agent, is_approved=False),
-        'cash_requests': CashRequest.objects.filter(agent=agent, is_approved=False),
-        'last_cashout': last_cashout,
-        'approved_cash_requests': approved_cash_requests,
-    }
-
-    return render(request, 'mma/enhanced_dashboard.html', context)
 
 @login_required
 def request_float(request):

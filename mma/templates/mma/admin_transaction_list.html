@@ -2,13 +2,83 @@
 
 {% block title %}Transaction List{% endblock %}
 
+{% block extra_css %}
+<style>
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.9rem;
+        background-color: var(--card-background);
+        border-radius: 10px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    th, td {
+        padding: 12px;
+        text-align: left;
+        border-bottom: 1px solid var(--secondary-text);
+    }
+
+    th {
+        color: var(--secondary-text);
+        font-weight: normal;
+        background-color: var(--primary-color-light);
+    }
+
+    tr:nth-child(even) {
+        background-color: var(--card-background-light);
+    }
+
+    tr:hover {
+        background-color: var(--primary-color-hover-light);
+    }
+
+    .btn {
+        padding: 10px 20px;
+        border: none;
+        background-color: var(--primary-color);
+        color: white;
+        border-radius: 8px;
+        cursor: pointer;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        margin-top: 20px;
+    }
+
+    .btn:hover {
+        background-color: var(--primary-color-hover);
+    }
+
+    .btn .icon {
+        margin-right: 8px;
+    }
+
+    @media (max-width: 767px) {
+        table {
+            font-size: 0.8rem;
+        }
+
+        th, td {
+            padding: 10px;
+        }
+
+        .btn {
+            font-size: 0.9rem;
+            padding: 8px 16px;
+        }
+    }
+</style>
+{% endblock %}
+
 {% block content %}
     <div class="container">
         <h1>Transaction List</h1>
         <table>
             <thead>
                 <tr>
-                    <th>Transaction ID</th>
+                    <th>ID</th>
                     <th>Amount</th>
                     <th>Date</th>
                     <th>Status</th>
@@ -17,14 +87,20 @@
             <tbody>
                 {% for transaction in transactions %}
                     <tr>
-                        <td>{{ transaction.agent }}</td>
-                        <td>{{ transaction.amount }}</td>
+                        <td>{{ transaction.id }}.</td>
+                        <td>K{{ transaction.amount|floatformat:2 }}</td>
                         <td>{{ transaction.created_at|date:"Y-m-d" }}</td>
                         <td>{{ transaction.transaction_type }}</td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="4">No transactions available.</td>
                     </tr>
                 {% endfor %}
             </tbody>
         </table>
-        <a href="{% url 'a_dashboard' %}" class="btn">Back to Dashboard</a>
+        <a href="{% url 'a_dashboard' %}" class="btn">
+            <i class="fas fa-arrow-left icon"></i> Back to Dashboard
+        </a>
     </div>
 {% endblock %}

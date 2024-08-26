@@ -2,6 +2,70 @@
 
 {% block title %}User Details{% endblock %}
 
+{% block extra_css %}
+<style>
+
+    .card {
+        background-color: var(--card-background);
+        border-radius: 15px;
+        padding: 10px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        margin-bottom: 10px;
+    }
+
+    .card p {
+        margin: 10px 0;
+        font-size: 1rem;
+        color: var(--text-color);
+    }
+
+    .card img {
+        border-radius: 10px;
+        margin-top: 10px;
+    }
+
+    .btn {
+        padding: 10px 20px;
+        border: none;
+        background-color: var(--primary-color);
+        color: white;
+        border-radius: 8px;
+        cursor: pointer;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+    }
+
+    .btn:hover {
+        background-color: var(--primary-color-hover);
+    }
+
+    .btn .icon {
+        margin-right: 8px;
+    }
+
+    .btn-secondary {
+        background-color: var(--secondary-color);
+    }
+
+    .btn-secondary:hover {
+        background-color: var(--secondary-color-hover);
+    }
+
+    @media (max-width: 767px) {
+        
+        .card p {
+            font-size: 0.9rem;
+        }
+        
+        .btn {
+            font-size: 0.9rem;
+            padding: 8px 16px;
+        }
+    }
+</style>
+{% endblock %}
+
 {% block content %}
     <div class="container">
         <h1>User Details</h1>
@@ -18,7 +82,11 @@
                 <p>No profile picture available</p>
             {% endif %}
         </div>
-        <a href="{% url 'a_user_list' %}" class="btn">Back to User List</a>
-        <a href="{% url 'a_dashboard' %}" class="btn">Back to Dashboard</a>
+        <a href="{% url 'a_user_list' %}" class="btn btn-secondary">
+            <i class="fas fa-users icon"></i> Back to User List
+        </a>
+        <a href="{% url 'a_dashboard' %}" class="btn">
+            <i class="fas fa-arrow-left icon"></i> Back to Dashboard
+        </a>
     </div>
 {% endblock %}

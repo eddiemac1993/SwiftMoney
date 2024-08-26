@@ -2,29 +2,131 @@
 
 {% block title %}User List{% endblock %}
 
+{% block extra_css %}
+<style>
+    .dashboard-container {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .card {
+        background-color: var(--card-background);
+        border-radius: 15px;
+        padding: 20px;
+        margin-bottom: 20px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .card-title {
+        color: var(--text-color);
+        font-size: 1.4rem;
+        margin-bottom: 15px;
+    }
+
+    .table-responsive {
+        overflow-x: auto;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.9em;
+    }
+
+    th, td {
+        padding: 10px;
+        text-align: left;
+        border-bottom: 1px solid var(--secondary-text);
+    }
+
+    th {
+        color: var(--secondary-text);
+        font-weight: normal;
+    }
+
+    .btn-container {
+        display: flex;
+        justify-content: flex-start;
+        margin-top: 20px;
+    }
+
+    .btn {
+        padding: 10px 20px;
+        border: none;
+        background-color: var(--primary-color);
+        color: white;
+        border-radius: 8px;
+        cursor: pointer;
+        text-decoration: none;
+        display: inline-block;
+    }
+
+    .btn:hover {
+        background-color: var(--primary-color-hover);
+    }
+
+    .btn-secondary {
+        background-color: var(--secondary-color);
+    }
+
+    .btn-secondary:hover {
+        background-color: var(--secondary-color-hover);
+    }
+
+    .btn .icon {
+        margin-right: 8px;
+    }
+
+    @media (max-width: 767px) {
+        table {
+            font-size: 0.8em;
+        }
+
+        th, td {
+            padding: 8px 5px;
+        }
+    }
+</style>
+{% endblock %}
+
 {% block content %}
-    <div class="container">
-        <h1>User List</h1>
-        <table>
-            <thead>
-                <tr>
-                    <th>Username</th>
-                    <th>Phone Number</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for user in users %}
-                    <tr>
-                        <td>{{ user.username }}</td>
-                        <td>{{ user.phone_number }}</td>
-                        <td>
-                            <a href="{% url 'a_user_detail' user.id %}">View Details</a>
-                        </td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-        <a href="{% url 'a_dashboard' %}" class="btn">Back to Dashboard</a>
+    <div class="dashboard-container">
+        <div class="card">
+            <h2 class="card-title">User List</h2>
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Username</th>
+                            <th>Phone Number</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for user in users %}
+                            <tr>
+                                <td>{{ user.username }}</td>
+                                <td>{{ user.phone_number }}</td>
+                                <td>
+                                    <a href="{% url 'a_user_detail' user.id %}" class="">
+                                        <i class="fas fa-eye icon"></i> 
+                                    </a>
+                                </td>
+                            </tr>
+                        {% empty %}
+                            <tr>
+                                <td colspan="3">No users found.</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <div class="btn-container">
+                <a href="{% url 'a_dashboard' %}" class="btn btn-primary">
+                    <i class="fas fa-arrow-left icon"></i> Back to Dashboard
+                </a>
+            </div>
+        </div>
     </div>
 {% endblock %}

@@ -2,6 +2,88 @@
 
 {% block title %}Admin Approval{% endblock %}
 
+{% block extra_css %}
+<style>
+    .card {
+        background-color: var(--card-background);
+        border-radius: 15px;
+        padding: 20px;
+        margin-bottom: 20px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    h1, h2 {
+        color: var(--text-color);
+        margin-bottom: 15px;
+        font-size: 1.4rem;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 20px;
+        background-color: var(--card-background-light);
+        border-radius: 10px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    th, td {
+        padding: 12px;
+        text-align: left;
+        border-bottom: 1px solid var(--secondary-text);
+    }
+
+    th {
+        color: var(--secondary-text);
+        background-color: var(--primary-color-light);
+    }
+
+    tr:nth-child(even) {
+        background-color: var(--card-background-light);
+    }
+
+    tr:hover {
+        background-color: var(--primary-color-hover-light);
+    }
+
+    .btn {
+        padding: 8px 16px;
+        border: none;
+        background-color: var(--primary-color);
+        color: white;
+        border-radius: 8px;
+        cursor: pointer;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        font-size: 0.9rem;
+    }
+
+    .btn:hover {
+        background-color: var(--primary-color-hover);
+    }
+
+    .btn .icon {
+        margin-right: 6px;
+    }
+
+    @media (max-width: 767px) {
+        table {
+            font-size: 0.8rem;
+        }
+
+        th, td {
+            padding: 10px;
+        }
+
+        .btn {
+            font-size: 0.8rem;
+            padding: 6px 12px;
+        }
+    }
+</style>
+{% endblock %}
+
 {% block content %}
     <div class="container">
         <div class="card">
@@ -22,35 +104,13 @@
                             <td>{{ user.username }}</td>
                             <td>{{ user.phone_number }}</td>
                             <td>
-                                <a href="{% url 'approve_user' user.id %}" class="btn">Approve</a>
+                                <a href="{% url 'approve_user' user.id %}" class="btn">
+                                    <i class="fas fa-check icon"></i> Approve
+                                </a>
                             </td>
                         </tr>
                     {% empty %}
                         <tr><td colspan="3">No pending users</td></tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-
-            <h2>Pending Float Requests</h2>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Agent</th>
-                        <th>Amount</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for request in pending_float_requests %}
-                        <tr>
-                            <td>{{ request.agent }}</td>
-                            <td>{{ request.amount }}</td>
-                            <td>
-                                <a href="{% url 'approve_float_request' request.id %}" class="btn">Approve</a>
-                            </td>
-                        </tr>
-                    {% empty %}
-                        <tr><td colspan="3">No pending float requests</td></tr>
                     {% endfor %}
                 </tbody>
             </table>
@@ -68,9 +128,11 @@
                     {% for request in pending_cash_requests %}
                         <tr>
                             <td>{{ request.agent }}</td>
-                            <td>{{ request.amount }}</td>
+                            <td>K{{ request.amount|floatformat:2 }}</td>
                             <td>
-                                <a href="{% url 'approve_cash_request' request.id %}" class="btn">Approve</a>
+                                <a href="{% url 'approve_cash_request' request.id %}" class="btn">
+                                    <i class="fas fa-check icon"></i> Approve
+                                </a>
                             </td>
                         </tr>
                     {% empty %}

@@ -5,24 +5,48 @@
 {% block content %}
     <h1 class="page-title">Admin Dashboard</h1>
     <div class="card-container">
+        <!-- Total Users Card -->
         <div class="card">
-            <h2 class="card-title"><i class="fas fa-users"></i> Total Users</h2>
+            <h2 class="card-title">
+                <i class="fas fa-users"></i> Total Users
+            </h2>
             <p class="card-content">{{ total_users }}</p>
-            <a href="{% url 'a_user_list' %}" class="btn">View Users</a>
+            <a href="{% url 'a_user_list' %}" class="btn">
+                <i class="fas fa-eye"></i> View Users
+            </a>
         </div>
-        <div class="card">
-            <h2 class="card-title"><i class="fas fa-exchange-alt"></i> Total Transactions</h2>
-            <p class="card-content">{{ total_transactions }}</p>
-            <a href="{% url 'a_transaction_list' %}" class="btn">View Transactions</a>
-        </div>
-        <div class="card">
-            <h2 class="card-title"><i class="fas fa-money-bill-wave"></i> Pending Cash Requests</h2>
-            <p class="card-content pending">{{ pending_cash_requests }}</p>
-        </div>
-    </div>
 
-    <div class="button-group">
-        <a href="{% url 'approve_cashout' %}" class="btn">Cashout Approvals</a>
-        <a href="{% url 'a_approval' %}" class="btn">Cash Request Approvals</a>
+        <!-- Total Transactions Card -->
+        <div class="card">
+            <h2 class="card-title">
+                <i class="fas fa-exchange-alt"></i> Total Transactions
+            </h2>
+            <p class="card-content">{{ total_transactions }}</p>
+            <a href="{% url 'a_transaction_list' %}" class="btn">
+                <i class="fas fa-eye"></i> View Transactions
+            </a>
+        </div>
+
+        <!-- Pending Cash Requests Card -->
+        <div class="card">
+            <h2 class="card-title">
+                <i class="fas fa-money-bill-wave"></i> Pending Cash Requests
+            </h2>
+            <p class="card-content pending">{{ pending_cash_requests }}</p>
+            <a href="{% url 'a_approval' %}" class="btn">
+                <i class="fas fa-check-circle"></i> Cash Request Approvals
+            </a>
+        </div>
+
+        <!-- Pending Cashout Requests Card -->
+        <div class="card">
+            <h2 class="card-title">
+                <i class="fas fa-hand-holding-usd"></i> Pending Cashout Requests
+            </h2>
+            <p class="card-content pending">{{ pending_cashout_requests }}</p>
+            <a href="{% url 'approve_cashout' %}" class="btn">
+                <i class="fas fa-check-circle"></i> Cashout Approvals
+            </a>
+        </div>
     </div>
 {% endblock %}
