@@ -1,0 +1,139 @@
+{% extends 'base.html' %}
+
+{% block title %}Product List{% endblock %}
+
+{% block extra_css %}
+<style>
+    .page-title {
+        font-size: 2rem;
+        color: var(--primary-color);
+        margin-bottom: 20px;
+        text-align: center;
+    }
+
+    .search-form {
+        display: flex;
+        justify-content: center;
+        margin-bottom: 30px;
+    }
+
+    .search-input {
+        padding: 10px;
+        font-size: 1rem;
+        border: 1px solid var(--primary-color);
+        border-radius: 5px;
+        width: 60%;
+        max-width: 400px;
+    }
+
+    .search-btn {
+        background-color: var(--primary-color);
+        color: white;
+        padding: 10px 20px;
+        border-radius: 5px;
+        margin-left: 10px;
+        cursor: pointer;
+        border: none;
+        transition: background-color 0.3s ease;
+    }
+
+    .search-btn:hover {
+        background-color: var(--primary-color-dark);
+    }
+
+    .card-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+        justify-content: center;
+        margin-bottom: 40px;
+    }
+
+    .card {
+        background-color: var(--card-background);
+        border-radius: 15px;
+        padding: 20px;
+        width: 100%;
+        max-width: 300px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        transition: transform 0.2s ease-in-out;
+    }
+
+    .card:hover {
+        transform: scale(1.05);
+    }
+
+    .card-title {
+        font-size: 1.5rem;
+        color: var(--text-color);
+        margin-bottom: 10px;
+    }
+
+    .card-content {
+        font-size: 1rem;
+        color: var(--secondary-text);
+        margin-bottom: 15px;
+    }
+
+    .button-group {
+        display: flex;
+        justify-content: center;
+    }
+
+    .btn {
+        background-color: var(--primary-color);
+        color: white;
+        padding: 10px 20px;
+        border-radius: 10px;
+        text-decoration: none;
+        font-size: 1rem;
+        transition: background-color 0.3s ease;
+    }
+
+    .btn:hover {
+        background-color: var(--primary-color-dark);
+    }
+
+    @media (max-width: 768px) {
+        .card-container {
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .card {
+            width: 100%;
+            max-width: 90%;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+    <h1 class="page-title">Product List</h1>
+
+    <!-- Search Form -->
+    <div class="search-form">
+        <form method="GET" action="">
+            <input type="text" name="q" class="search-input" placeholder="Search for products..." value="{{ query }}">
+            <button type="submit" class="search-btn">Search</button>
+        </form>
+    </div>
+
+    <!-- Product Cards -->
+    <div class="card-container">
+        {% if products %}
+            {% for product in products %}
+            <div class="card">
+                <h2 class="card-title">{{ product.name }}</h2>
+                <p class="card-content">{{ product.description }}</p>
+                <p class="card-content">Price: k{{ product.price }}</p>
+                <div class="button-group">
+                    <a href="{% url 'add_to_cart' product.id %}" class="btn">Add to Cart</a>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <p>No products match your search.</p>
+        {% endif %}
+    </div>
+{% endblock %}

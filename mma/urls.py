@@ -44,6 +44,18 @@ urlpatterns = [
     path('a/approve_float_request/<int:request_id>/', views.approve_float_request, name='approve_float_request'),
     path('a/approve_cash_request/<int:request_id>/', views.approve_cash_request, name='approve_cash_request'),
 
+    path('products/', views.product_list, name='product_list'),
+    path('add-to-cart/<int:product_id>/', views.add_to_cart, name='add_to_cart'),
+    path('cart/', views.view_cart, name='view_cart'),
+    path('checkout/', views.checkout_view, name='checkout'),
+    path('order-confirmation/<int:order_id>/', views.order_confirmation, name='order_confirmation'),
+    path('submit-order/', views.submit_order, name='submit_order'),
+    path('order/<int:order_id>/', views.order_detail, name='order_detail'),
+    path('order/<int:order_id>/pay-deposit/', views.pay_deposit, name='pay_deposit'),
+    path('order/<int:order_id>/cancel/', views.cancel_order, name='cancel_order'),
+    path('order/<int:order_id>/summary/', views.order_summary, name='order_summary'),
+
+
     # Error Pages (handled automatically by Django, add custom templates in your templates folder)
     # path('404/', views.custom_404_view, name='custom_404'),  # Custom 404 view (optional)
     # path('500/', views.custom_500_view, name='custom_500'),  # Custom 500 view (optional)

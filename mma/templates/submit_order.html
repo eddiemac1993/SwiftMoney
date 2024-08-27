@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+
+{% block title %}Submit{% endblock %}
+
+{% block content %}
+    <h1 class="page-title">SUBMIT</h1>
+    <div class="card">
+<form method="post" action="{% url 'submit_order' %}">
+    {% csrf_token %}
+    {{ form.non_field_errors }}
+    <div>
+        {{ form.agent.label_tag }} {{ form.agent }}
+        {{ form.agent.errors }}
+    </div>
+    <div>
+        {{ form.customer_name.label_tag }} {{ form.customer_name }}
+        {{ form.customer_name.errors }}
+    </div>
+    <div>
+        {{ form.total_amount.label_tag }} {{ form.total_amount }}
+        {{ form.total_amount.errors }}
+    </div>
+    <div>
+        {{ form.deposit_amount.label_tag }} {{ form.deposit_amount }}
+        {{ form.deposit_amount.errors }}
+    </div>
+    <div>
+        {{ form.status.label_tag }} {{ form.status }}
+        {{ form.status.errors }}
+    </div>
+    <div>
+        {{ form.delivery_date.label_tag }} {{ form.delivery_date }}
+        {{ form.delivery_date.errors }}
+    </div>
+    <button type="submit">Submit Order</button>
+</form>
+
+    </div>
+{% endblock %}

@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}swiftMoney{% endblock %}</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="manifest" href="{% static 'manifest.json' %}">
+    <link rel="apple-touch-icon" sizes="180x180" href="{% static 'icons/apple-touch-icon.png' %}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{% static 'icons/favicon-32x32.png' %}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{% static 'icons/favicon-16x16.png' %}">
+    <link rel="manifest" href="{% static 'icons/manifest.json' %}">
+    <link rel="manifest" href="{% static 'icons/site.webmanifest' %}">
+
+    <style>
+                :root {
+            --primary-color: #4CAF50;
+            --secondary-color: #2196F3;
+            --background-color: #121212;
+            --card-background: #1E1E1E;
+            --text-color: #FFFFFF;
+            --secondary-text: #B0B0B0;
+            --nav-height: 60px;
+            --table-header-bg: #333;
+            --table-row-bg: #1E1E1E;
+            --table-row-alt-bg: #2E2E2E;
+        }
+
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
+            padding-top: var(--nav-height);
+            padding-bottom: 70px;
+        }
+
+        header {
+            background-color: var(--card-background);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: var(--nav-height);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            z-index: 1000;
+        }
+
+        .logo {
+            font-size: 1.5em;
+            font-weight: 700;
+            color: var(--primary-color);
+            text-decoration: none;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .top-nav {
+            display: flex;
+            align-items: center;
+        }
+
+        .top-nav-item {
+            color: var(--text-color);
+            text-decoration: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            transition: background-color 0.3s, color 0.3s;
+            margin-left: 10px;
+        }
+
+        .top-nav-item:hover {
+            background-color: var(--primary-color);
+            color: var(--text-color);
+        }
+
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-color: var(--card-background);
+            display: flex;
+            justify-content: space-around;
+            padding: 10px 0;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.2);
+        }
+
+        .icon-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: transparent;
+            border: none;
+            color: var(--text-color);
+            text-decoration: none;
+            padding: 5px 10px;
+            border-radius: 10px;
+            transition: background-color 0.3s, transform 0.3s, color 0.3s;
+            min-width: 60px;
+        }
+
+        .icon-btn:hover, .icon-btn.active-page {
+            background-color: var(--primary-color);
+            transform: translateY(-2px);
+            color: var(--text-color);
+        }
+
+        .icon {
+            font-size: 1.4em;
+            margin-bottom: 4px;
+        }
+
+        .icon-text {
+            font-size: 0.75em;
+            text-align: center;
+            white-space: nowrap;
+        }
+
+        main {
+            margin-top: 20px;
+            padding: 0 20px;
+        }
+
+        .page-title {
+            font-size: 2.5em;
+            margin-bottom: 20px;
+            color: var(--primary-color);
+            text-align: center;
+        }
+
+        .card-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .card {
+            background-color: var(--card-background);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .card-title {
+            font-size: 1.5em;
+            margin-bottom: 10px;
+            color: var(--primary-color);
+        }
+
+        .card-content {
+            font-size: 1.2em;
+            color: var(--text-color);
+        }
+
+        .button-group {
+            margin-top: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .btn {
+            background-color: var(--primary-color);
+            color: var(--text-color);
+            border: none;
+            border-radius: 25px;
+            padding: 12px 24px;
+            cursor: pointer;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-block;
+            transition: background-color 0.3s, transform 0.3s, box-shadow 0.3s;
+            text-align: center;
+        }
+
+        .btn:hover {
+            background-color: #7C4DFF;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            margin-bottom: 20px;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        th, td {
+            padding: 15px;
+            text-align: left;
+        }
+
+        thead {
+            background-color: var(--primary-color);
+        }
+
+        tbody tr:nth-child(odd) {
+            background-color: var(--table-row-bg);
+        }
+
+        tbody tr:nth-child(even) {
+            background-color: var(--table-row-alt-bg);
+        }
+
+        th {
+            color: var(--text-color);
+            font-weight: 600;
+        }
+
+        td {
+            color: var(--secondary-text);
+        }
+
+        .install-btn {
+            display: none;
+            background-color: var(--secondary-color);
+            color: var(--background-color);
+            border: none;
+            border-radius: 25px;
+            padding: 12px 24px;
+            cursor: pointer;
+            font-weight: 600;
+            text-decoration: none;
+            transition: background-color 0.3s, transform 0.3s;
+            position: fixed;
+            bottom: 80px;
+            right: 20px;
+            z-index: 1000;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+
+        .install-btn:hover {
+            background-color: #04EBD6;
+            transform: translateY(-2px);
+        }
+
+        .install-btn:active {
+            transform: translateY(0);
+        }
+        /* Container for the messages */
+.messages {
+    margin: 20px;
+    padding: 10px;
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* Unordered list for the messages */
+.message-list {
+    list-style-type: none;
+    padding: 0;
+}
+
+/* General styles for all messages */
+.message-list li {
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    font-size: 16px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+}
+
+/* Error message specific styling */
+.message-list li.error {
+    background-color: #f8d7da;  /* Light red background */
+    color: #721c24;              /* Dark red text */
+    border-left: 5px solid #f44336; /* Bold left border */
+}
+
+/* Error message icon */
+.message-list li.error::before {
+    content: "⚠️";               /* Optional icon */
+    margin-right: 10px;
+}
+
+/* Hover effect */
+.message-list li.error:hover {
+    background-color: #f44336;   /* Bright red on hover */
+    color: white;
+    cursor: pointer;
+}
+
+button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+
+/* Close button (optional) */
+.message-list li.error .close-btn {
+    margin-left: auto;
+    background: none;
+    border: none;
+    font-size: 20px;
+    color: #721c24;
+    cursor: pointer;
+}
+
+    </style>
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+<header>
+    <a href="{% url 'home' %}" class="logo">swiftMoney</a>
+    <nav class="top-nav">
+        {% if user.is_authenticated %}
+            <a href="{% url 'product_list' %}" class="top-nav-item {% if request.resolver_match.url_name == 'product_list' %}active-page{% endif %}"><i class="fas fa-box"></i></a>
+<a href="{% url 'view_cart' %}" class="top-nav-item {% if request.resolver_match.url_name == 'view_cart' %}active-page{% endif %}"><i class="fas fa-shopping-cart"></i></a>
+
+
+        {% else %}
+
+            <a href="{% url 'login' %}" class="icon-btn {% if request.resolver_match.url_name == 'login' %}active-page{% endif %}" title="Login">
+                <span class="icon"><i class="fas fa-sign-in-alt"></i></span>
+            </a>
+            <a href="{% url 'register' %}" class="icon-btn {% if request.resolver_match.url_name == 'register' %}active-page{% endif %}" title="Register">
+                <span class="icon"><i class="fas fa-user-plus"></i></span>
+            </a>
+        {% endif %}
+    </nav>
+</header>
+<div class="messages">
+    {% if messages %}
+        <ul class="message-list">
+            {% for message in messages %}
+                <li class="{% if message.tags %}{{ message.tags }}{% endif %}">
+                    {{ message }}
+                    <button class="close-btn" onclick="this.parentElement.style.display='none';">&times;</button>
+                </li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+</div>
+
+<div class="container">
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+</div>
+
+<nav class="bottom-nav">
+    {% if user.is_authenticated %}
+        <a href="{% url 'dashboard' %}" class="icon-btn {% if request.resolver_match.url_name == 'dashboard' %}active-page{% endif %}" title="Dashboard">
+            <span class="icon"><i class="fas fa-home"></i></span>
+            <span class="icon-text">Dashboard</span>
+        </a>
+        <a href="{% url 'request_cash' %}" class="icon-btn {% if request.resolver_match.url_name == 'request_cash' %}active-page{% endif %}" title="Request Cash">
+            <span class="icon"><i class="fas fa-money-bill-wave"></i></span>
+            <span class="icon-text">Cash</span>
+        </a>
+        <a href="{% url 'cashout' %}" class="icon-btn {% if request.resolver_match.url_name == 'cashout' %}active-page{% endif %}" title="Cash Out">
+            <span class="icon"><i class="fas fa-hand-holding-usd"></i></span>
+            <span class="icon-text">CashOut</span>
+        </a>
+        <a href="{% url 'profile' %}" class="icon-btn {% if request.resolver_match.url_name == 'profile' %}active-page{% endif %}" title="Profile">
+            <span class="icon"><i class="fas fa-user"></i></span>
+            <span class="icon-text">Profile</span>
+        </a>
+    {% endif %}
+</nav>
+
+<button id="installButton" class="install-btn">Install App</button>
+
+<script>
+    let deferredPrompt;
+    const installButton = document.getElementById('installButton');
+
+    window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredPrompt = e;
+        installButton.style.display = 'block';
+    });
+
+    installButton.addEventListener('click', () => {
+        if (deferredPrompt) {
+            deferredPrompt.prompt();
+            deferredPrompt.userChoice.then((choiceResult) => {
+                if (choiceResult.outcome === 'accepted') {
+                    console.log('User accepted the install prompt');
+                } else {
+                    console.log('User dismissed the install prompt');
+                }
+                deferredPrompt = null;
+                installButton.style.display = 'none';
+            });
+        }
+    });
+
+    window.addEventListener('appinstalled', () => {
+        console.log('App was installed.');
+        installButton.style.display = 'none';
+    });
+
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('/static/service-worker.js')
+            .then(function(registration) {
+                console.log('Service Worker registered with scope:', registration.scope);
+            }).catch(function(error) {
+                console.log('Service Worker registration failed:', error);
+            });
+    }
+</script>
+</body>
+</html>

@@ -1,0 +1,135 @@
+{% extends 'base.html' %}
+
+{% block extra_css %}
+<style>
+    /* General Page Styling */
+    h1, h2, h3 {
+        color: var(--primary-color);
+    }
+
+    p {
+        font-size: 1rem;
+        line-height: 1.6;
+        color: var(--text-color);
+    }
+
+    /* Table Styling */
+    table {
+        width: 100%;
+        margin-top: 20px;
+        border-collapse: collapse;
+        background-color: var(--card-background);
+        border-radius: 8px;
+        overflow: hidden;
+    }
+
+    th, td {
+        padding: 10px;
+        text-align: left;
+        border-bottom: 1px solid #ddd;
+        font-size: 0.9rem;
+    }
+
+    th {
+        background-color: var(--secondary-background);
+        font-weight: bold;
+        color: var(--secondary-text);
+    }
+
+    td {
+        color: var(--text-color);
+    }
+
+    tfoot td {
+        font-weight: bold;
+        background-color: var(--secondary-background);
+    }
+
+    /* Button Styling */
+    button.btn {
+        background-color: var(--primary-color);
+        color: #fff;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+
+    button.btn:hover {
+        background-color: var(--primary-hover);
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        table, th, td {
+            font-size: 0.85rem;
+        }
+
+        table {
+            overflow-x: auto;
+            display: block;
+        }
+
+        button.btn {
+            width: 100%;
+            padding: 12px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+    <h1>Pay Deposit for Order #{{ order.id }}</h1>
+
+    <p>Thank you, {{ order.customer_name }}! Your order has been placed. To confirm your order, please pay the required deposit.</p>
+
+    <h2>Order Summary</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Product</th>
+                <th>Quantity</th>
+                <th>Price</th>
+                <th>Subtotal</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in order.items.all %}
+            <tr>
+                <td>{{ item.product.name }}</td>
+                <td>{{ item.quantity }}</td>
+                <td>k{{ item.product.price }}</td>
+                <td>k{{ item.subtotal }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+        <tfoot>
+            <tr>
+                <td colspan="3">Total Amount:</td>
+                <td>k{{ order.total_amount }}</td>
+            </tr>
+            <tr>
+                <td colspan="3">Deposit (30%):</td>
+                <td>k{{ order.deposit_amount }}</td>
+            </tr>
+        </tfoot>
+    </table>
+
+    <h3>Next Steps</h3>
+    <p>Please click the button below to proceed with the deposit payment of <strong>k{{ order.deposit_amount }}</strong>.</p>
+
+    <!-- Payment Form -->
+    <form method="POST">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-primary">Proceed to Pay Deposit</button>
+    </form>
+
+    <!-- Optional: Link to view full order details -->
+    <p><a href="{% url 'order_detail' order.id %}">View full order details</a></p>
+
+    <!-- Optional: Continue Shopping Link -->
+    <p><a href="{% url 'product_list' %}">Continue Shopping</a></p>
+
+{% endblock %}

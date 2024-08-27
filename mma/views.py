@@ -18,6 +18,222 @@ from django.dispatch import receiver
 from .models import CashoutRequest
 from django.core.mail import send_mail
 from django.conf import settings
+from django.shortcuts import render, redirect, get_object_or_404
+from .models import Product, Cart, CartItem, Order, Invoice, Refund
+from django.contrib.auth.decorators import login_required
+from django.db import transaction
+from django.shortcuts import render, redirect
+from .forms import OrderForm  # Adjust the import based on your form
+from .models import Order
+from django.shortcuts import redirect
+from django.http import JsonResponse
+from django.db.models import Q  # For advanced queries (OR queries)
+
+@login_required
+def product_list(request):
+    query = request.GET.get('q')  # Get the search query from the URL parameters
+    if query:
+        # Filter products based on the search query (in name or category)
+        products = Product.objects.filter(Q(name__icontains=query) | Q(category__icontains=query))
+    else:
+        # If no query, return all products
+        products = Product.objects.all()
+
+    return render(request, 'product_list.html', {'products': products, 'query': query})
+
+@login_required
+def add_to_cart(request, product_id):
+    product = get_object_or_404(Product, id=product_id)
+    cart, created = Cart.objects.get_or_create(agent=request.user)
+
+    cart_item, item_created = CartItem.objects.get_or_create(
+        cart=cart,
+        product=product,
+        defaults={'quantity': 1}
+    )
+
+    if not item_created:
+        cart_item.quantity += 1
+        cart_item.save()
+
+    messages.success(request, f"{product.name} added to your cart.")
+    return redirect('product_list')  # or wherever you want to redirect
+
+from django.shortcuts import redirect
+
+@login_required
+def view_cart(request):
+    try:
+        cart = Cart.objects.get(agent=request.user)
+        cart_items = cart.items.all()
+        total_amount = cart.total_amount()
+    except Cart.DoesNotExist:
+        cart = None
+        cart_items = []
+        total_amount = 0
+
+    # Handle POST requests for updating quantity or removing items
+    if request.method == 'POST':
+        item_id = request.POST.get('item_id')
+        action = request.POST.get('action')
+
+        try:
+            item = CartItem.objects.get(id=item_id, cart=cart)
+            if action == 'update_quantity':
+                new_quantity = int(request.POST.get('quantity'))
+                if new_quantity > 0:
+                    item.quantity = new_quantity
+                    item.save()
+            elif action == 'remove_item':
+                item.delete()
+        except CartItem.DoesNotExist:
+            pass
+
+        return redirect('view_cart')  # Redirect to the cart page after action
+
+    context = {
+        'cart': cart,
+        'cart_items': cart_items,
+        'total_amount': total_amount,
+    }
+    return render(request, 'view_cart.html', context)
+
+@login_required
+def checkout_view(request):
+    try:
+        cart = Cart.objects.get(agent=request.user)
+
+        # Check if the cart has items
+        if not cart.items.exists():
+            messages.error(request, "Your cart is empty.")
+            return redirect('view_cart')
+
+        # Handle the form submission
+        if request.method == 'POST':
+            form = OrderForm(request.POST)
+
+            if form.is_valid():
+                # Call the order submission function if the form is valid
+                return submit_order(request, form.cleaned_data)
+            else:
+                # Form is invalid
+                messages.error(request, "There was an error in your form. Please check your details.")
+        else:
+            # Display the order form if no POST request is made
+            form = OrderForm()
+
+        context = {
+            'form': form,
+            'cart': cart,
+            'total': cart.total_amount(),  # Pass the total cart amount to the context
+        }
+        return render(request, 'checkout.html', context)
+
+    # Handle case where cart does not exist for the user
+    except Cart.DoesNotExist:
+        messages.error(request, "You don't have an active cart.")
+        return redirect('product_list')
+
+from django.shortcuts import redirect
+from django.contrib import messages
+from django.db import transaction
+from .models import Order, OrderItem, Invoice
+from decimal import Decimal
+
+from django.contrib import messages
+from django.shortcuts import get_object_or_404, redirect, render
+from django.db import transaction
+from decimal import Decimal
+from .models import Cart, Order, OrderItem, Invoice
+
+@login_required
+@transaction.atomic
+def submit_order(request, form_data):
+    try:
+        cart = Cart.objects.get(agent=request.user)
+
+        # Create order using form data
+        order = Order.objects.create(
+            agent=request.user,
+            customer_name=form_data['customer_name'],
+            total_amount=cart.total_amount(),
+            deposit_amount=cart.total_amount() * Decimal('0.3'),
+            status='pending'
+        )
+
+        # Create order items
+        for cart_item in cart.items.all():
+            OrderItem.objects.create(
+                order=order,
+                product=cart_item.product,
+                quantity=cart_item.quantity
+            )
+
+        # Create invoice
+        Invoice.objects.create(order=order)
+
+        # Clear the cart
+        cart.items.all().delete()
+
+        messages.success(request, f"Order #{order.id} submitted successfully.")
+        return redirect('order_confirmation', order_id=order.id)
+
+    except Exception as e:
+        messages.error(request, f"An error occurred: {str(e)}")
+        return redirect('checkout')
+
+
+@login_required
+def order_confirmation(request, order_id):
+    order = get_object_or_404(Order, id=order_id, agent=request.user)
+    return render(request, 'order_confirmation.html', {'order': order})
+
+
+@login_required
+def order_detail(request, order_id):
+    order = get_object_or_404(Order, id=order_id)
+    invoice = order.invoice
+    return render(request, 'order_detail.html', {'order': order, 'invoice': invoice})
+
+@login_required
+def pay_deposit(request, order_id):
+    order = get_object_or_404(Order, id=order_id)
+
+    if request.method == 'POST':
+        # Simulate the deposit payment process here
+        # You can integrate with a payment gateway like Stripe, PayPal, etc.
+
+        # If payment is successful:
+        order.status = 'approved'
+        order.save()
+
+        messages.success(request, f"Deposit of {order.deposit_amount} has been paid successfully.")
+        return redirect('order_detail', order_id=order.id)
+
+    return render(request, 'pay_deposit.html', {'order': order})
+
+@login_required
+@transaction.atomic
+def cancel_order(request, order_id):
+    order = get_object_or_404(Order, id=order_id)
+
+    if order.status == 'pending':
+        order.status = 'cancelled'
+        order.save()
+
+        # Issue a refund for 15% of the deposit
+        refund_amount = order.deposit_amount * Decimal('0.15')
+        Refund.objects.create(order=order, amount=refund_amount)
+
+        return redirect('order_detail', order_id=order.id)
+
+    return redirect('order_detail', order_id=order.id)
+
+def order_summary(request, order_id):
+    order = get_object_or_404(Order, id=order_id)
+    delivery_date = order.calculate_delivery_date()
+
+    return render(request, 'order_summary.html', {'order': order, 'delivery_date': delivery_date})
 
 @staff_member_required
 def approve_cashout(request):

@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+
+{% block title %}Order Summary{% endblock %}
+
+{% block content %}
+    <h1 class="page-title">Order Summary</h1>
+    <p>Order ID: {{ order.id }}</p>
+    <p>Total Amount: {{ order.total_amount }}</p>
+    <p>Estimated Delivery Date: {{ delivery_date }}</p>
+
+    <div class="button-group">
+        <a href="{% url 'dashboard' %}" class="btn">Back to Dashboard</a>
+    </div>
+{% endblock %}

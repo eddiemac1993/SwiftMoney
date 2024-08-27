@@ -1,0 +1,106 @@
+{% extends 'base.html' %}
+
+{% block title %}Order Confirmation{% endblock %}
+
+{% block extra_css %}
+<style>
+    .order-confirmation {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+        background-color: var(--card-background);
+        border-radius: 10px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .order-confirmation h1 {
+        font-size: 1.5rem;
+        color: var(--text-color);
+    }
+
+    .order-summary {
+        margin-top: 20px;
+    }
+
+    .order-summary ul {
+        list-style: none;
+        padding: 0;
+    }
+
+    .order-summary li {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 10px;
+        font-size: 1rem;
+    }
+
+    .total-amount,
+    .deposit-amount {
+        font-size: 1.2rem;
+        font-weight: bold;
+        text-align: right;
+        color: var(--primary-color);
+    }
+
+    form {
+        margin-top: 20px;
+    }
+
+    form button {
+        background-color: var(--primary-color);
+        color: #fff;
+        padding: 10px 15px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 1rem;
+        transition: background-color 0.3s ease;
+    }
+
+    form button:hover {
+        background-color: var(--primary-hover);
+    }
+
+    .cancel-link {
+        display: block;
+        margin-top: 20px;
+        text-align: center;
+        color: var(--secondary-text);
+    }
+
+    @media (max-width: 768px) {
+        .order-summary li {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .order-summary li span {
+            margin-bottom: 5px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="order-confirmation">
+    <h1>Pay Deposit for Order #{{ order.id }}</h1>
+
+    <p>Hello {{ order.customer_name }},</p>
+    <p>Please pay a deposit of <strong>k{{ order.deposit_amount }}</strong> to confirm your order.</p>
+
+    <div class="order-summary">
+        <h3>Order Summary</h3>
+        <ul>
+            {% for item in order.items.all %}
+            <li>
+                <span>{{ item.quantity }} x {{ item.product.name }}</span>
+                <span>k{{ item.subtotal }}</span>
+            </li>
+            {% endfor %}
+        </ul>
+        <p class="total-amount">Total Amount: k{{ order.total_amount }}</p>
+        <p class="deposit-amount">Deposit Amount: k{{ order.deposit_amount }}</p>
+    </div>
+    <p><a href="{% url 'order_detail' order.id %}" class="cancel-link">Proceed to Pay Deposit</a></p>
+</div>
+{% endblock %}

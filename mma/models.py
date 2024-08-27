@@ -6,6 +6,111 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.contrib.auth import get_user_model
 
+class Product(models.Model):
+    name = models.CharField(max_length=200)
+    description = models.TextField()
+    category = models.CharField(max_length=100)
+    price = models.DecimalField(max_digits=10, decimal_places=2)
+    delivery_time = models.IntegerField(help_text="Delivery time in days")
+
+    def __str__(self):
+        return self.name
+
+class Cart(models.Model):
+    agent = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='carts')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def total_amount(self):
+        return sum(item.subtotal() for item in self.items.all())
+
+class CartItem(models.Model):
+    cart = models.ForeignKey(Cart, related_name='items', on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    quantity = models.PositiveIntegerField(default=1)
+
+    def subtotal(self):
+        return self.product.price * self.quantity
+
+    def __str__(self):
+        return f"{self.quantity} x {self.product.name}"
+
+from django.db import models
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+from django.utils import timezone
+
+class Order(models.Model):
+    STATUS_CHOICES = (
+        ('pending', 'Pending'),
+        ('approved', 'Approved'),
+        ('cancelled', 'Cancelled'),
+    )
+    agent = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='orders')
+    customer_name = models.CharField(max_length=200)
+    total_amount = models.DecimalField(max_digits=10, decimal_places=2)
+    deposit_amount = models.DecimalField(max_digits=10, decimal_places=2)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
+    created_at = models.DateTimeField(auto_now_add=True)
+    delivery_date = models.DateField(null=True, blank=True)  # Allow null or blank
+
+    def calculate_delivery_date(self):
+        if self.pk and self.items.exists():  # Ensure the instance has a primary key and items
+            longest_delivery_time = max(item.product.delivery_time for item in self.items.all())
+            return timezone.now().date() + timezone.timedelta(days=longest_delivery_time)
+        return timezone.now().date()
+
+    def __str__(self):
+        return f"Order {self.id} by {self.customer_name}"
+
+@receiver(post_save, sender=Order)
+def update_order_delivery_date(sender, instance, **kwargs):
+    if kwargs.get('created', False):  # Only update on creation
+        instance.delivery_date = instance.calculate_delivery_date()
+        instance.save(update_fields=['delivery_date'])
+
+
+class OrderItem(models.Model):
+    order = models.ForeignKey(Order, related_name='items', on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    quantity = models.PositiveIntegerField()
+
+    def subtotal(self):
+        return self.product.price * self.quantity
+
+    def __str__(self):
+        return f"{self.quantity} x {self.product.name}"
+
+class Invoice(models.Model):
+    order = models.OneToOneField(Order, on_delete=models.CASCADE, related_name='invoice')
+    issued_at = models.DateTimeField(auto_now_add=True)
+    amount_due = models.DecimalField(max_digits=10, decimal_places=2)
+
+    def calculate_amount_due(self):
+        return self.order.total_amount * Decimal('0.3')  # 30% deposit
+
+    def save(self, *args, **kwargs):
+        self.amount_due = self.calculate_amount_due()
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return f"Invoice for Order {self.order.id}"
+
+class Refund(models.Model):
+    order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='refunds')
+    amount = models.DecimalField(max_digits=10, decimal_places=2)
+    issued_at = models.DateTimeField(auto_now_add=True)
+
+    def calculate_refund(self):
+        return self.order.deposit_amount * Decimal('0.15')
+
+    def save(self, *args, **kwargs):
+        self.amount = self.calculate_refund()
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return f"Refund for Order {self.order.id}"
+
+
 @receiver(post_save, sender=get_user_model())
 def create_user_balance(sender, instance, created, **kwargs):
     if created:

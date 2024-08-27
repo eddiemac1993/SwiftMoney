@@ -79,7 +79,7 @@
     <h1 class="welcome-title">Welcome to SwiftMoney</h1>
     {% if user.is_authenticated %}
         <p class="welcome-message">Hello, {{ user.username }}! We're glad to see you back.</p>
-        <a href="{% url 'dashboard' %}" class="cta-button">Go to Dashboard</a>
+        <a href="{% url 'product_list' %}" class="cta-button">Ordering</a>
     {% else %}
         <p class="welcome-message">Experience fast and secure financial transactions with SwiftMoney.</p>
         <a href="{% url 'register' %}" class="cta-button">Get Started</a>

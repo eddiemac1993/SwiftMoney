@@ -1,0 +1,123 @@
+{% extends 'base.html' %}
+
+{% block title %}View Cart{% endblock %}
+
+{% block extra_css %}
+<style>
+    .page-title {
+        font-size: 2rem;
+        color: var(--primary-color);
+        margin-bottom: 20px;
+        text-align: center;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 30px;
+    }
+
+    th, td {
+        padding: 10px;
+        text-align: left;
+        border-bottom: 1px solid #ddd;
+    }
+
+    th {
+        background-color: var(--primary-color);
+        color: white;
+    }
+
+    .btn-primary, .btn-remove {
+        padding: 8px 12px;
+        border-radius: 5px;
+        color: white;
+        text-decoration: none;
+        margin-top: 10px;
+        display: inline-block;
+    }
+
+    .btn-primary {
+        background-color: var(--primary-color);
+    }
+
+    .btn-remove {
+        background-color: red;
+    }
+
+    .quantity-input {
+        width: 50px;
+        text-align: center;
+        padding: 5px;
+        border-radius: 5px;
+        border: 1px solid #ddd;
+    }
+
+    .total {
+        text-align: right;
+        font-size: 1.5rem;
+        margin-top: 20px;
+    }
+
+    .button-group {
+        text-align: right;
+        margin-top: 20px;
+    }
+
+    .btn-primary:hover, .btn-remove:hover {
+        opacity: 0.8;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+    <h1 class="page-title">Your Cart</h1>
+    {% if cart_items %}
+        <form method="POST" action="{% url 'view_cart' %}">
+            {% csrf_token %}
+            <table>
+                <thead>
+                    <tr>
+                        <th>Product</th>
+                        <th>Quantity</th>
+                        <th>Price</th>
+                        <th>Subtotal</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in cart_items %}
+                    <tr>
+                        <td>{{ item.product.name }}</td>
+                        <td>
+                            <!-- Quantity Update Form -->
+                            <input type="number" name="quantity" value="{{ item.quantity }}" class="quantity-input" min="1">
+                            <input type="hidden" name="item_id" value="{{ item.id }}">
+                            <input type="hidden" name="action" value="update_quantity">
+                        </td>
+                        <td>k{{ item.product.price }}</td>
+                        <td>k{{ item.subtotal }}</td>
+                        <td>
+                            <!-- Remove Item Button -->
+                            <button type="submit" name="action" value="remove_item" class="btn-remove">Remove</button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <div class="button-group">
+                <button type="submit" class="btn btn-primary">Update Cart</button>
+            </div>
+        </form>
+
+        <div class="total">
+            <strong>Total: k{{ total_amount }}</strong>
+        </div>
+        <div class="button-group">
+            <a href="{% url 'checkout' %}" class="btn btn-primary">Proceed to Checkout</a>
+        </div>
+    {% else %}
+        <p>Your cart is empty.</p>
+        <a href="{% url 'product_list' %}" class="btn btn-primary">Continue Shopping</a>
+    {% endif %}
+{% endblock %}

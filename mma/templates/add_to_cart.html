@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+
+{% block title %}Add to Cart{% endblock %}
+
+{% block content %}
+    <h1 class="page-title">Add to Cart</h1>
+    <div class="card">
+        <h2 class="card-title">{{ product.name }}</h2>
+        <p class="card-content">Price: {{ product.price }}</p>
+        <form method="POST">
+            {% csrf_token %}
+            <label for="quantity">Quantity:</label>
+            <input type="number" id="quantity" name="quantity" value="1" min="1">
+            <div class="button-group">
+                <button type="submit" class="btn">Add to Cart</button>
+            </div>
+        </form>
+    </div>
+{% endblock %}
