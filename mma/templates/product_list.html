@@ -1,11 +1,18 @@
 {% extends 'base.html' %}
 
 {% block title %}Product List{% endblock %}
-
 {% block extra_css %}
 <style>
+    /* Consistent container styling */
+    .dashboard-container {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+        margin-bottom: 20px;
+    }
+
     .page-title {
-        font-size: 2rem;
+        font-size: 1.5rem;  /* Adjusted for consistency */
         color: var(--primary-color);
         margin-bottom: 20px;
         text-align: center;
@@ -14,7 +21,7 @@
     .search-form {
         display: flex;
         justify-content: center;
-        margin-bottom: 30px;
+        margin-bottom: 20px;  /* Adjusted spacing */
     }
 
     .search-input {
@@ -41,11 +48,12 @@
         background-color: var(--primary-color-dark);
     }
 
+    /* Grid container for the cards */
     .card-container {
-        display: flex;
-        flex-wrap: wrap;
+        display: grid;
         gap: 20px;
-        justify-content: center;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        justify-items: center;
         margin-bottom: 40px;
     }
 
@@ -64,7 +72,7 @@
     }
 
     .card-title {
-        font-size: 1.5rem;
+        font-size: 1.2rem;  /* Adjusted for consistency */
         color: var(--text-color);
         margin-bottom: 10px;
     }
@@ -94,24 +102,31 @@
         background-color: var(--primary-color-dark);
     }
 
+    /* Responsive adjustments */
+    @media (max-width: 1200px) {
+        .card-container {
+            grid-template-columns: repeat(3, 1fr);  /* 3 cards per row */
+        }
+    }
+
     @media (max-width: 768px) {
         .card-container {
-            flex-direction: column;
-            align-items: center;
+            grid-template-columns: repeat(2, 1fr);  /* 2 cards per row */
         }
+    }
 
-        .card {
-            width: 100%;
-            max-width: 90%;
+    @media (max-width: 480px) {
+        .card-container {
+            grid-template-columns: 1fr;  /* 1 card per row */
         }
     }
 </style>
 {% endblock %}
 
 {% block content %}
+<div class="dashboard-container">
     <h1 class="page-title">Product List</h1>
 
-    <!-- Search Form -->
     <div class="search-form">
         <form method="GET" action="">
             <input type="text" name="q" class="search-input" placeholder="Search for products..." value="{{ query }}">
@@ -119,21 +134,22 @@
         </form>
     </div>
 
-    <!-- Product Cards -->
-    <div class="card-container">
-        {% if products %}
+    {% if products %}
+        <div class="card-container">
             {% for product in products %}
-            <div class="card">
-                <h2 class="card-title">{{ product.name }}</h2>
-                <p class="card-content">{{ product.description }}</p>
-                <p class="card-content">Price: k{{ product.price }}</p>
-                <div class="button-group">
-                    <a href="{% url 'add_to_cart' product.id %}" class="btn">Add to Cart</a>
+                <div class="card">
+                    <h2 class="card-title">{{ product.name }}</h2>
+                    <p class="card-content">{{ product.description }}</p>
+                    <p class="card-content">{{ product.category }}</p>
+                    <p class="card-content">Price: K{{ product.price }}</p>
+                    <div class="button-group">
+                        <a href="{% url 'add_to_cart' product.id %}" class="btn">Add to Cart</a>
+                    </div>
                 </div>
-            </div>
             {% endfor %}
-        {% else %}
-            <p>No products match your search.</p>
-        {% endif %}
-    </div>
+        </div>
+    {% else %}
+        <p>No products available.</p>
+    {% endif %}
+</div>
 {% endblock %}

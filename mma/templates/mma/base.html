@@ -335,12 +335,10 @@ button:hover {
     <nav class="top-nav">
         {% if user.is_authenticated %}
             {% if user.username == 'mobilemoney' %}
-                <a href="{% url 'a_dashboard' %}" class="top-nav-item {% if request.resolver_match.url_name == 'a_dashboard' %}active-page{% endif %}"><i class="fas fa-user-shield"></i></a>
+                <a href="{% url 'a_dashboard' %}" class="top-nav-item {% if request.resolver_match.url_name == 'a_dashboard' %}active-page{% endif %}" title="Admin"><i class="fas fa-user-shield"></i></a>
             {% endif %}
-            <a href="{% url 'custom_logout' %}" class="icon-btn" title="Logout">
-                <span class="icon"><i class="fas fa-sign-out-alt"></i></span>
-            </a>
-        {% else %}
+            <a href="{% url 'custom_logout' %}" class="top-nav-item {% if request.resolver_match.url_name == 'custom_logout' %}active-page{% endif %}" title="Logout"><i class="fas fa-sign-out-alt"></i></a>
+            {% else %}
             <a href="{% url 'login' %}" class="icon-btn {% if request.resolver_match.url_name == 'login' %}active-page{% endif %}" title="Login">
                 <span class="icon"><i class="fas fa-sign-in-alt"></i></span>
             </a>

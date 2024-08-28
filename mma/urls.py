@@ -15,6 +15,10 @@ urlpatterns = [
     path('approve-user/<int:user_id>/', views.approve_user, name='approve_user'),
     path('approve-float-request/<int:request_id>/', views.approve_float_request, name='approve_float_request'),
     path('approve-cash-request/<int:request_id>/', views.approve_cash_request, name='approve_cash_request'),
+    path('approve-orders/', views.admin_approve_orders, name='admin_approve_orders'),
+
+    path('approved-orders/', views.approved_order_list, name='approved_order_list'),
+    path('generate-invoice/<int:order_id>/', views.generate_invoice, name='generate_invoice'),
 
     path('transactions/', views.transaction_list, name='transaction_list'),  # Added transaction list view
     path('transactions/<int:id>/', views.transaction_detail, name='transaction_detail'),  # Added transaction detail view

@@ -28,38 +28,121 @@ from .models import Order
 from django.shortcuts import redirect
 from django.http import JsonResponse
 from django.db.models import Q  # For advanced queries (OR queries)
+from django.shortcuts import redirect
+from django.contrib import messages
+from django.db import transaction
+from .models import Order, OrderItem, Invoice
+from decimal import Decimal
+from django.contrib import messages
+from django.shortcuts import get_object_or_404, redirect, render
+from django.db import transaction
+from decimal import Decimal
+from .models import Cart, Order, OrderItem, Invoice
+from django.contrib.admin.views.decorators import staff_member_required
+from django.shortcuts import get_object_or_404, render
+from django.http import HttpResponse
+from django.template.loader import render_to_string
+from weasyprint import HTML
+from io import BytesIO
+
+
+from django.db.models import Q
+from django.shortcuts import render
+from collections import defaultdict
+from .models import Product
+from .models import Order
+
+@staff_member_required
+def approved_order_list(request):
+    approved_orders = Order.objects.filter(status='approved').order_by('-created_at')
+    context = {
+        'approved_orders': approved_orders,
+    }
+    return render(request, 'mma/approved_order_list.html', context)
+
+@staff_member_required
+def generate_invoice(request, order_id):
+    order = get_object_or_404(Order, id=order_id)
+
+    if order.status != 'approved':
+        return HttpResponse("Invoice can only be generated for approved orders.", status=400)
+
+    # Render the invoice template
+    html_string = render_to_string('mma/invoice_template.html', {'order': order})
+
+    # Generate PDF
+    html = HTML(string=html_string)
+    result = html.write_pdf()
+
+    # Create HTTP response
+    response = HttpResponse(content_type='application/pdf;')
+    response['Content-Disposition'] = f'inline; filename=invoice_{order.id}.pdf'
+    response['Content-Transfer-Encoding'] = 'binary'
+
+    # Write PDF to response
+    with BytesIO(result) as pdf:
+        response.write(pdf.read())
+
+    return response
+
+from django.shortcuts import render
+from django.db.models import Q
+from .models import Product
 
 @login_required
 def product_list(request):
-    query = request.GET.get('q')  # Get the search query from the URL parameters
-    if query:
-        # Filter products based on the search query (in name or category)
-        products = Product.objects.filter(Q(name__icontains=query) | Q(category__icontains=query))
-    else:
-        # If no query, return all products
-        products = Product.objects.all()
+    query = request.GET.get('q')
 
-    return render(request, 'product_list.html', {'products': products, 'query': query})
+    if query:
+        products = Product.objects.filter(
+            Q(name__icontains=query) | Q(category__icontains=query)
+        ).order_by('category', 'name')
+    else:
+        products = Product.objects.all().order_by('category', 'name')
+
+    try:
+        cart = Cart.objects.get(agent=request.user)
+        cart_item_count = cart.items.count()
+    except Cart.DoesNotExist:
+        cart_item_count = 0
+
+    return render(request, 'product_list.html', {
+        'products': products,
+        'query': query,
+        'cart_item_count': cart_item_count  # Add the count to context
+    })
+
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import get_object_or_404, redirect
+from django.contrib import messages
+from .models import Product, Cart, CartItem
 
 @login_required
 def add_to_cart(request, product_id):
+    # Get the product, or return 404 if not found
     product = get_object_or_404(Product, id=product_id)
+
+    # Get or create the user's cart
     cart, created = Cart.objects.get_or_create(agent=request.user)
 
+    # Get or create a cart item for the product
     cart_item, item_created = CartItem.objects.get_or_create(
         cart=cart,
         product=product,
         defaults={'quantity': 1}
     )
 
+    # If the cart item already exists, increment the quantity
     if not item_created:
         cart_item.quantity += 1
         cart_item.save()
+        messages.info(request, f"Quantity updated: {product.name} is now {cart_item.quantity} in your cart.")
+    else:
+        messages.success(request, f"{product.name} added to your cart.")
 
-    messages.success(request, f"{product.name} added to your cart.")
-    return redirect('product_list')  # or wherever you want to redirect
-
-from django.shortcuts import redirect
+    # Redirect back to the same page (or product list as fallback)
+    next_url = request.GET.get('next', 'product_list')
+    return redirect(next_url)
 
 @login_required
 def view_cart(request):
@@ -67,10 +150,12 @@ def view_cart(request):
         cart = Cart.objects.get(agent=request.user)
         cart_items = cart.items.all()
         total_amount = cart.total_amount()
+        cart_item_count = cart_items.count()  # Calculate the number of items
     except Cart.DoesNotExist:
         cart = None
         cart_items = []
         total_amount = 0
+        cart_item_count = 0
 
     # Handle POST requests for updating quantity or removing items
     if request.method == 'POST':
@@ -95,8 +180,10 @@ def view_cart(request):
         'cart': cart,
         'cart_items': cart_items,
         'total_amount': total_amount,
+        'cart_item_count': cart_item_count,  # Add the count to context
     }
     return render(request, 'view_cart.html', context)
+
 
 @login_required
 def checkout_view(request):
@@ -133,18 +220,6 @@ def checkout_view(request):
     except Cart.DoesNotExist:
         messages.error(request, "You don't have an active cart.")
         return redirect('product_list')
-
-from django.shortcuts import redirect
-from django.contrib import messages
-from django.db import transaction
-from .models import Order, OrderItem, Invoice
-from decimal import Decimal
-
-from django.contrib import messages
-from django.shortcuts import get_object_or_404, redirect, render
-from django.db import transaction
-from decimal import Decimal
-from .models import Cart, Order, OrderItem, Invoice
 
 @login_required
 @transaction.atomic
@@ -234,6 +309,30 @@ def order_summary(request, order_id):
     delivery_date = order.calculate_delivery_date()
 
     return render(request, 'order_summary.html', {'order': order, 'delivery_date': delivery_date})
+
+@staff_member_required
+def admin_approve_orders(request):
+    pending_orders = Order.objects.filter(status='pending')
+
+    if request.method == 'POST':
+        order_id = request.POST.get('order_id')
+        action = request.POST.get('action')
+
+        order = get_object_or_404(Order, id=order_id)
+
+        if action == 'approve':
+            order.status = 'approved'
+            order.approved_by = request.user
+            order.save()
+            messages.success(request, f"Order #{order.id} has been approved.")
+        elif action == 'reject':
+            order.status = 'cancelled'
+            order.save()
+            messages.warning(request, f"Order #{order.id} has been rejected.")
+
+        return redirect('admin_approve_orders')
+
+    return render(request, 'approve_orders.html', {'pending_orders': pending_orders})
 
 @staff_member_required
 def approve_cashout(request):
@@ -604,11 +703,13 @@ def admin_approval(request):
     pending_users = CustomUser.objects.filter(is_approved=False)
     pending_float_requests = FloatRequest.objects.filter(is_approved=False)
     pending_cash_requests = CashRequest.objects.filter(is_approved=False)
+    pending_orders = Order.objects.filter(status='pending')
 
     context = {
         'pending_users': pending_users,
         'pending_float_requests': pending_float_requests,
         'pending_cash_requests': pending_cash_requests,
+        'pending_orders': pending_orders,
     }
     return render(request, 'mma/admin_approval.html', context)
 

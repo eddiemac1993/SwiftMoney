@@ -51,7 +51,8 @@ class Order(models.Model):
     deposit_amount = models.DecimalField(max_digits=10, decimal_places=2)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
     created_at = models.DateTimeField(auto_now_add=True)
-    delivery_date = models.DateField(null=True, blank=True)  # Allow null or blank
+    delivery_date = models.DateField(null=True, blank=True)
+    is_approved = models.BooleanField(default=False)
 
     def calculate_delivery_date(self):
         if self.pk and self.items.exists():  # Ensure the instance has a primary key and items

@@ -16,10 +16,17 @@
     .order-confirmation h1 {
         font-size: 1.5rem;
         color: var(--text-color);
+        margin-bottom: 20px;
     }
 
     .order-summary {
         margin-top: 20px;
+    }
+
+    .order-summary h3 {
+        font-size: 1.2rem;
+        color: var(--text-color);
+        margin-bottom: 15px;
     }
 
     .order-summary ul {
@@ -62,10 +69,20 @@
     }
 
     .cancel-link {
-        display: block;
+        display: inline-block;
         margin-top: 20px;
         text-align: center;
-        color: var(--secondary-text);
+        color: #fff;
+        background-color: var(--primary-color);
+        padding: 10px 20px;
+        border-radius: 5px;
+        text-decoration: none;
+        font-size: 1rem;
+        transition: background-color 0.3s ease;
+    }
+
+    .cancel-link:hover {
+        background-color: var(--primary-hover);
     }
 
     @media (max-width: 768px) {

@@ -48,5 +48,23 @@
                 <i class="fas fa-check-circle"></i> Cashout Approvals
             </a>
         </div>
+                <div class="card">
+            <h2 class="card-title">
+                <i class="fas fa-shopping-cart"></i> Pending Orders
+            </h2>
+            <p class="card-content pending">{{ pending_orders }}</p>
+            <a href="{% url 'admin_approve_orders' %}" class="btn">
+                <i class="fas fa-check-circle"></i> Order Approvals
+            </a>
+        </div>
+                <div class="card">
+            <h2 class="card-title">
+                <i class="fas fa-file-invoice"></i> Approved Orders
+            </h2>
+            <p class="card-content">{{ approved_orders }}</p>
+            <a href="{% url 'approved_order_list' %}" class="btn">
+                <i class="fas fa-eye"></i> View Approved Orders
+            </a>
+        </div>
     </div>
 {% endblock %}

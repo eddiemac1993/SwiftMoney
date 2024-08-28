@@ -1,0 +1,37 @@
+{% extends 'mma/base.html' %}
+{% block title %}Approved Orders{% endblock %}
+{% block content %}
+    <h1 class="page-title">Approved Orders</h1>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Order ID</th>
+                <th>Customer Name</th>
+                <th>Agent</th>
+                <th>Total Amount</th>
+                <th>Date</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for order in approved_orders %}
+            <tr>
+                <td>{{ order.id }}</td>
+                <td>{{ order.customer_name }}</td>
+                <td>{{ order.agent.username }}</td>
+                <td>K{{ order.total_amount|floatformat:2 }}</td>
+                <td>{{ order.created_at|date:"F d, Y" }}</td>
+                <td>
+                    <a href="{% url 'generate_invoice' order.id %}" class="btn btn-sm btn-primary">
+                        <i class="fas fa-file-invoice"></i> Generate Invoice
+                    </a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="6">No approved orders found.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}
