@@ -1,104 +1,101 @@
 {% extends "mma/base.html" %}
-
-{% block title %}Welcome to SwiftMoney{% endblock %}
-
+{% block title %}Welcome to SwiftMoney - Mobile Agent Portal{% endblock %}
 {% block extra_css %}
 <style>
     .welcome-container {
         text-align: center;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 25px 5px;
     }
-
     .welcome-title {
         font-size: 2.5rem;
         color: var(--primary-color);
         margin-bottom: 20px;
     }
-
     .welcome-message {
         font-size: 1.2rem;
         color: var(--text-color);
         margin-bottom: 30px;
     }
-
     .feature-grid {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
         gap: 20px;
         margin-top: 40px;
     }
-
     .feature-card {
         background-color: var(--card-background);
         border-radius: 15px;
         padding: 20px;
         text-align: center;
         transition: transform 0.3s ease;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
     }
-
     .feature-card:hover {
         transform: translateY(-5px);
     }
-
     .feature-icon {
         font-size: 2.5rem;
         color: var(--primary-color);
         margin-bottom: 15px;
     }
-
     .feature-title {
         font-size: 1.2rem;
         color: var(--text-color);
         margin-bottom: 10px;
     }
-
     .feature-description {
         font-size: 0.9rem;
         color: var(--secondary-text);
     }
-
     .cta-button {
         display: inline-block;
         background-color: var(--primary-color);
-        color: var(--text-color);
+        color: white;
         padding: 12px 24px;
         border-radius: 25px;
         text-decoration: none;
         font-weight: bold;
         transition: background-color 0.3s ease;
+        margin-top: 20px;
     }
-
     .cta-button:hover {
         background-color: #45a049;
     }
+    .order-icon {
+        margin-right: 8px;
+    }
 </style>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 {% endblock %}
-
 {% block content %}
 <div class="welcome-container">
     <h1 class="welcome-title">Welcome to SwiftMoney</h1>
     {% if user.is_authenticated %}
-        <p class="welcome-message">Hello, {{ user.username }}! We're glad to see you back.</p>
-        <a href="{% url 'product_list' %}" class="cta-button">Ordering</a>
+        <p class="welcome-message">Hello, Agent {{ user.username }}! Ready to serve your customers?</p>
+        <a href="{% url 'product_list' %}" class="cta-button">
+            <i class="fas fa-shopping-cart order-icon"></i>Start Order
+        </a>
     {% else %}
-        <p class="welcome-message">Experience fast and secure financial transactions with SwiftMoney.</p>
-        <a href="{% url 'register' %}" class="cta-button">Get Started</a>
+        <p class="welcome-message">Empower your customers with swift financial services.</p>
+        <a href="{% url 'register' %}" class="cta-button">Become an Agent</a>
     {% endif %}
-
     <div class="feature-grid">
         <div class="feature-card">
-            <div class="feature-icon"><i class="fas fa-bolt"></i></div>
-            <h2 class="feature-title">Quick Transfers</h2>
-            <p class="feature-description">Send money instantly to anyone, anywhere.</p>
+            <div class="feature-icon"><i class="fas fa-hand-holding-usd"></i></div>
+            <h2 class="feature-title">Cash Requests</h2>
+            <p class="feature-description">Easily request and manage cash for your operations.</p>
         </div>
         <div class="feature-card">
-            <div class="feature-icon"><i class="fas fa-shield-alt"></i></div>
-            <h2 class="feature-title">Secure Transactions</h2>
-            <p class="feature-description">Your financial safety is our top priority.</p>
+            <div class="feature-icon"><i class="fas fa-user-check"></i></div>
+            <h2 class="feature-title">Customer Orders</h2>
+            <p class="feature-description">Process customer orders quickly and efficiently.</p>
         </div>
         <div class="feature-card">
-            <div class="feature-icon"><i class="fas fa-chart-line"></i></div>
-            <h2 class="feature-title">Easy Management</h2>
-            <p class="feature-description">Track your expenses and manage your finances effortlessly.</p>
+            <div class="feature-icon"><i class="fas fa-mobile-alt"></i></div>
+            <h2 class="feature-title">Mobile Flexibility</h2>
+            <p class="feature-description">Conduct transactions anywhere with our mobile platform.</p>
         </div>
     </div>
 </div>

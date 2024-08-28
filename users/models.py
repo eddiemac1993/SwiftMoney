@@ -22,15 +22,14 @@ class CustomUser(AbstractUser):
     is_admin = models.BooleanField(default=False)  # Add this line
 
     def save(self, *args, **kwargs):
-        if not self.phone_number.startswith('+260'):
-            raise ValueError("Phone number must start with +260")
+
         super().save(*args, **kwargs)
 
 @receiver(post_save, sender=CustomUser)
 def handle_profile_pic(sender, instance, **kwargs):
     if instance.profile_pic and not instance.profile_pic_thumbnail:
         logger.info(f'Profile picture uploaded for user: {instance.username}')
-        
+
         try:
             image = Image.open(instance.profile_pic)
             max_size = (200, 200)
@@ -47,15 +46,15 @@ def handle_profile_pic(sender, instance, **kwargs):
 
             thumb_size = (100, 100)
             image.thumbnail(thumb_size)
-            
+
             thumb_io = io.BytesIO()
             image.save(thumb_io, format='JPEG')
             thumb_file = ContentFile(thumb_io.getvalue(), 'thumb_' + instance.profile_pic.name)
-            
+
             instance.profile_pic_thumbnail.save(thumb_file.name, thumb_file, save=False)
             logger.info(f'Thumbnail created for user: {instance.username}')
 
             instance.save(update_fields=['profile_pic_thumbnail'])
-        
+
         except Exception as e:
             logger.error(f'Error processing profile picture for user {instance.username}: {e}')
