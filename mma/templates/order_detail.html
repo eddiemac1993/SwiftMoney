@@ -28,8 +28,12 @@
 
     <div class="button-group">
         {% if order.status == 'pending' %}
-            <a href="{% url 'pay_deposit' order.id %}" class="btn">Pay Deposit</a>
+            <a href="{% url 'pay_deposit' order.id %}" class="btn">Order Confirmation</a>
             <a href="{% url 'cancel_order' order.id %}" class="btn">Cancel Order</a>
         {% endif %}
+        {% if order.status == 'approved' %}
+        <a href="{% url 'generate_invoice' order.id %}" class="btn btn-sm btn-primary">
+                        <i class="fas fa-file-invoice"></i> Generate Invoice
+                    </a>{% endif %}
     </div>
 {% endblock %}

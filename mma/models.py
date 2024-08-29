@@ -5,6 +5,10 @@ from decimal import Decimal
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.contrib.auth import get_user_model
+from django.db import models
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+from django.utils import timezone
 
 class Product(models.Model):
     name = models.CharField(max_length=200)
@@ -33,11 +37,6 @@ class CartItem(models.Model):
 
     def __str__(self):
         return f"{self.quantity} x {self.product.name}"
-
-from django.db import models
-from django.db.models.signals import post_save
-from django.dispatch import receiver
-from django.utils import timezone
 
 class Order(models.Model):
     STATUS_CHOICES = (

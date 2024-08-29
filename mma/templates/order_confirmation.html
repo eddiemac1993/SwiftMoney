@@ -118,6 +118,6 @@
         <p class="total-amount">Total Amount: k{{ order.total_amount }}</p>
         <p class="deposit-amount">Deposit Amount: k{{ order.deposit_amount }}</p>
     </div>
-    <p><a href="{% url 'order_detail' order.id %}" class="cancel-link">Proceed to Pay Deposit</a></p>
+    <p><a href="{% url 'order_detail' order.id %}" class="cancel-link">Place the Order</a></p>
 </div>
 {% endblock %}

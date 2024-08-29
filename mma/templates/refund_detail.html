@@ -1,0 +1,11 @@
+<!-- mma/templates/mma/refund_detail.html -->
+{% extends 'base.html' %}
+
+{% block content %}
+  <h2>Refunds for Order {{ order.id }}</h2>
+  <ul>
+    {% for refund in refunds %}
+      <li>Refund ID: {{ refund.id }} - Amount: {{ refund.amount }} - Issued At: {{ refund.issued_at }}</li>
+    {% endfor %}
+  </ul>
+{% endblock %}

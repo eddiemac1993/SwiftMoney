@@ -1,6 +1,108 @@
 {% extends 'mma/base.html' %}
 {% block title %}Approved Orders{% endblock %}
 {% block content %}
+{% block extra_css %}
+<style>
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.9rem;
+        background-color: var(--card-background);
+        border-radius: 10px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    th, td {
+        padding: 12px;
+        text-align: left;
+        border-bottom: 1px solid var(--secondary-text);
+    }
+
+    th {
+        color: var(--secondary-text);
+        font-weight: normal;
+        background-color: var(--primary-color-light);
+    }
+
+    tr:nth-child(even) {
+        background-color: var(--card-background-light);
+    }
+
+    tr:hover {
+        background-color: var(--primary-color-hover-light);
+    }
+
+    .btn {
+        padding: 8px 16px;
+        border: none;
+        background-color: var(--primary-color);
+        color: white;
+        border-radius: 8px;
+        cursor: pointer;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        margin-top: 10px;
+        font-size: 0.85rem; /* Adjusted for smaller size */
+    }
+
+    .btn .icon {
+        margin-right: 6px;
+    }
+
+    .btn:hover {
+        background-color: var(--primary-color-hover);
+    }
+
+    @media (max-width: 1024px) {
+        table {
+            font-size: 0.8rem;
+        }
+
+        th, td {
+            padding: 10px;
+        }
+
+        .btn {
+            font-size: 0.8rem;
+            padding: 8px 14px;
+        }
+    }
+
+    @media (max-width: 767px) {
+        table {
+            font-size: 0.75rem;
+        }
+
+        th, td {
+            padding: 8px;
+        }
+
+        .btn {
+            font-size: 0.75rem;
+            padding: 6px 12px;
+            margin-top: 8px;
+        }
+    }
+
+    @media (max-width: 480px) {
+        table {
+            font-size: 0.7rem;
+        }
+
+        th, td {
+            padding: 6px;
+        }
+
+        .btn {
+            font-size: 0.7rem;
+            padding: 5px 10px;
+            margin-top: 6px;
+        }
+    }
+</style>
+{% endblock %}
     <h1 class="page-title">Approved Orders</h1>
     <table class="table">
         <thead>
@@ -25,6 +127,11 @@
                     <a href="{% url 'generate_invoice' order.id %}" class="btn btn-sm btn-primary">
                         <i class="fas fa-file-invoice"></i> Generate Invoice
                     </a>
+
+                        <a href="{% url 'refund_list' order.id %}" class="btn btn-sm btn-secondary" style="margin-left: 10px;">
+                            <i class="fas fa-undo"></i> Refund
+                        </a>
+
                 </td>
             </tr>
             {% empty %}

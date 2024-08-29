@@ -2,6 +2,16 @@ from django import forms
 from .models import FloatRequest, CashRequest
 from django import forms
 from .models import Order
+# mma/forms.py
+from django import forms
+from .models import Refund
+
+class RefundForm(forms.ModelForm):
+    class Meta:
+        model = Refund
+        fields = ['order']  # Exclude 'amount' as it's auto-calculated
+
+
 
 class OrderForm(forms.ModelForm):
     class Meta:

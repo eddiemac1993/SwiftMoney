@@ -48,6 +48,31 @@
         background-color: var(--primary-color-dark);
     }
 
+    /* Category buttons styling */
+    .category-buttons {
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+    }
+
+    .category-btn {
+        background-color: var(--secondary-color);
+        color: white;
+        padding: 10px 20px;
+        border-radius: 5px;
+        cursor: pointer;
+        border: none;
+        transition: background-color 0.3s ease;
+        text-decoration: none;
+        font-size: 1rem;
+    }
+
+    .category-btn:hover {
+        background-color: var(--secondary-color-dark);
+    }
+
     /* Grid container for the cards */
     .card-container {
         display: grid;
@@ -120,6 +145,104 @@
             grid-template-columns: 1fr;  /* 1 card per row */
         }
     }
+    /* Category badges styling */
+    .category-buttons {
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+    }
+
+    .category-badge {
+        background-color: var(--primary-color);
+        color: white;
+        padding: 5px 10px;
+        border-radius: 15px;
+        cursor: pointer;
+        font-size: 0.875rem;  /* Smaller font size for badge */
+        text-decoration: none;
+        display: inline-block;
+        transition: background-color 0.3s ease;
+    }
+
+    .category-badge:hover {
+        background-color: var(--primary-color-dark);
+    }
+    .button-group {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .btn {
+        background-color: var(--primary-color);
+        color: white;
+        padding: 10px 20px;
+        border-radius: 10px;
+        text-decoration: none;
+        font-size: 1rem;
+        transition: background-color 0.3s ease;
+        margin-bottom: 10px;
+    }
+
+    .btn:hover {
+        background-color: var(--primary-color-dark);
+    }
+
+    /* Share icons styling */
+    .share-icons {
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+    }
+
+    .share-icons a {
+        color: var(--primary-color);
+        font-size: 1.25rem;
+        transition: color 0.3s ease;
+    }
+
+    .share-icons a:hover {
+        color: var(--primary-color-dark);
+    }
+    .price-tag {
+    display: inline-block;
+    background-color: var(--primary-color);
+    color: white;
+    padding: 5px 10px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    border-radius: 5px;
+    position: relative;
+}
+
+.price-tag:before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 0;
+    width: 0;
+    height: 0;
+    border-top: 10px solid transparent;
+    border-bottom: 10px solid transparent;
+    border-right: 10px solid var(--primary-color);
+    transform: translateY(-50%);
+}
+
+.price-tag:after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    right: -10px;
+    width: 0;
+    height: 0;
+    border-top: 10px solid transparent;
+    border-bottom: 10px solid transparent;
+    border-left: 10px solid var(--primary-color);
+    transform: translateY(-50%);
+}
+
 </style>
 {% endblock %}
 
@@ -134,16 +257,39 @@
         </form>
     </div>
 
+    <!-- Category Filter Badges -->
+    <div class="category-buttons">
+        <!-- 'Show All' badge to reset the filter -->
+        <a href="{% url 'product_list' %}" class="category-badge">Show All</a>
+
+        {% for category in categories %}
+            <a href="?category={{ category }}" class="category-badge">{{ category }}</a>
+        {% endfor %}
+    </div>
+
     {% if products %}
         <div class="card-container">
             {% for product in products %}
                 <div class="card">
                     <h2 class="card-title">{{ product.name }}</h2>
                     <p class="card-content">{{ product.description }}</p>
-                    <p class="card-content">{{ product.category }}</p>
-                    <p class="card-content">Price: K{{ product.price }}</p>
+                    <p class="card-content">Price: <span class="price-tag">K{{ product.price }}</span></p>
                     <div class="button-group">
                         <a href="{% url 'add_to_cart' product.id %}" class="btn">Add to Cart</a>
+                        <div class="share-icons">
+                            <!-- WhatsApp -->
+                            <a href="https://api.whatsapp.com/send?text=Check%20this%20out:%20{{ product.name }}%20{{ request.build_absolute_uri }}" target="_blank">
+                                <i class="fab fa-whatsapp"></i>
+                            </a>
+                            <!-- SMS (Assuming this opens the SMS app on mobile) -->
+                            <a href="sms:?body=Check%20this%20out:%20{{ product.name }}%20{{ request.build_absolute_uri }}">
+                                <i class="fas fa-sms"></i>
+                            </a>
+                            <!-- Facebook -->
+                            <a href="https://www.facebook.com/sharer/sharer.php?u={{ request.build_absolute_uri }}" target="_blank">
+                                <i class="fab fa-facebook"></i>
+                            </a>
+                        </div>
                     </div>
                 </div>
             {% endfor %}

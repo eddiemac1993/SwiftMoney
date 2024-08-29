@@ -18,7 +18,6 @@ from django.dispatch import receiver
 from .models import CashoutRequest
 from django.core.mail import send_mail
 from django.conf import settings
-from django.shortcuts import render, redirect, get_object_or_404
 from .models import Product, Cart, CartItem, Order, Invoice, Refund
 from django.contrib.auth.decorators import login_required
 from django.db import transaction
@@ -44,13 +43,68 @@ from django.http import HttpResponse
 from django.template.loader import render_to_string
 from weasyprint import HTML
 from io import BytesIO
-
-
-from django.db.models import Q
-from django.shortcuts import render
-from collections import defaultdict
-from .models import Product
+from django.views import View
+from django.views.generic import ListView
+from .forms import RefundForm  # Assuming you have a form for handling refunds
+# mma/views.py
+from django.shortcuts import render, get_object_or_404
 from .models import Order
+from .forms import RefundForm  # Ensure this path is correct
+
+def refund_list(request, order_id):
+    order = get_object_or_404(Order, id=order_id)
+    if request.method == 'POST':
+        form = RefundForm(request.POST)
+        if form.is_valid():
+            refund = form.save(commit=False)
+            refund.order = order
+            refund.save()
+            # Redirect or return a response
+    else:
+        form = RefundForm()
+
+    return render(request, 'mma/refund_list.html', {'form': form, 'order': order})
+
+class RefundListView(ListView):
+    model = Refund
+    template_name = 'refund_list.html'
+
+# views.py
+# views.py
+
+class RefundDetailView(View):
+    def get(self, request, refund_id):
+        refund = get_object_or_404(Refund, id=refund_id)
+        context = {
+            'refund': refund
+        }
+        return render(request, 'refund_detail.html', context)
+
+# mma/views.py
+from django.shortcuts import render, get_object_or_404, redirect
+from .models import Order, Refund
+from .forms import RefundForm
+
+def refund_create(request, order_id):
+    order = get_object_or_404(Order, id=order_id)
+    if request.method == 'POST':
+        form = RefundForm(request.POST)
+        if form.is_valid():
+            refund = form.save(commit=False)
+            refund.order = order
+            refund.save()
+            return redirect('refund_detail', order_id=order.id)  # Correct view name and argument
+    else:
+        form = RefundForm()
+
+    return render(request, 'refund_form.html', {'form': form, 'order': order})
+
+def refund_detail(request, order_id):
+    # Example view for showing refund details
+    order = get_object_or_404(Order, id=order_id)
+    refunds = order.refunds.all()
+    return render(request, 'refund_detail.html', {'order': order, 'refunds': refunds})
+
 
 @staff_member_required
 def approved_order_list(request):
@@ -67,15 +121,24 @@ def generate_invoice(request, order_id):
     if order.status != 'approved':
         return HttpResponse("Invoice can only be generated for approved orders.", status=400)
 
+    # Calculate the estimated delivery time in days
+    if order.delivery_date:
+        delivery_days = (order.delivery_date - timezone.now().date()).days
+    else:
+        delivery_days = 'N/A'  # If delivery date is not set
+
     # Render the invoice template
-    html_string = render_to_string('mma/invoice_template.html', {'order': order})
+    html_string = render_to_string('mma/invoice_template.html', {
+        'order': order,
+        'delivery_days': delivery_days,  # Pass delivery_days to template
+    })
 
     # Generate PDF
     html = HTML(string=html_string)
     result = html.write_pdf()
 
     # Create HTTP response
-    response = HttpResponse(content_type='application/pdf;')
+    response = HttpResponse(content_type='application/pdf')
     response['Content-Disposition'] = f'inline; filename=invoice_{order.id}.pdf'
     response['Content-Transfer-Encoding'] = 'binary'
 
@@ -85,20 +148,25 @@ def generate_invoice(request, order_id):
 
     return response
 
-from django.shortcuts import render
-from django.db.models import Q
-from .models import Product
-
 @login_required
 def product_list(request):
     query = request.GET.get('q')
+    category_filter = request.GET.get('category')
 
+    # Filter products by search query if provided
     if query:
         products = Product.objects.filter(
             Q(name__icontains=query) | Q(category__icontains=query)
         ).order_by('category', 'name')
     else:
         products = Product.objects.all().order_by('category', 'name')
+
+    # Filter products by category if a category is selected
+    if category_filter:
+        products = products.filter(category=category_filter)
+
+    # Get all distinct categories from products
+    categories = Product.objects.values_list('category', flat=True).distinct()
 
     try:
         cart = Cart.objects.get(agent=request.user)
@@ -109,6 +177,7 @@ def product_list(request):
     return render(request, 'product_list.html', {
         'products': products,
         'query': query,
+        'categories': categories,  # Pass categories to the template
         'cart_item_count': cart_item_count  # Add the count to context
     })
 

@@ -34,6 +34,10 @@ urlpatterns = [
 
     path('receipt/<int:transaction_id>/download/', views.download_receipt, name='download_receipt'),
     path('invoice/<int:transaction_id>/download/', views.download_invoice, name='download_invoice'),
+    path('refund/<int:order_id>/', views.refund_create, name='refund_create'),
+    path('refund/<int:order_id>/', views.refund_list, name='refund_list'),
+    path('orders/<int:order_id>/refunds/', views.RefundListView.as_view(), name='order_refund_list'),
+    path('refunds/<int:order_id>/', views.refund_detail, name='refund_detail'),
 
     # Admin URLs
     path('admin/dashboard/', views.admin_dashboard, name='admin_dashboard'),
