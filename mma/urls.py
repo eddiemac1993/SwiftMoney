@@ -18,7 +18,7 @@ urlpatterns = [
     path('approve-orders/', views.admin_approve_orders, name='admin_approve_orders'),
 
     path('approved-orders/', views.approved_order_list, name='approved_order_list'),
-    path('generate-invoice/<int:order_id>/', views.generate_invoice, name='generate_invoice'),
+    path('generate/<int:order_id>/<str:doc_type>/', views.generate_document, name='generate_document'),
 
     path('transactions/', views.transaction_list, name='transaction_list'),  # Added transaction list view
     path('transactions/<int:id>/', views.transaction_detail, name='transaction_detail'),  # Added transaction detail view

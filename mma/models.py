@@ -5,17 +5,13 @@ from decimal import Decimal
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.contrib.auth import get_user_model
-from django.db import models
-from django.db.models.signals import post_save
-from django.dispatch import receiver
-from django.utils import timezone
 
 class Product(models.Model):
     name = models.CharField(max_length=200)
     description = models.TextField()
     category = models.CharField(max_length=100)
     price = models.DecimalField(max_digits=10, decimal_places=2)
-    delivery_time = models.IntegerField(help_text="Delivery time in days")
+    delivery_time = models.PositiveIntegerField()
 
     def __str__(self):
         return self.name
@@ -55,9 +51,21 @@ class Order(models.Model):
 
     def calculate_delivery_date(self):
         if self.pk and self.items.exists():  # Ensure the instance has a primary key and items
-            longest_delivery_time = max(item.product.delivery_time for item in self.items.all())
+            # Define the additional delay in days
+            additional_delay = 2  # For example, add a 2-day delay to all delivery times
+
+            # Calculate the maximum delivery time including the additional delay
+            longest_delivery_time = max(
+                item.product.delivery_time + additional_delay for item in self.items.all()
+            )
             return timezone.now().date() + timezone.timedelta(days=longest_delivery_time)
         return timezone.now().date()
+
+    def save(self, *args, **kwargs):
+        # If the order is being created, set the delivery date
+        if not self.delivery_date:
+            self.delivery_date = self.calculate_delivery_date()
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return f"Order {self.id} by {self.customer_name}"

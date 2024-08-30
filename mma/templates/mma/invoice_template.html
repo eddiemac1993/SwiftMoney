@@ -1,9 +1,11 @@
 <!DOCTYPE html>
+{% load extra_filters %}
+
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Invoice {{ order.id }}</title>
+    <title>{{ document_type|capfirst }} {{ order.id }}</title>
     <style>
         /* Add your styling here */
         body {
@@ -57,51 +59,87 @@
         <div class="company-info">
             <h2>Comagil Enterprise Limited</h2>
             <p>PO Box 660249</p>
-            <p>Moze, Zambia</p>
+            <p>Monze, Zambia</p>
             <p>Phone: +260 763 76000</p>
             <p>Email: conarynwanagombe@gmail.com</p>
         </div>
 
         <div class="invoice-header">
-            <h1>INV-001{{ order.id }}</h1>
+            <h1>{{ document_type|capfirst }} INV-001{{ order.id }}</h1>
             <p>Issued at: {{ order.invoice.issued_at }}</p>
         </div>
 
         <div class="invoice-details">
-            <p><strong>Customer:</strong> {{ order.customer_name }}</p>
-            <p><strong>Total Amount:</strong> K{{ order.total_amount }}</p>
-            <p><strong>Deposit Amount:</strong> K{{ order.deposit_amount }}</p>
-            <p><strong>Amount Due:</strong> K{{ order.invoice.amount_due }}</p>
-            <p><strong>Estimated Delivery Time:</strong> {{ delivery_days }} days</p>
+            <p>Order ID: {{ order.id }}</p>
+            <p>Customer Name: {{ order.customer_name }}</p>
+            <p>Total Amount: K{{ order.total_amount }}</p>
+            {% if document_type == 'invoice' or document_type == 'quotation' %}
+                <p>Deposit Amount: {{ order.deposit_amount }}</p>
+                <p>Status: {{ order.get_status_display }}</p>
+                <p>Delivery Date: {{ order.delivery_date }}</p>
+                {% if is_invoice_or_receipt %}
+                    <p>Estimated Delivery Days: {{ delivery_days }}</p>
+                {% endif %}
+            {% elif document_type == 'receipt' %}
+                <p>Total Amount in Words: {{ order.total_amount|number_to_words }} Kwacha Only</p>
+            {% endif %}
         </div>
 
-        <div class="invoice-items">
-            <h2>Order Items</h2>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Product</th>
-                        <th>Quantity</th>
-                        <th>Price</th>
-                        <th>Subtotal</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for item in order.items.all %}
+        {% if document_type == 'invoice' or document_type == 'quotation' %}
+            <div class="invoice-items">
+                <h2>Order Items</h2>
+                <table>
+                    <thead>
                         <tr>
-                            <td>{{ item.product.name }}</td>
-                            <td>{{ item.quantity }}</td>
-                            <td>K{{ item.product.price }}</td>
-                            <td>K{{ item.subtotal }}</td>
+                            <th>Product</th>
+                            <th>Quantity</th>
+                            <th>Price</th>
+                            <th>Subtotal</th>
                         </tr>
-                    {% endfor %}
-                    <tr class="total-row">
-                        <td colspan="3" style="text-align: right;">Total Amount:</td>
-                        <td>K{{ order.total_amount }}</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
+                    </thead>
+                    <tbody>
+                        {% for item in order.items.all %}
+                            <tr>
+                                <td>{{ item.product.name }}</td>
+                                <td>{{ item.quantity }}</td>
+                                <td>K{{ item.product.price }}</td>
+                                <td>K{{ item.subtotal }}</td>
+                            </tr>
+                        {% endfor %}
+                        {% if document_type == 'invoice' %}
+                            <tr class="total-row">
+                                <td colspan="3" style="text-align: right;">Total Amount:</td>
+                                <td>K{{ order.total_amount }}</td>
+                            </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        {% elif document_type == 'receipt' %}
+            <div class="invoice-items">
+                <h2>Order Items</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Product</th>
+                            <th>Quantity</th>
+                            <th>Price</th>
+                            <th>Subtotal</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in order.items.all %}
+                            <tr>
+                                <td>{{ item.product.name }}</td>
+                                <td>{{ item.quantity }}</td>
+                                <td>K{{ item.product.price }}</td>
+                                <td>K{{ item.subtotal }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% endif %}
 
         <div class="invoice-footer">
             <p>Thank you for your business!</p>

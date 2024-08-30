@@ -31,9 +31,17 @@
             <a href="{% url 'pay_deposit' order.id %}" class="btn">Order Confirmation</a>
             <a href="{% url 'cancel_order' order.id %}" class="btn">Cancel Order</a>
         {% endif %}
-        {% if order.status == 'approved' %}
-        <a href="{% url 'generate_invoice' order.id %}" class="btn btn-sm btn-primary">
-                        <i class="fas fa-file-invoice"></i> Generate Invoice
-                    </a>{% endif %}
+       {% if order.status == 'approved' %}
+    <a href="{% url 'generate_document' order.id 'invoice' %}" class="btn btn-sm btn-primary">
+        <i class="fas fa-file-invoice"></i> Generate Invoice
+    </a>
+{% endif %}
+<a href="{% url 'generate_document' order.id 'quotation' %}" class="btn btn-sm btn-secondary">
+    <i class="fas fa-file-alt"></i> Generate Quotation
+</a>
+<a href="{% url 'generate_document' order.id 'receipt' %}" class="btn btn-sm btn-success">
+    <i class="fas fa-receipt"></i> Generate Receipt
+</a>
+
     </div>
 {% endblock %}

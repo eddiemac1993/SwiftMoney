@@ -19,37 +19,14 @@ from .models import CashoutRequest
 from django.core.mail import send_mail
 from django.conf import settings
 from .models import Product, Cart, CartItem, Order, Invoice, Refund
-from django.contrib.auth.decorators import login_required
 from django.db import transaction
-from django.shortcuts import render, redirect
-from .forms import OrderForm  # Adjust the import based on your form
-from .models import Order
-from django.shortcuts import redirect
+from .forms import OrderForm
 from django.http import JsonResponse
 from django.db.models import Q  # For advanced queries (OR queries)
-from django.shortcuts import redirect
-from django.contrib import messages
-from django.db import transaction
-from .models import Order, OrderItem, Invoice
-from decimal import Decimal
-from django.contrib import messages
-from django.shortcuts import get_object_or_404, redirect, render
-from django.db import transaction
-from decimal import Decimal
-from .models import Cart, Order, OrderItem, Invoice
-from django.contrib.admin.views.decorators import staff_member_required
-from django.shortcuts import get_object_or_404, render
-from django.http import HttpResponse
-from django.template.loader import render_to_string
-from weasyprint import HTML
 from io import BytesIO
 from django.views import View
 from django.views.generic import ListView
 from .forms import RefundForm  # Assuming you have a form for handling refunds
-# mma/views.py
-from django.shortcuts import render, get_object_or_404
-from .models import Order
-from .forms import RefundForm  # Ensure this path is correct
 
 def refund_list(request, order_id):
     order = get_object_or_404(Order, id=order_id)
@@ -114,37 +91,52 @@ def approved_order_list(request):
     }
     return render(request, 'mma/approved_order_list.html', context)
 
+from django.http import HttpResponse
+from django.shortcuts import get_object_or_404
+from django.template.loader import render_to_string
+from django.utils import timezone
+from weasyprint import HTML
+from io import BytesIO
+from django.contrib.admin.views.decorators import staff_member_required
+
 @staff_member_required
-def generate_invoice(request, order_id):
+def generate_document(request, order_id, doc_type):
     order = get_object_or_404(Order, id=order_id)
 
-    if order.status != 'approved':
+    # Check if the document type is invoice and the order is not approved
+    if doc_type == 'invoice' and order.status != 'approved':
         return HttpResponse("Invoice can only be generated for approved orders.", status=400)
 
-    # Calculate the estimated delivery time in days
-    if order.delivery_date:
+    # Calculate the estimated delivery time in days for invoice or receipt
+    if order.delivery_date and doc_type in ['invoice', 'receipt']:
         delivery_days = (order.delivery_date - timezone.now().date()).days
     else:
         delivery_days = 'N/A'  # If delivery date is not set
 
-    # Render the invoice template
-    html_string = render_to_string('mma/invoice_template.html', {
+    # Prepare context data based on the document type
+    context = {
         'order': order,
-        'delivery_days': delivery_days,  # Pass delivery_days to template
-    })
+        'delivery_days': delivery_days,
+        'document_type': doc_type,
+        'is_invoice_or_receipt': doc_type in ["invoice", "receipt"],
+        'is_invoice_or_quotation': doc_type in ["invoice", "quotation"]
+    }
+
+
+    # Render the appropriate template
+    html_string = render_to_string('mma/invoice_template.html', context)
 
     # Generate PDF
     html = HTML(string=html_string)
-    result = html.write_pdf()
+    pdf_result = html.write_pdf()
 
     # Create HTTP response
     response = HttpResponse(content_type='application/pdf')
-    response['Content-Disposition'] = f'inline; filename=invoice_{order.id}.pdf'
+    response['Content-Disposition'] = f'inline; filename={doc_type}_{order.id}.pdf'
     response['Content-Transfer-Encoding'] = 'binary'
 
     # Write PDF to response
-    with BytesIO(result) as pdf:
-        response.write(pdf.read())
+    response.write(pdf_result)
 
     return response
 
@@ -184,7 +176,7 @@ def product_list(request):
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect
 from django.contrib import messages
-from .models import Product, Cart, CartItem
+from .models import Product, Cart, CartItem, OrderItem
 
 @login_required
 def add_to_cart(request, product_id):
@@ -292,11 +284,11 @@ def checkout_view(request):
 
 @login_required
 @transaction.atomic
+@login_required
+@transaction.atomic
 def submit_order(request, form_data):
     try:
         cart = Cart.objects.get(agent=request.user)
-
-        # Create order using form data
         order = Order.objects.create(
             agent=request.user,
             customer_name=form_data['customer_name'],
@@ -305,7 +297,6 @@ def submit_order(request, form_data):
             status='pending'
         )
 
-        # Create order items
         for cart_item in cart.items.all():
             OrderItem.objects.create(
                 order=order,
@@ -313,18 +304,15 @@ def submit_order(request, form_data):
                 quantity=cart_item.quantity
             )
 
-        # Create invoice
         Invoice.objects.create(order=order)
-
-        # Clear the cart
         cart.items.all().delete()
-
         messages.success(request, f"Order #{order.id} submitted successfully.")
         return redirect('order_confirmation', order_id=order.id)
 
     except Exception as e:
         messages.error(request, f"An error occurred: {str(e)}")
         return redirect('checkout')
+
 
 
 @login_required
