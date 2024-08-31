@@ -17,6 +17,8 @@ urlpatterns = [
     path('approve-cash-request/<int:request_id>/', views.approve_cash_request, name='approve_cash_request'),
     path('approve-orders/', views.admin_approve_orders, name='admin_approve_orders'),
 
+    path('terms-and-conditions/', views.terms_and_conditions, name='terms-and-conditions'),
+
     path('approved-orders/', views.approved_order_list, name='approved_order_list'),
     path('generate/<int:order_id>/<str:doc_type>/', views.generate_document, name='generate_document'),
 

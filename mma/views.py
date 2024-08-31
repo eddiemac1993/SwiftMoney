@@ -28,6 +28,9 @@ from django.views import View
 from django.views.generic import ListView
 from .forms import RefundForm  # Assuming you have a form for handling refunds
 
+def terms_and_conditions(request):
+    return render(request, 'terms_and_conditions.html')
+
 def refund_list(request, order_id):
     order = get_object_or_404(Order, id=order_id)
     if request.method == 'POST':

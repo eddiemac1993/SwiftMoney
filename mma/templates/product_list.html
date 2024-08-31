@@ -278,7 +278,7 @@
                         <a href="{% url 'add_to_cart' product.id %}" class="btn">Add to Cart</a>
                         <div class="share-icons">
                             <!-- WhatsApp -->
-                            <a href="https://api.whatsapp.com/send?text=Check%20this%20out:%20{{ product.name }}%20{{ request.build_absolute_uri }}" target="_blank">
+                            <a href="https://api.whatsapp.com/send?text=Check%20this%20out:%20{{ product.name }}%20{{ request.build_absolute_uri }}/?q={{ product.name }}" target="_blank">
                                 <i class="fab fa-whatsapp"></i>
                             </a>
                             <!-- SMS (Assuming this opens the SMS app on mobile) -->
