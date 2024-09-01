@@ -275,7 +275,11 @@
                     <p class="card-content">{{ product.description }}</p>
                     <p class="card-content">Price: <span class="price-tag">K{{ product.price }}</span></p>
                     <div class="button-group">
+                        {% if user.is_authenticated %}
                         <a href="{% url 'add_to_cart' product.id %}" class="btn">Add to Cart</a>
+                        {% else %}
+                        <a href="{% url 'agent_list' %}" class="btn">Visit Our Agents</a>
+                        {% endif %}
                         <div class="share-icons">
                             <!-- WhatsApp -->
                             <a href="https://api.whatsapp.com/send?text=Check%20this%20out:%20{{ product.name }}%20{{ request.build_absolute_uri }}/?q={{ product.name }}" target="_blank">

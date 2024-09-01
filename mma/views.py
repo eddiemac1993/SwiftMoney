@@ -18,15 +18,14 @@ from django.dispatch import receiver
 from .models import CashoutRequest
 from django.core.mail import send_mail
 from django.conf import settings
-from .models import Product, Cart, CartItem, Order, Invoice, Refund
+from .models import Product, Cart,Balance, CashoutRequest, CashRequest, Transaction, CartItem, Order, Invoice, Refund, OrderItem
 from django.db import transaction
 from .forms import OrderForm
-from django.http import JsonResponse
-from django.db.models import Q  # For advanced queries (OR queries)
-from io import BytesIO
+from django.db.models import Q
 from django.views import View
 from django.views.generic import ListView
 from .forms import RefundForm  # Assuming you have a form for handling refunds
+from django.contrib.auth.models import AnonymousUser
 
 def terms_and_conditions(request):
     return render(request, 'terms_and_conditions.html')
@@ -49,9 +48,6 @@ class RefundListView(ListView):
     model = Refund
     template_name = 'refund_list.html'
 
-# views.py
-# views.py
-
 class RefundDetailView(View):
     def get(self, request, refund_id):
         refund = get_object_or_404(Refund, id=refund_id)
@@ -59,11 +55,6 @@ class RefundDetailView(View):
             'refund': refund
         }
         return render(request, 'refund_detail.html', context)
-
-# mma/views.py
-from django.shortcuts import render, get_object_or_404, redirect
-from .models import Order, Refund
-from .forms import RefundForm
 
 def refund_create(request, order_id):
     order = get_object_or_404(Order, id=order_id)
@@ -93,14 +84,6 @@ def approved_order_list(request):
         'approved_orders': approved_orders,
     }
     return render(request, 'mma/approved_order_list.html', context)
-
-from django.http import HttpResponse
-from django.shortcuts import get_object_or_404
-from django.template.loader import render_to_string
-from django.utils import timezone
-from weasyprint import HTML
-from io import BytesIO
-from django.contrib.admin.views.decorators import staff_member_required
 
 @staff_member_required
 def generate_document(request, order_id, doc_type):
@@ -143,7 +126,57 @@ def generate_document(request, order_id, doc_type):
 
     return response
 
-@login_required
+def agent_list(request):
+    query = request.GET.get('q')
+
+    # Filter agents by business location if a search query is provided
+    if query:
+        agents = CustomUser.objects.filter(business_location__icontains=query, is_admin=False)
+    else:
+        agents = CustomUser.objects.filter(is_admin=False)
+
+    return render(request, 'agent_list.html', {
+        'agents': agents,
+        'query': query,
+    })
+
+def product_list_anonymous(request):
+    query = request.GET.get('q')
+    category_filter = request.GET.get('category')
+
+    # Filter products by search query if provided
+    if query:
+        products = Product.objects.filter(
+            Q(name__icontains=query) | Q(category__icontains=query)
+        ).order_by('category', 'name')
+    else:
+        products = Product.objects.all().order_by('category', 'name')
+
+    # Filter products by category if a category is selected
+    if category_filter:
+        products = products.filter(category=category_filter)
+
+    # Get all distinct categories from products
+    categories = Product.objects.values_list('category', flat=True).distinct()
+
+    # If the user is not authenticated, don't access user-specific data
+    if isinstance(request.user, AnonymousUser):
+        cart_item_count = 0
+    else:
+        try:
+            cart = Cart.objects.get(agent=request.user)
+            cart_item_count = cart.items.count()
+        except Cart.DoesNotExist:
+            cart_item_count = 0
+
+    return render(request, 'product_list.html', {
+        'products': products,
+        'query': query,
+        'categories': categories,  # Pass categories to the template
+        'cart_item_count': cart_item_count  # Add the count to context
+    })
+
+
 def product_list(request):
     query = request.GET.get('q')
     category_filter = request.GET.get('category')
@@ -175,11 +208,6 @@ def product_list(request):
         'categories': categories,  # Pass categories to the template
         'cart_item_count': cart_item_count  # Add the count to context
     })
-
-from django.contrib.auth.decorators import login_required
-from django.shortcuts import get_object_or_404, redirect
-from django.contrib import messages
-from .models import Product, Cart, CartItem, OrderItem
 
 @login_required
 def add_to_cart(request, product_id):
@@ -445,14 +473,6 @@ def create_balance(sender, instance, created, **kwargs):
     if created:
         Balance.objects.create(agent=instance)
 
-from decimal import Decimal
-from django.contrib import messages
-from django.core.mail import send_mail
-from django.shortcuts import redirect, render
-from django.conf import settings
-from django.contrib.auth.decorators import login_required
-from .models import Balance, CashoutRequest
-
 @login_required
 def cashout(request):
     # Fetch or create the user's balance
@@ -595,13 +615,6 @@ def admin_report(request):
     else:
         form = ReportForm()
     return render(request, 'mma/admin_report.html', {'form': form})
-
-
-from django.shortcuts import render
-from django.contrib.auth.decorators import login_required
-from django.db.models import Sum
-from django.utils import timezone
-from .models import Balance, CashoutRequest, CashRequest, Transaction
 
 @login_required
 def dashboard(request):

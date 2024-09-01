@@ -55,6 +55,8 @@ urlpatterns = [
     path('a/approve_cash_request/<int:request_id>/', views.approve_cash_request, name='approve_cash_request'),
 
     path('products/', views.product_list, name='product_list'),
+    path('agents/', views.agent_list, name='agent_list'),
+    path('product-list/', views.product_list_anonymous, name='product_list_anonymous'),
     path('add-to-cart/<int:product_id>/', views.add_to_cart, name='add_to_cart'),
     path('cart/', views.view_cart, name='view_cart'),
     path('checkout/', views.checkout_view, name='checkout'),

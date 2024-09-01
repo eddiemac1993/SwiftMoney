@@ -74,12 +74,15 @@
     <h1 class="welcome-title">Welcome to SwiftMoney</h1>
     {% if user.is_authenticated %}
         <p class="welcome-message">Hello, Agent {{ user.username }}! Ready to serve your customers?</p>
-        <a href="{% url 'product_list' %}" class="cta-button">
+<a href="{% url 'product_list' %}" class="cta-button">
             <i class="fas fa-shopping-cart order-icon"></i>Start Order
         </a>
     {% else %}
         <p class="welcome-message">Empower your customers with swift financial services.</p>
         <a href="{% url 'register' %}" class="cta-button">Become an Agent</a>
+        <a href="{% url 'product_list_anonymous' %}" class="cta-button">
+            <i class="fas fa-shopping-cart order-icon"></i>View Products
+        </a>
     {% endif %}
     <div class="feature-grid">
     <div class="feature-card">
