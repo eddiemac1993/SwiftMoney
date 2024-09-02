@@ -1,0 +1,194 @@
+{% extends "mma/base.html" %}
+{% load static %}
+{% block title %}Partnerships | SwiftMoney{% endblock %}
+
+{% block extra_css %}
+<style>
+    .welcome-container {
+        text-align: center;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 25px 5px;
+    }
+    .welcome-title {
+        font-size: 2.5rem;
+        color: var(--primary-color);
+        margin-bottom: 20px;
+    }
+    .welcome-message {
+        font-size: 1.2rem;
+        color: var(--text-color);
+        margin-bottom: 30px;
+    }
+    .feature-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 20px;
+        margin-top: 40px;
+    }
+    .feature-card {
+        background-color: var(--card-background);
+        border-radius: 15px;
+        padding: 20px;
+        text-align: center;
+        transition: transform 0.3s ease;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+    .feature-card:hover {
+        transform: translateY(-5px);
+    }
+    .feature-icon {
+        font-size: 2.5rem;
+        color: var(--primary-color);
+        margin-bottom: 15px;
+    }
+    .feature-title {
+        font-size: 1.2rem;
+        color: var(--text-color);
+        margin-bottom: 10px;
+    }
+    .feature-description {
+        font-size: 0.9rem;
+        color: var(--secondary-text);
+    }
+        .partnerships-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+        font-family: Arial, sans-serif;
+    }
+    .partnerships-header {
+        text-align: center;
+        margin-bottom: 40px;
+    }
+    .partnerships-header h1 {
+        font-size: 2.5rem;
+        color: var(--primary-color);
+    }
+    .partnerships-header p {
+        font-size: 1.2rem;
+        color: var(--text-color);
+    }
+    .partners-list {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 20px;
+        margin-top: 30px;
+    }
+    .partner-card {
+        background-color: var(--card-background);
+        border-radius: 15px;
+        padding: 20px;
+        text-align: center;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+    .partner-card img {
+        max-width: 100px;
+        margin-bottom: 15px;
+    }
+    .partner-card h3 {
+        font-size: 1.2rem;
+        color: var(--text-color);
+        margin-bottom: 10px;
+    }
+    .partner-card p {
+        font-size: 0.9rem;
+        color: var(--secondary-text);
+    }
+    .cta-button {
+        display: inline-block;
+        background-color: var(--primary-color);
+        color: white;
+        padding: 12px 24px;
+        border-radius: 25px;
+        text-decoration: none;
+        font-weight: bold;
+        transition: background-color 0.3s ease;
+        margin-top: 20px;
+    }
+    .cta-button:hover {
+        background-color: #45a049;
+    }
+    .order-icon {
+        margin-right: 8px;
+    }
+</style>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+{% endblock %}
+
+{% block content %}
+<div class="welcome-container">
+    <h1 class="welcome-title">Partner with SwiftMoney</h1>
+    <p class="welcome-message">Explore our partnership opportunities and see how you can grow with us.</p>
+
+    <div class="feature-grid">
+        <div class="feature-card">
+            <div class="feature-icon"><i class="fas fa-handshake"></i></div>
+            <h2 class="feature-title">Expand Your Business</h2>
+            <p class="feature-description">Collaborate with us to offer more services and reach a broader customer base.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon"><i class="fas fa-tachometer-alt"></i></div>
+            <h2 class="feature-title">Increase Your Reach</h2>
+            <p class="feature-description">Leverage our platform to connect with more customers and grow your business.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon"><i class="fas fa-rocket"></i></div>
+            <h2 class="feature-title">Boost Your Revenue</h2>
+            <p class="feature-description">Benefit from our attractive partnership incentives and boost your revenue.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon"><i class="fas fa-cogs"></i></div>
+            <h2 class="feature-title">Seamless Integration</h2>
+            <p class="feature-description">Integrate smoothly with our systems and enjoy a hassle-free experience.</p>
+        </div>
+    </div>
+</div>
+<div class="partnerships-container">
+    <div class="partnerships-header">
+        <h1>Our Partnerships</h1>
+        <p>We are proud to collaborate with these esteemed partners to provide exceptional services and opportunities.</p>
+    </div>
+
+    <div class="partners-list">
+        <!-- Partner 1 -->
+        <div class="partner-card">
+            <img src="{% static 'images/partner1-logo.png' %}" alt="Partner 1 Logo">
+            <h3>Partner 1</h3>
+            <p>Partner 1 description or tagline.</p>
+        </div>
+
+        <!-- Partner 2 -->
+        <div class="partner-card">
+            <img src="{% static 'images/partner2-logo.png' %}" alt="Partner 2 Logo">
+            <h3>Partner 2</h3>
+            <p>Partner 2 description or tagline.</p>
+        </div>
+
+        <!-- Partner 3 -->
+        <div class="partner-card">
+            <img src="{% static 'images/partner3-logo.png' %}" alt="Partner 3 Logo">
+            <h3>Partner 3</h3>
+            <p>Partner 3 description or tagline.</p>
+        </div>
+
+        <!-- Partner 4 -->
+        <div class="partner-card">
+            <img src="{% static 'images/partner4-logo.png' %}" alt="Partner 4 Logo">
+            <h3>Partner 4</h3>
+            <p>Partner 4 description or tagline.</p>
+        </div>
+
+        <!-- Add more partner cards as needed -->
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Example JavaScript code
+        console.log('Partnerships page loaded.');
+    });
+</script>
+{% endblock %}

@@ -592,7 +592,17 @@ def admin_dashboard(request):
 @user_passes_test(is_admin)
 def admin_user_list(request):
     users = CustomUser.objects.all()
-    return render(request, 'mma/admin_user_list.html', {'users': users})
+
+    # Prepare a list of dictionaries containing user and balance data
+    user_data = []
+    for user in users:
+        balance = Balance.objects.filter(agent=user).first()  # Fetch the balance for each user
+        user_data.append({
+            'user': user,
+            'balance': balance.cash if balance else 0.00  # Assuming 'cash' is the balance field
+        })
+
+    return render(request, 'mma/admin_user_list.html', {'user_data': user_data})
 
 @user_passes_test(is_admin)
 def admin_user_detail(request, user_id):
@@ -602,7 +612,18 @@ def admin_user_detail(request, user_id):
 @user_passes_test(is_admin)
 def admin_transaction_list(request):
     transactions = Transaction.objects.all()
-    return render(request, 'mma/admin_transaction_list.html', {'transactions': transactions})
+
+    # Calculate total cash in (when agents cash out, i.e., money comes into the system)
+    total_cash_in = transactions.filter(transaction_type='cashout').aggregate(Sum('amount'))['amount__sum'] or Decimal('0.00')
+
+    # Calculate total cash out (money given to agents upon their request)
+    total_cash_out = transactions.filter(transaction_type__in=['float_request', 'cash_request']).aggregate(Sum('amount'))['amount__sum'] or Decimal('0.00')
+
+    return render(request, 'mma/admin_transaction_list.html', {
+        'transactions': transactions,
+        'total_cash_in': total_cash_in,
+        'total_cash_out': total_cash_out
+    })
 
 @user_passes_test(is_admin)
 def admin_report(request):
@@ -854,3 +875,6 @@ def float_request_detail(request, id):
     float_request = get_object_or_404(FloatRequest, id=id)
     return render(request, 'mma/float_request_detail.html', {'float_request': float_request})
 
+def partnerships(request):
+    # Your logic here
+    return render(request, 'mma/partnerships.html')

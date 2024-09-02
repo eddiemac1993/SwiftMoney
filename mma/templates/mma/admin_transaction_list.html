@@ -69,36 +69,64 @@
             padding: 8px 16px;
         }
     }
+    .summary {
+        margin-bottom: 20px;
+        padding: 15px;
+        background-color: var(--card-background-light);
+        border-radius: 10px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .summary p {
+        margin: 0;
+        font-size: 1.1rem;
+        font-weight: bold;
+        color: var(--primary-color);
+    }
+
+    .summary p span {
+        color: var(--secondary-text);
+        font-weight: normal;
+    }
 </style>
 {% endblock %}
-
 {% block content %}
     <div class="container">
         <h1>Transaction List</h1>
+
+        <div class="summary">
+            <p>Total Cash In: <span>K{{ total_cash_in|floatformat:2 }}</span></p>
+            <p>Total Cash Out: <span>K{{ total_cash_out|floatformat:2 }}</span></p>
+            <p>Net Balance: <span>K{{ total_cash_in|floatformat:2 }} - K{{ total_cash_out|floatformat:2 }}</span></p>
+        </div>
+
         <table>
             <thead>
                 <tr>
                     <th>ID</th>
+                    <th>Agent Username</th>
                     <th>Amount</th>
                     <th>Date</th>
-                    <th>Status</th>
+                    <th>Type</th>
                 </tr>
             </thead>
             <tbody>
                 {% for transaction in transactions %}
                     <tr>
                         <td>{{ transaction.id }}.</td>
+                        <td>{{ transaction.agent.username }}</td>
                         <td>K{{ transaction.amount|floatformat:2 }}</td>
                         <td>{{ transaction.created_at|date:"Y-m-d" }}</td>
                         <td>{{ transaction.transaction_type }}</td>
                     </tr>
                 {% empty %}
                     <tr>
-                        <td colspan="4">No transactions available.</td>
+                        <td colspan="5">No transactions available.</td>
                     </tr>
                 {% endfor %}
             </tbody>
         </table>
+
         <a href="{% url 'a_dashboard' %}" class="btn">
             <i class="fas fa-arrow-left icon"></i> Back to Dashboard
         </a>

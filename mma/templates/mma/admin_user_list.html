@@ -100,17 +100,23 @@
                         <tr>
                             <th>Username</th>
                             <th>Phone Number</th>
+                            <th>Full Name</th>
+                            <th>Business Location</th>
+                            <th>Balance (K)</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {% for user in users %}
+                        {% for item in user_data %}
                             <tr>
-                                <td>{{ user.username }}</td>
-                                <td>{{ user.phone_number }}</td>
+                                <td>{{ item.user.username }}</td>
+                                <td>{{ item.user.phone_number }}</td>
+                                <td>{{ item.user.first_name }} {{ item.user.last_name }}</td>
+                                <td>{{ item.user.business_location }}</td>
+                                <td>K{{ item.balance|floatformat:2 }}</td>
                                 <td>
                                     <a href="{% url 'a_user_detail' user.id %}" class="">
-                                        <i class="fas fa-eye icon"></i> 
+                                        <i class="fas fa-eye icon"></i>
                                     </a>
                                 </td>
                             </tr>

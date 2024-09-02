@@ -1,5 +1,54 @@
 {% extends "mma/base.html" %}
+
 {% block title %}Terms and Conditions{% endblock %}
+
+{% block extra_css %}
+<style>
+    .content-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+        font-family: Arial, sans-serif;
+        line-height: 1.6;
+    }
+    h1, h2 {
+        color: var(--primary-color);
+        margin-bottom: 20px;
+    }
+    h1 {
+        font-size: 2.5rem;
+    }
+    h2 {
+        font-size: 1.8rem;
+        margin-top: 30px;
+        border-bottom: 2px solid var(--primary-color);
+        padding-bottom: 10px;
+    }
+    p {
+        color: var(--text-color);
+        margin-bottom: 20px;
+    }
+    ul, ol {
+        margin-bottom: 20px;
+        padding-left: 20px;
+    }
+    ul li, ol li {
+        margin-bottom: 10px;
+    }
+    .contact-info {
+        margin-top: 30px;
+    }
+    .contact-info p {
+        margin: 0;
+    }
+    .last-updated {
+        font-style: italic;
+        color: var(--secondary-text);
+        margin-top: 30px;
+    }
+</style>
+{% endblock %}
+
 {% block content %}
 <div class="content-container">
     <h1>Terms and Conditions</h1>
@@ -91,13 +140,24 @@
     <p>If any provision of these Terms and Conditions is found to be unenforceable or invalid under any applicable law, such unenforceability or invalidity shall not render these Terms and Conditions unenforceable or invalid as a whole, and such provisions shall be deleted without affecting the remaining provisions herein.</p>
     
     <h2>12. Contact Information</h2>
-    <p>If you have any questions about our Terms and Conditions, please contact us at:</p>
-    <p>SwiftMoney<br>
-    123 Main Street<br>
-    Lusaka, Zambia<br>
-    Email: support@swiftmoney.com<br>
-    Phone: +260 123 456 789</p>
+    <div class="contact-info">
+        <p>If you have any questions about our Terms and Conditions, please contact us at:</p>
+        <p>SwiftMoney<br>
+        123 Main Street<br>
+        Lusaka, Zambia<br>
+        Email: <a href="mailto:support@swiftmoney.com">support@swiftmoney.com</a><br>
+        Phone: +260 123 456 789</p>
+    </div>
     
-    <p>Last Updated: [Insert Date]</p>
+    <p class="last-updated">Last Updated: [Insert Date]</p>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Example JavaScript code
+        console.log('Terms and Conditions page loaded.');
+    });
+</script>
 {% endblock %}
