@@ -339,11 +339,11 @@ button:hover {
             {% endif %}
             <a href="{% url 'custom_logout' %}" class="top-nav-item {% if request.resolver_match.url_name == 'custom_logout' %}active-page{% endif %}" title="Logout"><i class="fas fa-sign-out-alt"></i></a>
             {% else %}
-            <a href="{% url 'login' %}" class="icon-btn {% if request.resolver_match.url_name == 'login' %}active-page{% endif %}" title="Login">
-                <span class="icon"><i class="fas fa-sign-in-alt"></i></span>
+            <a href="{% url 'login' %}" class="top-nav-item {% if request.resolver_match.url_name == 'login' %}active-page{% endif %}" title="Login">
+                <i class="fas fa-sign-in-alt"></i>
             </a>
-            <a href="{% url 'register' %}" class="icon-btn {% if request.resolver_match.url_name == 'register' %}active-page{% endif %}" title="Register">
-                <span class="icon"><i class="fas fa-user-plus"></i></span>
+            <a href="{% url 'register' %}" class="top-nav-item {% if request.resolver_match.url_name == 'register' %}active-page{% endif %}" title="Register">
+                <i class="fas fa-user-plus"></i>
             </a>
         {% endif %}
     </nav>

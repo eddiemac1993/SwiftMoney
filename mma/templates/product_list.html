@@ -18,35 +18,59 @@
         text-align: center;
     }
 
-    .search-form {
-        display: flex;
-        justify-content: center;
-        margin-bottom: 20px;  /* Adjusted spacing */
-    }
+/* Improved search form */
+.search-form {
+    display: flex;
+    justify-content: center;
+    align-items: center; /* Ensure items are vertically centered */
+    flex-wrap: wrap; /* Allow wrapping on smaller screens */
+    margin-bottom: 20px;
+}
 
+.search-input {
+    padding: 10px;
+    font-size: 1rem;
+    border: 1px solid var(--primary-color);
+    border-radius: 25px; /* More rounded corners */
+    width: 60%;
+    max-width: 400px;
+    transition: width 0.3s ease;
+}
+
+.search-btn {
+    background-color: var(--primary-color);
+    color: white;
+    padding: 10px 20px;
+    border-radius: 25px; /* More rounded corners */
+    margin-left: 10px;
+    cursor: pointer;
+    border: none;
+    transition: background-color 0.3s ease, width 0.3s ease;
+}
+
+.search-btn:hover {
+    background-color: var(--primary-color-dark);
+}
+
+/* Responsive adjustments for the search form */
+@media (max-width: 768px) {
     .search-input {
-        padding: 10px;
-        font-size: 1rem;
-        border: 1px solid var(--primary-color);
-        border-radius: 5px;
-        width: 60%;
-        max-width: 400px;
+        width: 93%; /* Increase the width on smaller screens */
     }
 
     .search-btn {
-        background-color: var(--primary-color);
-        color: white;
-        padding: 10px 20px;
-        border-radius: 5px;
-        margin-left: 10px;
-        cursor: pointer;
-        border: none;
-        transition: background-color 0.3s ease;
+        width: 100%; /* Full width for the button on smaller screens */
+        margin-left: 0;
+        margin-top: 10px; /* Add spacing between input and button */
     }
 
-    .search-btn:hover {
-        background-color: var(--primary-color-dark);
+    .search-form {
+        flex-direction: column; /* Stack the input and button vertically */
     }
+}
+
+/* Other styles remain the same */
+
 
     /* Category buttons styling */
     .category-buttons {
@@ -75,11 +99,11 @@
 
     /* Grid container for the cards */
     .card-container {
-        display: grid;
-        gap: 20px;
-        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-        justify-items: center;
-        margin-bottom: 40px;
+    display: grid;
+    gap: 20px;
+    grid-template-columns: repeat(3, 1fr);  /* 3 cards per row on large screens */
+    justify-items: center;
+    margin-bottom: 40px;
     }
 
     .card {
@@ -242,7 +266,12 @@
     border-left: 10px solid var(--primary-color);
     transform: translateY(-50%);
 }
-
+.product-image {
+    width: 100%;
+    height: auto;
+    border-radius: 10px;
+    margin-bottom: 15px;
+}
 </style>
 {% endblock %}
 
@@ -272,7 +301,8 @@
             {% for product in products %}
                 <div class="card">
                     <h2 class="card-title">{{ product.name }}</h2>
-                    <p class="card-content">{{ product.description }}</p>
+                    <img src="{% if product.image %}{{ product.image.url }}{% else %}/media/product_default.png{% endif %}" alt="{{ product.name }}" class="product-image">
+<p class="card-content">{{ product.description }}</p>
                     <p class="card-content">Price: <span class="price-tag">K{{ product.price }}</span></p>
                     <div class="button-group">
                         {% if user.is_authenticated %}

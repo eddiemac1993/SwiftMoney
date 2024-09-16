@@ -1,79 +1,179 @@
 {% extends 'mma/base.html' %}
-
+{% load static %}
 {% block title %}Login{% endblock %}
 
 {% block content %}
     <style>
         .login-container {
-    max-width: 400px;
-    margin: 0 auto;
-    padding: 20px;
-    background-color: var(--card-background);
-    border-radius: 10px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
+            max-width: 400px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: var(--card-background);
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
 
-.login-container h1 {
-    font-size: 1.5rem;
-    color: var(--primary-color);
-    margin-bottom: 20px;
-    text-align: center;
-}
+        .login-container img.logo {
+            max-width: 100px;
+            margin-bottom: 20px;
+            background-color: white;
+            border: 3px solid white; /* White border around image */
+            border-radius: 50%; /* Optional: Makes the image circular */
+        }
 
-.login-form {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-}
+        .login-container h2 {
+            color: var(--primary-color); 
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+        }
 
-.login-form p {
-    margin: 0;
-}
+        .login-form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
 
-.login-form button.btn-primary {
-    background-color: var(--primary-color);
-    color: white;
-    border: none;
-    padding: 10px;
-    border-radius: 5px;
-    font-size: 1rem;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-}
+        .login-form input {
+            padding: 10px;
+            border-radius: 25px;
+            border: 1px solid #ccc;
+            width: 100%;
+            box-sizing: border-box;
+            font-size: 1rem;
+        }
 
-.login-form button.btn-primary:hover {
-    background-color: darken(var(--primary-color), 10%);
-}
+        .login-form input::placeholder {
+            font-size: 0.95rem;
+            color: #999;
+        }
 
-.links {
-    margin-top: 15px;
-    text-align: center;
-}
+        .login-form input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+        }
 
-.links .link {
-    color: var(--primary-color);
-    text-decoration: none;
-    font-size: 0.9rem;
-    margin: 0 10px;
-    transition: color 0.3s ease;
-}
+        .login-form .password-container {
+            position: relative;
+        }
 
-.links .link:hover {
-    color: darken(var(--primary-color), 10%);
-}
+        .login-form .password-container input[type="password"],
+        .login-form .password-container input[type="text"] {
+            padding-right: 40px;
+        }
 
+        .login-form .password-container .toggle-password {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: black; /* Black eye icon */
+        }
+
+        .login-form button.btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 25px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            width: 100%;
+        }
+
+        .login-form button.btn-primary:hover {
+            background-color: darken(var(--primary-color), 10%);
+        }
+
+        .login-form .forgot-password {
+            font-size: 0.85rem;
+            color: var(--primary-color);
+            text-decoration: none;
+            margin-top: 10px;
+        }
+
+        .login-form .forgot-password:hover {
+            color: darken(var(--primary-color), 10%);
+        }
+
+        .login-form .btn-secondary {
+            background-color: transparent;
+            color: var(--primary-color);
+            border: 1px solid var(--primary-color);
+            padding: 10px;
+            border-radius: 25px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            width: 100%;
+            margin-top: 15px;
+        }
+
+        .login-form .btn-secondary:hover {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .footer-links {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .footer-links .link {
+            color: white; /* Set links to white */
+            text-decoration: none;
+            font-size: 0.8rem;
+            margin: 0 10px;
+            transition: color 0.3s ease;
+        }
+
+        .footer-links .link:hover {
+            color: darken(var(--secondary-color), 10%);
+        }
     </style>
 
     <div class="login-container">
-        <h1>Login</h1>
+        <img src="{% static 'logo1-removebg-preview.png' %}" alt="Logo" class="logo">
+        <h2>Login</h2>
         <form method="post" class="login-form">
             {% csrf_token %}
-            {{ form.as_p }}
+            <input type="text" name="username" placeholder="Enter your username">
+
+            <!-- Password field with eye icon for toggle -->
+            <div class="password-container">
+                <input type="password" id="password" name="password" placeholder="Enter your password">
+                <i class="fas fa-eye toggle-password" id="togglePassword"></i> <!-- Eye icon for toggling password -->
+            </div>
+
             <button type="submit" class="btn-primary">Login</button>
+            <a href="{% url 'password_reset' %}" class="forgot-password">Forgot password?</a>
+
+            <a href="{% url 'register' %}">
+                <button type="button" class="btn-secondary">Create new account</button>
+            </a>
         </form>
-        <div class="links">
-            <a href="{% url 'register' %}" class="link">Register</a>
-            <a href="{% url 'password_reset' %}" class="link">Forgot password?</a>
+
+        <div class="footer-links">
+            <a href="#" class="link">About</a>
+            <a href="#" class="link">Help</a>
+            <a href="#" class="link">More</a>
         </div>
     </div>
+
+    <script>
+        const togglePassword = document.querySelector('#togglePassword');
+        const password = document.querySelector('#password');
+
+        togglePassword.addEventListener('click', function () {
+            // Toggle the type attribute of the password input field
+            const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
+            password.setAttribute('type', type);
+            
+            // Toggle the eye icon
+            this.classList.toggle('fa-eye-slash');
+        });
+    </script>
 {% endblock %}

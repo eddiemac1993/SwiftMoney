@@ -730,7 +730,7 @@ def request_cash(request):
             total_requests += CashRequest.objects.filter(agent=request.user, is_approved=False).aggregate(Sum('amount'))['amount__sum'] or 0
             remaining_limit = balance.request_limit - total_requests
 
-            if Decimal('100') <= amount <= remaining_limit:
+            if Decimal('50') <= amount <= remaining_limit:
                 cash_request = form.save(commit=False)
                 cash_request.agent = request.user
                 cash_request.save()
@@ -747,7 +747,7 @@ def request_cash(request):
                 messages.success(request, f"Cash request for {amount} has been submitted.")
                 return redirect('dashboard')
             else:
-                messages.error(request, f"Amount must be between k100 and k{remaining_limit}.")
+                messages.error(request, f"Amount must be between k50 and k{remaining_limit}.")
     else:
         form = CashRequestForm()
 

@@ -12,6 +12,7 @@ class Product(models.Model):
     category = models.CharField(max_length=100)
     price = models.DecimalField(max_digits=10, decimal_places=2)
     delivery_time = models.PositiveIntegerField()
+    image = models.ImageField(upload_to='product_images/', null=True, blank=True, default='product_default.png')
 
     def __str__(self):
         return self.name
@@ -166,7 +167,7 @@ class CashoutRequest(models.Model):
 
 class Balance(models.Model):
     agent = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
-    request_limit = models.DecimalField(max_digits=10, decimal_places=2, default=500)
+    request_limit = models.DecimalField(max_digits=10, decimal_places=2, default=100)
     cash = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     last_cashout = models.DateField(null=True, blank=True)
     float = models.DecimalField(max_digits=10, decimal_places=2, default=0)

@@ -1,86 +1,168 @@
 {% extends "mma/base.html" %}
-
+{% load static %}
 {% block title %}Register{% endblock %}
 
 {% block extra_css %}
 <style>
-.form-container {
-    max-width: 500px;
-    margin: 0 auto;
-    padding: 20px;
-    background-color: var(--card-background);
-    border-radius: 10px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
+    .form-container {
+        max-width: 500px;
+        margin: 0 auto;
+        padding: 20px;
+        background-color: var(--card-background);
+        border-radius: 10px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        text-align: center;
+    }
 
-.form-container h2.card-title {
-    font-size: 1.5rem;
-    color: var(--primary-color);
-    margin-bottom: 20px;
-    text-align: center;
-}
+    .form-container img.logo {
+        max-width: 100px;
+        margin-bottom: 20px;
+        background-color: white;
+        border: 3px solid white;
+        border-radius: 50%; /* Rounded logo */
+    }
 
-.form-group {
-    margin-bottom: 15px;
-}
+    .form-container h2.card-title {
+        font-size: 1.5rem;
+        color: var(--primary-color);
+        margin-bottom: 20px;
+    }
 
-.form-group label {
-    display: block;
-    margin-bottom: 5px;
-    font-weight: bold;
-    color: var(--text-color);
-}
+    .form-group {
+        margin-bottom: 15px;
+        text-align: left;
+        position: relative;
+    }
 
-.form-group input,
-.form-group select,
-.form-group textarea {
-    width: 100%;
-    padding: 10px;
-    border: 1px solid var(--secondary-text);
-    border-radius: 5px;
-    box-sizing: border-box; /* Ensures padding is included in width */
-}
+    .form-group label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: bold;
+        color: var(--text-color);
+    }
 
-.form-group .help-text {
-    font-size: 0.9em;
-    color: var(--secondary-text);
-    margin-top: 5px;
-}
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid var(--secondary-text);
+        border-radius: 25px; /* Rounded corners */
+        box-sizing: border-box;
+        font-size: 1rem;
+        transition: border-color 0.3s ease;
+    }
 
-.form-group .error-message {
-    font-size: 0.9em;
-    color: #D32F2F;
-    margin-top: 5px;
-}
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+        outline: none;
+        border-color: var(--primary-color);
+        box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+    }
 
-.btn-register {
-    background-color: var(--primary-color);
-    color: white;
-    border: none;
-    padding: 10px 15px;
-    border-radius: 5px;
-    font-size: 1rem;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-    width: 100%;
-}
+    .form-group .help-text {
+        font-size: 0.9em;
+        color: var(--secondary-text);
+        margin-top: 5px;
+    }
 
-.btn-register:hover {
-    background-color: darken(var(--primary-color), 10%);
-}
+    .form-group .error-message {
+        font-size: 0.9em;
+        color: #D32F2F;
+        margin-top: 5px;
+        transition: color 0.3s ease;
+    }
 
+    .btn-register {
+        background-color: var(--primary-color);
+        color: white;
+        border: none;
+        padding: 10px 15px;
+        border-radius: 25px;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+        width: 100%;
+    }
+
+    .btn-register:hover {
+        background-color: darken(var(--primary-color), 10%);
+    }
+
+    .login-link {
+        display: block;
+        margin-top: 15px;
+        text-align: center;
+    }
+
+    .login-link a {
+        background-color: transparent;
+        color: var(--primary-color);
+        border: 2px solid var(--primary-color);
+        padding: 8px 16px;
+        border-radius: 25px;
+        font-size: 1rem;
+        text-decoration: none;
+        transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    .login-link a:hover {
+        background-color: var(--primary-color);
+        color: white;
+    }
+
+    /* Password field with eye icon */
+    .password-container {
+        position: relative;
+    }
+
+    .password-container input[type="password"],
+    .password-container input[type="text"] {
+        padding-right: 40px; /* Space for the eye icon */
+    }
+
+    .password-container .toggle-password {
+        position: absolute;
+        top: 50%;
+        right: 10px;
+        transform: translateY(-50%);
+        cursor: pointer;
+        color: black;
+    }
+
+    /* Interactive error styles */
+    .error input {
+        border-color: #D32F2F;
+        background-color: rgba(211, 47, 47, 0.05);
+    }
+
+    .error .error-message {
+        display: block;
+    }
 </style>
 {% endblock %}
 
 {% block content %}
 <div class="form-container">
+    <img src="{% static 'logo1-removebg-preview.png' %}" alt="Logo" class="logo">
     <h2 class="card-title">Register</h2>
-    <form method="post" enctype="multipart/form-data">
+    <form method="post" enctype="multipart/form-data" id="register-form">
         {% csrf_token %}
         {% for field in form %}
-            <div class="form-group">
+            <div class="form-group{% if field.errors %} error{% endif %}">
                 <label for="{{ field.id_for_label }}">{{ field.label }}</label>
-                {{ field }}
+
+                {% if field.name == "password1" or field.name == "password2" %}
+                    <!-- For password fields, add the password container with eye icon -->
+                    <div class="password-container">
+                        {{ field }}
+                        <i class="toggle-password fa fa-eye" aria-hidden="true"></i> <!-- Eye icon -->
+                    </div>
+                {% else %}
+                    {{ field }}
+                {% endif %}
+
                 {% if field.help_text %}
                     <p class="help-text">{{ field.help_text|safe }}</p>
                 {% endif %}
@@ -92,6 +174,52 @@
             </div>
         {% endfor %}
         <button type="submit" class="btn-register">Register</button>
+        
+        <div class="login-link">
+            <a href="{% url 'login' %}">Already have an account? Login</a>
+        </div>
     </form>
 </div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const form = document.getElementById("register-form");
+        const inputs = form.querySelectorAll("input, select, textarea");
+        const togglePasswordIcons = document.querySelectorAll(".toggle-password");
+
+        // Password visibility toggle
+        togglePasswordIcons.forEach(icon => {
+            icon.addEventListener("click", function () {
+                const passwordField = this.previousElementSibling;
+                if (passwordField.type === "password") {
+                    passwordField.type = "text";
+                    this.classList.replace("fa-eye", "fa-eye-slash");
+                } else {
+                    passwordField.type = "password";
+                    this.classList.replace("fa-eye-slash", "fa-eye");
+                }
+            });
+        });
+
+        // Validation error messages interaction
+        inputs.forEach(input => {
+            input.addEventListener("input", function () {
+                const parent = input.closest('.form-group');
+                const errorMessages = parent.querySelectorAll('.error-message');
+
+                if (input.checkValidity()) {
+                    parent.classList.remove("error");
+                    errorMessages.forEach(error => {
+                        error.style.display = "none";
+                    });
+                } else {
+                    parent.classList.add("error");
+                    errorMessages.forEach(error => {
+                        error.style.display = "block";
+                    });
+                }
+            });
+        });
+    });
+</script>
 {% endblock %}
