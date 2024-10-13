@@ -6,6 +6,8 @@ from django.core.mail import send_mail
 from django.conf import settings
 from .forms import ProfileForm  # Assuming you have a form for updating profiles
 from .models import CustomUser
+from mma.models import Balance  # Import the Balance model from your mma app
+from django.db import IntegrityError
 
 def register(request):
     if request.method == 'POST':
@@ -13,6 +15,15 @@ def register(request):
         if form.is_valid():
             user = form.save()
             login(request, user)
+
+            # Check if the user already has a Balance before creating
+            try:
+                # Create a Balance object for the new user (agent) if not already created
+                Balance.objects.create(agent=user)
+            except IntegrityError:
+                # If an IntegrityError occurs, it means the Balance already exists
+                pass
+
             # Send notification email to admin
             send_mail(
                 'New User Registration',
@@ -24,10 +35,8 @@ def register(request):
             return redirect('login')
     else:
         form = CustomUserCreationForm()
-    return render(request, 'users/register.html', {'form': form})
 
-def welcome(request):
-    return render(request, 'users/welcome.html')
+    return render(request, 'users/register.html', {'form': form})
 
 @login_required
 def profile(request):
@@ -41,3 +50,6 @@ def profile(request):
         form = ProfileForm(instance=user)
 
     return render(request, 'users/profile.html', {'form': form})
+
+def welcome(request):
+    return render(request, 'users/welcome.html')

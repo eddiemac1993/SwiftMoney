@@ -21,6 +21,9 @@ class CustomUser(AbstractUser):
     is_approved = models.BooleanField(default=False)
     is_admin = models.BooleanField(default=False)  # Add this line
 
+    def is_mobilemoney(self):
+        return self.username == 'mobilemoney'
+
     def save(self, *args, **kwargs):
 
         super().save(*args, **kwargs)

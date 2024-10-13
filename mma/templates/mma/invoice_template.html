@@ -1,93 +1,192 @@
 <!DOCTYPE html>
 {% load extra_filters %}
-
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ document_type|capfirst }} {{ order.id }}</title>
     <style>
-        /* Add your styling here */
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-        }
-        .invoice-container {
-            padding: 20px;
-            border: 1px solid #ddd;
-            width: 100%;
-            max-width: 800px;
-            margin: 0 auto;
-        }
-        .invoice-header {
-            text-align: center;
-            margin-bottom: 20px;
-        }
-        .invoice-details, .invoice-items {
-            margin-bottom: 20px;
-        }
-        .invoice-items table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        .invoice-items th, .invoice-items td {
-            border: 1px solid #ddd;
-            padding: 10px;
-            text-align: left;
-        }
-        .invoice-items th {
-            background-color: #f4f4f4;
-        }
-        .company-info {
-            text-align: center;
-            margin-bottom: 20px;
-            font-size: 0.9rem;
-        }
-        .invoice-footer {
-            margin-top: 20px;
-            text-align: center;
-            font-size: 0.9rem;
-        }
-        .total-row {
-            font-weight: bold;
-        }
-    </style>
-</head>
-<body>
-    <div class="invoice-container">
-        <div class="company-info">
-            <h2>Comagil Enterprise Limited</h2>
-            <p>PO Box 660249</p>
-            <p>Monze, Zambia</p>
-            <p>Phone: +260 763 76000</p>
-            <p>Email: conarynwanagombe@gmail.com</p>
-        </div>
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&family=Merriweather:wght@400;700&display=swap');
 
+:root {
+    --primary-color: #2C3E50;
+    --secondary-color: #2980B9;
+    --background-color: #F8F9FA;
+    --text-color: #333;
+    --border-color: #DADFE1;
+    --highlight-color: #EAECEE;
+}
+
+body {
+    font-family: 'Roboto', sans-serif;
+    line-height: 1.6;
+    color: var(--text-color);
+    background-color: var(--background-color);
+    margin: 0;
+    padding: 20px;
+}
+.letterhead {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid var(--primary-color);
+    font-family: 'Merriweather', serif;
+}
+
+.letterhead h2 {
+    font-size: 24px;
+    font-weight: bold;
+    color: var(--primary-color);
+    margin: 0;
+    flex: 1;
+    text-align: left;
+}
+
+.letterhead .contact-info {
+    text-align: right;
+    flex: 1;
+    color: var(--secondary-color);
+}
+
+.letterhead .contact-info p {
+    margin: 5px 0;
+}
+
+}
+
+.invoice-container {
+    background-color: white;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    padding: 40px;
+    max-width: 800px;
+    margin: 20px auto;
+    border: 1px solid var(--border-color);
+}
+
+.invoice-header {
+    background-color: var(--primary-color);
+    color: white;
+    padding: 20px;
+    border-radius: 4px;
+    margin-bottom: 30px;
+}
+
+.invoice-header h1 {
+    margin: 0;
+    font-size: 28px;
+    font-family: 'Merriweather', serif;
+    font-weight: bold;
+}
+
+.invoice-details {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.invoice-details p {
+    margin: 5px 0;
+}
+
+.invoice-items table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 40px;
+}
+
+.invoice-items th, .invoice-items td {
+    padding: 15px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.invoice-items th {
+    background-color: var(--highlight-color);
+    color: var(--primary-color);
+    text-align: left;
+    font-weight: 700;
+}
+
+.invoice-items td {
+    font-weight: 400;
+}
+
+.total-row td {
+    font-weight: bold;
+    background-color: var(--highlight-color);
+}
+
+.invoice-footer {
+    text-align: center;
+    margin-top: 30px;
+    color: var(--secondary-color);
+    font-style: italic;
+}
+
+
+@media print {
+    body {
+        background-color: white;
+    }
+    .invoice-container {
+        box-shadow: none;
+        border: none;
+    }
+}
+
+</style>
+
+<body>
+<div class="letterhead">
+    <!-- Left: Company Name -->
+    <h3>SwiftStyles Enterprise Ltd</h3>
+
+    <!-- Right: Contact Information -->
+    <div class="contact-info">
+        <p>Monze, Zambia</p>
+        <p>Phone: +260 773351643</p>
+        <p>Email: swiftstyles@gmail.com</p>
+    </div>
+</div>
+
+
+    <!-- Invoice Content -->
+    <div class="invoice-container">
         <div class="invoice-header">
             <h1>{{ document_type|capfirst }} INV-001{{ order.id }}</h1>
             <p>Issued at: {{ order.invoice.issued_at }}</p>
         </div>
 
-        <div class="invoice-details">
-            <p>Order ID: {{ order.id }}</p>
-            <p>Customer Name: {{ order.customer_name }}</p>
-            <p>Total Amount: K{{ order.total_amount }}</p>
-            {% if document_type == 'invoice' or document_type == 'quotation' %}
-                <p>Deposit Amount: {{ order.deposit_amount }}</p>
-                <p>Status: {{ order.get_status_display }}</p>
-                <p>Delivery Date: {{ order.delivery_date }}</p>
-                {% if is_invoice_or_receipt %}
-                    <p>Estimated Delivery Days: {{ delivery_days }}</p>
-                {% endif %}
-            {% elif document_type == 'receipt' %}
-                <p>Total Amount in Words: {{ order.total_amount|number_to_words }} Kwacha Only</p>
+<div class="invoice-details">
+    <div>
+        <p><strong>Order ID:</strong> {{ order.id }}</p>
+        <p><strong>Customer Name:</strong> {{ order.customer_name }}</p>
+        <p><strong>Customer Phone:</strong> {{ order.phone_number }}</p>
+    </div>
+    <div>
+        <p><strong>Total Amount:</strong> K{{ order.total_amount }}</p>
+        {% if document_type == 'invoice' or document_type == 'quotation' %}
+            <p><strong>Deposit Amount:</strong> {{ order.deposit_amount }}</p>
+            {% if is_invoice_or_receipt %}
+                <p><strong>Estimated Delivery:</strong> 3 days</p>
             {% endif %}
-        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- New full-width section for "Amount in Words" -->
+{% if document_type == 'receipt' %}
+    <div class="amount-in-words">
+        <p><strong>Amount in Words:</strong> {{ order.total_amount|number_to_words }} Kwacha Only</p>
+    </div>
+{% endif %}
+
 
         {% if document_type == 'invoice' or document_type == 'quotation' %}
             <div class="invoice-items">
-                <h2>Order Items</h2>
                 <table>
                     <thead>
                         <tr>
@@ -117,7 +216,7 @@
             </div>
         {% elif document_type == 'receipt' %}
             <div class="invoice-items">
-                <h2>Order Items</h2>
+                <h4>Deposit Paid: K{{ order.deposit_amount }}</h4>
                 <table>
                     <thead>
                         <tr>
@@ -141,6 +240,7 @@
             </div>
         {% endif %}
 
+        <!-- Footer -->
         <div class="invoice-footer">
             <p>Thank you for your business!</p>
         </div>

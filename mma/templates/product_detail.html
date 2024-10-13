@@ -1,0 +1,306 @@
+{% extends 'base.html' %}
+{% block title %}{{ product.name }} | Product Details{% endblock %}
+{% block extra_css %}
+<style>
+    /* Product Detail Page Styles */
+    .product-detail-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 40px 20px;
+    }
+    .product-detail-card {
+        display: flex;
+        background-color: var(--card-background);
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+        transition: box-shadow 0.3s ease;
+    }
+    .product-detail-card:hover {
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+    }
+    .image-section {
+        flex: 1;
+        padding: 30px;
+        position: relative;
+    }
+    .product-detail-image {
+        width: 100%;
+        height: 450px;
+        object-fit: cover;
+        border-radius: 10px;
+        transition: transform 0.3s ease, filter 0.3s ease;
+    }
+    .product-detail-image:hover {
+        transform: scale(1.05);
+        filter: brightness(1.1);
+    }
+    .image-gallery {
+        display: flex;
+        justify-content: center;
+        margin-top: 20px;
+    }
+    .thumbnail {
+        width: 60px;
+        height: 60px;
+        object-fit: cover;
+        border-radius: 5px;
+        margin: 0 5px;
+        cursor: pointer;
+        opacity: 0.6;
+        transition: opacity 0.3s ease, transform 0.3s ease;
+    }
+    .thumbnail:hover, .thumbnail.active {
+        opacity: 1;
+        transform: scale(1.1);
+    }
+    .product-info-section {
+        flex: 1;
+        padding: 40px;
+    }
+    .product-title {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: #333;
+        margin-bottom: 15px;
+    }
+    .product-price {
+        font-size: 2rem;
+        font-weight: 600;
+        color: #27ae60;
+        margin-bottom: 25px;
+    }
+    .product-description {
+        font-size: 1.1rem;
+        line-height: 1.6;
+        color: #555;
+        margin-bottom: 30px;
+    }
+    .rating {
+        display: flex;
+        align-items: center;
+        margin-bottom: 15px;
+    }
+    .rating .stars {
+        color: #f39c12;
+        margin-right: 10px;
+        font-size: 1.5rem;
+    }
+    .rating .count {
+        color: #777;
+        font-size: 0.9rem;
+    }
+    .animated-stars {
+        transition: transform 0.4s ease;
+    }
+    .animated-stars:hover {
+        transform: scale(1.1);
+    }
+    .product-meta {
+        font-size: 1rem;
+        color: #777;
+        margin-bottom: 30px;
+    }
+    .product-meta p {
+        margin: 10px 0;
+        display: flex;
+        align-items: center;
+    }
+    .product-meta i {
+        margin-right: 10px;
+        font-size: 1.2rem;
+    }
+    .size-selector, .quantity-selector {
+        margin-bottom: 20px;
+    }
+    .size-selector select, .quantity-selector input {
+        padding: 5px 10px;
+        border-radius: 5px;
+        border: 1px solid #ddd;
+        width: 100%;
+    }
+    .button-group {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-top: 30px;
+    }
+    .btn {
+        padding: 10px 20px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        border: none;
+        border-radius: 25px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    .btn-back {
+        background-color: #6c757d;
+        color: white;
+    }
+    .btn-back:hover {
+        background-color: #5a6268;
+    }
+    .btn-add-to-cart {
+        background-color: #3498db;
+        color: white;
+    }
+    .btn-add-to-cart:hover {
+        background-color: #2980b9;
+    }
+    .btn-share-whatsapp {
+        background-color: #25d366;
+        color: white;
+    }
+    .btn-share-whatsapp:hover {
+        background-color: #128c7e;
+    }
+    .btn-share-facebook {
+        background-color: #3b5998;
+        color: white;
+    }
+    .btn-share-facebook:hover {
+        background-color: #2d4373;
+    }
+    /* Related Products Carousel */
+    .related-products {
+        margin-top: 50px;
+    }
+    .related-title {
+        font-size: 1.8rem;
+        margin-bottom: 20px;
+    }
+    .related-items {
+        display: flex;
+        gap: 15px;
+        overflow-x: auto;
+    }
+    .related-item {
+        background-color: var(--card-background);
+        padding: 15px;
+        border-radius: 10px;
+        min-width: 200px;
+        text-align: center;
+        transition: transform 0.3s ease;
+    }
+    .related-item:hover {
+        transform: translateY(-10px);
+    }
+    .related-item img {
+        width: 100%;
+        height: 150px;
+        object-fit: cover;
+        border-radius: 5px;
+        margin-bottom: 10px;
+    }
+    /* Reviews */
+    .review-section {
+        margin-top: 50px;
+    }
+    .review-title {
+        font-size: 1.8rem;
+        margin-bottom: 20px;
+    }
+    .review-list {
+        margin-bottom: 20px;
+    }
+    .review-item {
+        margin-bottom: 15px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid #ddd;
+    }
+    .review-item .reviewer {
+        font-weight: bold;
+    }
+    .review-item .review-text {
+        font-size: 1rem;
+        color: #555;
+    }
+    .write-review {
+        margin-top: 20px;
+    }
+    .write-review textarea {
+        width: 100%;
+        padding: 10px;
+        border-radius: 5px;
+        border: 1px solid #ddd;
+        margin-bottom: 10px;
+    }
+    .write-review button {
+        padding: 10px 15px;
+        background-color: #27ae60;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+    .write-review button:hover {
+        background-color: #219150;
+    }
+    /* Responsive Design */
+    @media (max-width: 992px) {
+        .product-detail-card {
+            flex-direction: column;
+        }
+        .image-section, .product-info-section {
+            padding: 20px;
+        }
+        .product-detail-image {
+            height: 300px;
+        }
+        .product-title {
+            font-size: 2rem;
+        }
+        .product-price {
+            font-size: 1.5rem;
+        }
+    }
+    @media (max-width: 576px) {
+        .button-group {
+            flex-direction: column;
+        }
+        .btn {
+            width: 100%;
+        }
+    }
+</style>
+{% endblock %}
+{% block content %}
+<div class="product-detail-container">
+    <div class="product-detail-card" itemscope itemtype="https://schema.org/Product">
+        <div class="image-section">
+            <span class="product-badge">New Arrival</span>
+            <img src="{% if product.image %}{{ product.image.url }}{% else %}/media/product_default.png{% endif %}"
+                 alt="{% if product.image %}Image of {{ product.name }}{% else %}No image available{% endif %}"
+                 class="product-detail-image"
+                 itemprop="image"
+                 loading="lazy">
+        </div>
+        <div class="product-info-section">
+            <h1 class="product-title" itemprop="name">{{ product.name }}</h1>
+            <p class="product-price" itemprop="price"> k{{ product.price }}</p>
+            <p class="product-description" itemprop="description">{{ product.description }}</p>
+            <div class="rating">
+                <div class="stars animated-stars">★★★★☆</div>
+                <span class="count">({{ product.review_count }} reviews)</span>
+            </div>
+            <div class="product-meta">
+                <p><i class="fas fa-tag"></i> Category: {{ product.category.name }}</p>
+                <p><i class="fas fa-box"></i> In stock: {{ product.stock }}</p>
+                <p><i class="fas fa-truck"></i> Delivery in 2-3 days</p>
+                <p><i class="fas fa-sync-alt"></i> Free returns within 30 days</p>
+            </div>
+            <div class="button-group">
+                <a href="#" class="btn btn-share-whatsapp"
+                   onclick="window.open('https://api.whatsapp.com/send?text={{ request.build_absolute_uri }}', '_blank')">
+                    WhatsApp
+                </a>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+{% endblock %}

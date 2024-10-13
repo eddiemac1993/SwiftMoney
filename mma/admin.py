@@ -58,11 +58,11 @@ class CashRequestAdmin(admin.ModelAdmin):
     list_filter = ('is_approved',)
     readonly_fields = ('days_until_expiration',)
 
-@admin.register(CashoutRequest)
 class CashoutRequestAdmin(admin.ModelAdmin):
-    list_display = ('agent', 'amount', 'is_approved', 'status', 'created_at', 'approved_at')
-    search_fields = ('agent__username',)
-    list_filter = ('status', 'is_approved')
+    list_display = ('id', 'amount', 'status', 'approved_at', 'created_at')  # Update with actual fields
+    list_filter = ('status',)  # Adjust according to existing fields
+
+admin.site.register(CashoutRequest, CashoutRequestAdmin)
 
 @admin.register(Balance)
 class BalanceAdmin(admin.ModelAdmin):

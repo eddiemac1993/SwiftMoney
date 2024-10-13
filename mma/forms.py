@@ -11,12 +11,28 @@ class RefundForm(forms.ModelForm):
         model = Refund
         fields = ['order']  # Exclude 'amount' as it's auto-calculated
 
+# In forms.py
 
+from django import forms
+from .models import Product
+
+class ProductForm(forms.ModelForm):
+    class Meta:
+        model = Product
+        fields = ['name', 'description', 'category', 'price', 'delivery_time', 'image']
+        widgets = {
+            'name': forms.TextInput(attrs={'class': 'form-control'}),
+            'description': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
+            'category': forms.TextInput(attrs={'class': 'form-control'}),
+            'price': forms.NumberInput(attrs={'class': 'form-control'}),
+            'delivery_time': forms.NumberInput(attrs={'class': 'form-control'}),
+            'image': forms.FileInput(attrs={'class': 'form-control'}),
+        }
 
 class OrderForm(forms.ModelForm):
     class Meta:
         model = Order
-        fields = ['customer_name']
+        fields = ['customer_name', 'phone_number']
 
 class FloatRequestForm(forms.ModelForm):
     class Meta:

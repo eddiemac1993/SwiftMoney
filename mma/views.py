@@ -26,6 +26,7 @@ from django.views import View
 from django.views.generic import ListView
 from .forms import RefundForm  # Assuming you have a form for handling refunds
 from django.contrib.auth.models import AnonymousUser
+from django.core.paginator import Paginator
 
 def terms_and_conditions(request):
     return render(request, 'terms_and_conditions.html')
@@ -142,6 +143,8 @@ def agent_list(request):
 
 def product_list_anonymous(request):
     query = request.GET.get('q')
+    min_price = request.GET.get('min_price')
+    max_price = request.GET.get('max_price')
     category_filter = request.GET.get('category')
 
     # Filter products by search query if provided
@@ -155,6 +158,26 @@ def product_list_anonymous(request):
     # Filter products by category if a category is selected
     if category_filter:
         products = products.filter(category=category_filter)
+
+    # Filter by price range if provided
+    if min_price and min_price.lower() != 'none':
+        try:
+            min_price = float(min_price)
+            products = products.filter(price__gte=min_price)
+        except ValueError:
+            pass  # Handle the case where conversion fails
+
+    if max_price and max_price.lower() != 'none':
+        try:
+            max_price = float(max_price)
+            products = products.filter(price__lte=max_price)
+        except ValueError:
+            pass  # Handle the case where conversion fails
+
+    # Pagination
+    paginator = Paginator(products, 100)  # Show 10 products per page
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
 
     # Get all distinct categories from products
     categories = Product.objects.values_list('category', flat=True).distinct()
@@ -172,13 +195,17 @@ def product_list_anonymous(request):
     return render(request, 'product_list.html', {
         'products': products,
         'query': query,
+        'page_obj': page_obj,
+        'min_price': min_price,
+        'max_price': max_price,
         'categories': categories,  # Pass categories to the template
         'cart_item_count': cart_item_count  # Add the count to context
     })
 
-
 def product_list(request):
     query = request.GET.get('q')
+    min_price = request.GET.get('min_price')
+    max_price = request.GET.get('max_price')
     category_filter = request.GET.get('category')
 
     # Filter products by search query if provided
@@ -193,21 +220,80 @@ def product_list(request):
     if category_filter:
         products = products.filter(category=category_filter)
 
+    # Filter by price range
+    if min_price:
+        products = products.filter(price__gte=min_price)
+    if max_price:
+        products = products.filter(price__lte=max_price)
+
+    # Pagination
+    paginator = Paginator(products, 100)  # Show 10 products per page
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
     # Get all distinct categories from products
     categories = Product.objects.values_list('category', flat=True).distinct()
 
-    try:
-        cart = Cart.objects.get(agent=request.user)
-        cart_item_count = cart.items.count()
-    except Cart.DoesNotExist:
-        cart_item_count = 0
+    # Check if the user is authenticated
+    if request.user.is_authenticated:
+        try:
+            cart = Cart.objects.get(agent=request.user)
+            cart_item_count = cart.items.count()
+        except Cart.DoesNotExist:
+            cart_item_count = 0
+    else:
+        cart_item_count = 0  # If the user is not authenticated, cart count is 0
+
+    can_add_product = request.user.is_authenticated
 
     return render(request, 'product_list.html', {
         'products': products,
         'query': query,
+        'page_obj': page_obj,
+        'min_price': min_price,
+        'max_price': max_price,
         'categories': categories,  # Pass categories to the template
-        'cart_item_count': cart_item_count  # Add the count to context
+        'cart_item_count': cart_item_count,  # Add the count to context
+        'can_add_product': can_add_product  # Add this line
     })
+
+from django.shortcuts import render, get_object_or_404
+from .models import Product
+
+def product_detail(request, product_id):
+    # Get the product by ID or return 404 if not found
+    product = get_object_or_404(Product, id=product_id)
+
+    # Check if the user is authenticated to show cart item count
+    if request.user.is_authenticated:
+        try:
+            cart = Cart.objects.get(agent=request.user)
+            cart_item_count = cart.items.count()
+        except Cart.DoesNotExist:
+            cart_item_count = 0
+    else:
+        cart_item_count = 0  # If the user is not authenticated, cart count is 0
+
+    return render(request, 'product_detail.html', {
+        'product': product,
+        'cart_item_count': cart_item_count  # Pass the cart item count
+    })
+
+
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import render, redirect
+from .forms import ProductForm
+
+@login_required
+def add_product(request):
+    if request.method == 'POST':
+        form = ProductForm(request.POST, request.FILES)
+        if form.is_valid():
+            form.save()
+            return redirect('product_list')
+    else:
+        form = ProductForm()
+    return render(request, 'add_product.html', {'form': form})
 
 @login_required
 def add_to_cart(request, product_id):
@@ -323,6 +409,7 @@ def submit_order(request, form_data):
         order = Order.objects.create(
             agent=request.user,
             customer_name=form_data['customer_name'],
+            phone_number=form_data['phone_number'],
             total_amount=cart.total_amount(),
             deposit_amount=cart.total_amount() * Decimal('0.3'),
             status='pending'
@@ -431,13 +518,12 @@ def approve_cashout(request):
         cashout_request = get_object_or_404(CashoutRequest, id=cashout_id)
 
         if action == 'approve':
-            cashout_request.is_approved = True
+            cashout_request.status = 'approved'
             cashout_request.approved_at = timezone.now()
             cashout_request.save()
 
             # Update agent's balance
             balance = Balance.objects.get(agent=cashout_request.agent)
-
             # Create a transaction for the approved cashout
             Transaction.objects.create(
                 agent=cashout_request.agent,
@@ -445,22 +531,23 @@ def approve_cashout(request):
                 transaction_type='cashout'
             )
 
-            # Update the balance
+            # Reset balance after cashout
             balance.cash = 0
             balance.float = 0
             balance.last_cashout = timezone.now().date()
-            balance.update_request_limit()  # Update the request limit
+            balance.update_request_limit()
             balance.save()
 
             messages.success(request, f"Cashout request {cashout_id} approved successfully.")
 
         elif action == 'reject':
-            cashout_request.delete()
-            messages.success(request, f"Cashout request {cashout_id} rejected and deleted.")
+            cashout_request.status = 'rejected'
+            cashout_request.save()
+            messages.success(request, f"Cashout request {cashout_id} rejected.")
 
         return redirect('approve_cashout')
 
-    pending_requests = CashoutRequest.objects.filter(is_approved=False).order_by('created_at')
+    pending_requests = CashoutRequest.objects.filter(status='pending').order_by('created_at')
     return render(request, 'mma/approve_cashout.html', {'pending_requests': pending_requests})
 
 def custom_logout(request):
@@ -469,31 +556,26 @@ def custom_logout(request):
     return redirect('home')  # Redirect to the homepage or any other page
 
 @receiver(post_save, sender=CustomUser)
-def create_balance(sender, instance, created, **kwargs):
-    if created:
+def create_balance(sender, instance, **kwargs):
+    # Check if a Balance already exists for the agent
+    if not Balance.objects.filter(agent=instance).exists():
         Balance.objects.create(agent=instance)
 
 @login_required
 def cashout(request):
-    # Fetch or create the user's balance
     balance, created = Balance.objects.get_or_create(agent=request.user)
 
     # Check if the user already has a pending cashout request
     has_pending_request = CashoutRequest.objects.filter(agent=request.user, status='pending').exists()
 
-    # Calculate the total amount (cash + float)
     requested_cash = balance.cash
     requested_float = balance.float
     total_requested = requested_cash + requested_float
 
-    # Calculate 20% interest on the total requested amount
     interest = total_requested * Decimal('0.2') if total_requested > 0 else Decimal('0')
-
-    # Calculate the total cashout amount (requested + interest)
     total_amount = total_requested + interest
 
     if request.method == 'POST':
-        # Only proceed if the user has sufficient balance
         if total_requested > 0:
             if not has_pending_request:
                 # Create a new cashout request
@@ -503,7 +585,6 @@ def cashout(request):
                     status='pending'
                 )
 
-                # Send notification email to admin
                 send_mail(
                     'Cashout Request Submitted',
                     f"User {request.user.username} has requested a cashout of {total_amount} (including 20% interest).",
@@ -526,7 +607,6 @@ def cashout(request):
         'has_pending_request': has_pending_request,
     }
     return render(request, 'mma/cashout.html', context)
-
 
 @login_required
 def download_receipt(request, transaction_id):
@@ -585,7 +665,7 @@ def admin_dashboard(request):
         'total_transactions': Transaction.objects.count(),
         'pending_float_requests': FloatRequest.objects.filter(is_approved=False).count(),
         'pending_cash_requests': CashRequest.objects.filter(is_approved=False).count(),
-        'pending_cashout_requests': CashoutRequest.objects.filter(is_approved=False).count(),  # Added this line
+        'pending_cashout_requests': CashoutRequest.objects.filter(status='Pending').count(),  # Adjust this line
     }
     return render(request, 'mma/admin_dashboard.html', context)
 
@@ -681,6 +761,7 @@ def dashboard(request):
         'cash_interest': cash_interest,
         'total_amount': total_amount,
     }
+
     return render(request, 'mma/dashboard.html', context)
 
 @login_required

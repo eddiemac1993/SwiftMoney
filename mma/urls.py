@@ -2,7 +2,9 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
-    path('', views.index, name='home'),
+    path('home/', views.index, name='home'),
+    path('products/<int:product_id>/', views.product_detail, name='product_detail'),
+    path('add-product/', views.add_product, name='add_product'),
     path('partnerships/', views.partnerships, name='partnerships'),
     path('logout/', views.custom_logout, name='custom_logout'),
     path('dashboard/', views.dashboard, name='dashboard'),
@@ -37,8 +39,9 @@ urlpatterns = [
 
     path('receipt/<int:transaction_id>/download/', views.download_receipt, name='download_receipt'),
     path('invoice/<int:transaction_id>/download/', views.download_invoice, name='download_invoice'),
-    path('refund/<int:order_id>/', views.refund_create, name='refund_create'),
-    path('refund/<int:order_id>/', views.refund_list, name='refund_list'),
+    path('refund/<int:order_id>/create/', views.refund_create, name='refund_create'),
+    path('refund/<int:order_id>/list/', views.refund_list, name='refund_list'),
+
     path('orders/<int:order_id>/refunds/', views.RefundListView.as_view(), name='order_refund_list'),
     path('refunds/<int:order_id>/', views.refund_detail, name='refund_detail'),
 
@@ -55,7 +58,7 @@ urlpatterns = [
     path('a/approve_float_request/<int:request_id>/', views.approve_float_request, name='approve_float_request'),
     path('a/approve_cash_request/<int:request_id>/', views.approve_cash_request, name='approve_cash_request'),
 
-    path('products/', views.product_list, name='product_list'),
+    path('', views.product_list, name='product_list'),
     path('agents/', views.agent_list, name='agent_list'),
     path('product-list/', views.product_list_anonymous, name='product_list_anonymous'),
     path('add-to-cart/<int:product_id>/', views.add_to_cart, name='add_to_cart'),

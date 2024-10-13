@@ -124,14 +124,13 @@
                 <td>K{{ order.total_amount|floatformat:2 }}</td>
                 <td>{{ order.created_at|date:"F d, Y" }}</td>
                 <td>
-                    <a href="{% url 'generate_invoice' order.id %}" class="btn btn-sm btn-primary">
+                    <a href="{% url 'generate_document' order.id 'invoice' %}" class="btn btn-sm btn-primary">
                         <i class="fas fa-file-invoice"></i> Generate Invoice
                     </a>
 
                         <a href="{% url 'refund_list' order.id %}" class="btn btn-sm btn-secondary" style="margin-left: 10px;">
                             <i class="fas fa-undo"></i> Refund
                         </a>
-
                 </td>
             </tr>
             {% empty %}

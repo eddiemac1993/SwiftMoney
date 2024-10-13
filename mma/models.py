@@ -7,6 +7,15 @@ from django.dispatch import receiver
 from django.contrib.auth import get_user_model
 
 class Product(models.Model):
+    CATEGORY_CHOICES = [
+        ('electronics', 'Electronics'),
+        ('clothing', 'Clothing'),
+        ('books', 'Books'),
+        ('home', 'Home & Garden'),
+        ('toys', 'Toys & Games'),
+        ('other', 'Other'),
+    ]
+
     name = models.CharField(max_length=200)
     description = models.TextField()
     category = models.CharField(max_length=100)
@@ -41,8 +50,10 @@ class Order(models.Model):
         ('approved', 'Approved'),
         ('cancelled', 'Cancelled'),
     )
+
     agent = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='orders')
     customer_name = models.CharField(max_length=200)
+    phone_number = models.CharField(max_length=15, null=True, blank=True)  # Allow null values
     total_amount = models.DecimalField(max_digits=10, decimal_places=2)
     deposit_amount = models.DecimalField(max_digits=10, decimal_places=2)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
@@ -51,11 +62,8 @@ class Order(models.Model):
     is_approved = models.BooleanField(default=False)
 
     def calculate_delivery_date(self):
-        if self.pk and self.items.exists():  # Ensure the instance has a primary key and items
-            # Define the additional delay in days
-            additional_delay = 2  # For example, add a 2-day delay to all delivery times
-
-            # Calculate the maximum delivery time including the additional delay
+        if self.pk and self.items.exists():
+            additional_delay = 2
             longest_delivery_time = max(
                 item.product.delivery_time + additional_delay for item in self.items.all()
             )
@@ -63,7 +71,6 @@ class Order(models.Model):
         return timezone.now().date()
 
     def save(self, *args, **kwargs):
-        # If the order is being created, set the delivery date
         if not self.delivery_date:
             self.delivery_date = self.calculate_delivery_date()
         super().save(*args, **kwargs)

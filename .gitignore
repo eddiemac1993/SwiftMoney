@@ -10,15 +10,6 @@ venv/
 *.pyc
 __pycache__/
 
-# Database files
-*.sqlite3
-
-# Static files
-staticfiles/
-
-# Media files
-media/
-
 # IDE specific files
 .idea/
 .vscode/

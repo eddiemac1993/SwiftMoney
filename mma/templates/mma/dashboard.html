@@ -147,45 +147,22 @@
 <div class="dashboard-container">
     <div class="left-column">
 
-        <div class="card">
-            <h2>Latest Cashout</h2>
-            <div class="stat-grid">
-                <div class="stat-item">
-                    <div class="stat-label">Date</div>
-                    <div class="stat-value">
-                        {% if latest_cashout %}
-                            {{ latest_cashout.created_at|date:"Y-m-d" }}
-                        {% else %}
-                            No Cashout Yet
-                        {% endif %}
-                    </div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-label">Amount</div>
-                    <div class="stat-value">
-                        {% if latest_cashout %}
-                            K{{ latest_cashout.amount|floatformat:2 }}
-                        {% else %}
-                            N/A
-                        {% endif %}
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="card">
-            <h2>Next Available Request Amount</h2>
-            <div class="balance-amount">K{{ balance.request_limit|floatformat:2 }}</div>
-        </div>
-
-<div class="card">
+ <div class="card">
     <h3>Current Cash Request</h3>
     {% if current_cash_request %}
         <div class="cash-request">
             <p>Amount: K{{ current_cash_request.amount|floatformat:2 }}</p>
             {% if current_cash_request.is_approved %}
-                {% if days_until_expiration is not None %}
-                    <p>Days until expiration: {{ days_until_expiration }}</p>
+                <p>Status: Approved</p>
+                {% if current_cash_request.expiration_date %}
+                    <p>Expiration Date: {{ current_cash_request.expiration_date|date:"Y-m-d" }}</p>
+                    <p>Days until expiration:
+                        {% if days_until_expiration is not None %}
+                            {{ days_until_expiration }} days remaining
+                        {% else %}
+                            Expired
+                        {% endif %}
+                    </p>
                 {% else %}
                     <p>Expiration date not set</p>
                 {% endif %}
@@ -197,6 +174,11 @@
         <p>No current cash request.</p>
     {% endif %}
 </div>
+
+        <div class="card">
+            <h2>Next Available Request Amount</h2>
+            <div class="balance-amount">K{{ balance.request_limit|floatformat:2 }}</div>
+        </div>
 
         <div class="card">
             <h2>Your Balance</h2>
@@ -218,9 +200,7 @@
 
         <div class="card">
             <h2>Make a Request</h2>
-            <div class="btn-container">
-                <a href="{% url 'request_cash' %}" class="btn btn-secondary">Request Cash</a>
-            </div>
+
         </div>
     </div>
 
