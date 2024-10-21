@@ -15,7 +15,7 @@ from django.contrib.auth import logout
 from django.contrib import messages
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from .models import CashoutRequest
+from .models import CashoutRequest, Sale
 from django.core.mail import send_mail
 from django.conf import settings
 from .models import Product, Cart,Balance, CashoutRequest, CashRequest, Transaction, CartItem, Order, Invoice, Refund, OrderItem
@@ -27,6 +27,16 @@ from django.views.generic import ListView
 from .forms import RefundForm  # Assuming you have a form for handling refunds
 from django.contrib.auth.models import AnonymousUser
 from django.core.paginator import Paginator
+
+def search_log_view(request):
+    # Retrieve all search logs, ordered by date (newest first)
+    search_logs = SearchLog.objects.all().order_by('-search_date')
+
+    context = {
+        'search_logs': search_logs
+    }
+    return render(request, 'mma/search_logs.html', context)
+
 
 def terms_and_conditions(request):
     return render(request, 'terms_and_conditions.html')
@@ -202,60 +212,92 @@ def product_list_anonymous(request):
         'cart_item_count': cart_item_count  # Add the count to context
     })
 
+from django.db.models import Q
+from django.core.paginator import Paginator
+from django.utils import timezone
+from .models import Product, SearchLog, Synonym
+
+
 def product_list(request):
-    query = request.GET.get('q')
+    query = request.GET.get('q', '').strip()  # Ensure query is always a string, even if empty
     min_price = request.GET.get('min_price')
     max_price = request.GET.get('max_price')
     category_filter = request.GET.get('category')
+    verified_filter = request.GET.get('verified')
 
-    # Filter products by search query if provided
+    # Start with all products, ordering by creation date (latest first)
+    products = Product.objects.all().order_by('-created')
+
+    new_arrival_threshold = timezone.now() - timedelta(days=4)
+    new_arrivals = products.filter(created__gte=new_arrival_threshold)
+
+    # Check for synonyms if a query is provided
     if query:
-        products = Product.objects.filter(
-            Q(name__icontains=query) | Q(category__icontains=query)
-        ).order_by('category', 'name')
-    else:
-        products = Product.objects.all().order_by('category', 'name')
+        synonym_entry = Synonym.objects.filter(term__iexact=query).first()
+        main_term = synonym_entry.main_term if synonym_entry else query
 
-    # Filter products by category if a category is selected
+        # Filter products based on the main term
+        products = products.filter(
+            Q(name__icontains=main_term) | Q(category__icontains=main_term)
+        )
+
+    # Log the search query (whether the user is logged in or not)
+    search_term = query if query else "N/A"  # Avoid logging 'None' as search term
+
+    SearchLog.objects.create(
+        user=request.user if request.user.is_authenticated else None,
+        search_term=search_term,
+        search_date=timezone.now()
+    )
+
+    # Filter by category if provided
     if category_filter:
         products = products.filter(category=category_filter)
 
-    # Filter by price range
+    # Filter by price range if provided
     if min_price:
         products = products.filter(price__gte=min_price)
     if max_price:
         products = products.filter(price__lte=max_price)
 
+    # Filter by verified status if provided
+    if verified_filter:
+        products = products.filter(verified=True)
+
     # Pagination
-    paginator = Paginator(products, 100)  # Show 10 products per page
+    paginator = Paginator(products, 100)  # Show 100 products per page
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
 
-    # Get all distinct categories from products
+    # Get distinct categories for filtering options
     categories = Product.objects.values_list('category', flat=True).distinct()
 
-    # Check if the user is authenticated
+    # Handle cart item count for authenticated users
+    cart_item_count = 0
     if request.user.is_authenticated:
         try:
             cart = Cart.objects.get(agent=request.user)
             cart_item_count = cart.items.count()
         except Cart.DoesNotExist:
-            cart_item_count = 0
-    else:
-        cart_item_count = 0  # If the user is not authenticated, cart count is 0
+            pass
 
-    can_add_product = request.user.is_authenticated
+    can_add_product = True  # Allow all users to add a product
 
-    return render(request, 'product_list.html', {
-        'products': products,
+    context = {
+        'products': products,  # Keep this for the total products (not paginated)
         'query': query,
-        'page_obj': page_obj,
+        'new_arrivals': new_arrivals,
+        'page_obj': page_obj,  # This is the paginated product list
         'min_price': min_price,
         'max_price': max_price,
-        'categories': categories,  # Pass categories to the template
-        'cart_item_count': cart_item_count,  # Add the count to context
-        'can_add_product': can_add_product  # Add this line
-    })
+        'categories': categories,
+        'cart_item_count': cart_item_count,
+        'can_add_product': can_add_product,
+        'verified_filter': verified_filter,
+    }
+
+    return render(request, 'product_list.html', context)
+
 
 from django.shortcuts import render, get_object_or_404
 from .models import Product
@@ -279,21 +321,47 @@ def product_detail(request, product_id):
         'cart_item_count': cart_item_count  # Pass the cart item count
     })
 
-
-from django.contrib.auth.decorators import login_required
-from django.shortcuts import render, redirect
-from .forms import ProductForm
-
 @login_required
+def product_edit(request, product_id):
+    product = get_object_or_404(Product, id=product_id)
+
+    # Check if the logged-in user is the owner
+    if request.user != product.added_by:
+        return redirect('product_detail', product_id=product_id)  # Redirect if not owner
+
+    if request.method == 'POST':
+        form = ProductForm(request.POST, request.FILES, instance=product)
+        if form.is_valid():
+            form.save()
+            return redirect('product_detail', product_id=product.id)
+    else:
+        form = ProductForm(instance=product)
+
+    return render(request, 'product_edit.html', {'form': form, 'product': product})
+
+
+# views.py
+from django.shortcuts import render, redirect
+from .models import Product
+from .forms import ProductForm  # Assuming you have a ProductForm defined
+
 def add_product(request):
     if request.method == 'POST':
         form = ProductForm(request.POST, request.FILES)
         if form.is_valid():
-            form.save()
-            return redirect('product_list')
+            product = form.save(commit=False)
+            # Check if the user is authenticated
+            if request.user.is_authenticated:
+                product.added_by = request.user  # Assign logged-in user
+            else:
+                product.added_by = None  # Or handle as needed
+            product.save()
+            return redirect('/')  # Redirect to a success page
     else:
         form = ProductForm()
     return render(request, 'add_product.html', {'form': form})
+
+
 
 @login_required
 def add_to_cart(request, product_id):
@@ -430,6 +498,115 @@ def submit_order(request, form_data):
     except Exception as e:
         messages.error(request, f"An error occurred: {str(e)}")
         return redirect('checkout')
+
+@login_required
+def complete_order(request, order_id):
+    try:
+        # Get the order by ID or raise a 404 if it doesn't exist
+        order = get_object_or_404(Order, id=order_id, agent=request.user)
+
+        # Update the order status to 'approved'
+        order.status = 'approved'
+
+        # Call a method to log sales or any additional processing
+        order.complete_order()  # Ensure this method exists in your Order model
+
+        # Save the updated order
+        order.save()
+
+        # Optionally, you can redirect to an order detail or confirmation page
+        return redirect('order_detail', order_id=order.id)
+
+    except Exception as e:
+        messages.error(request, f"An error occurred while completing the order: {str(e)}")
+        return redirect('order_detail', order_id=order_id)
+
+
+@login_required
+def completed_orders(request):
+    user = request.user
+
+    # Admins can see all completed orders
+    if user.is_staff:
+        completed_orders = Order.objects.filter(status='completed')
+    else:
+        # Allow agents to see all completed orders associated with their business location
+        completed_orders = Order.objects.filter(status='completed')
+
+        # Further filter by business location if the user has one
+        if hasattr(user, 'business_location') and user.business_location:
+            completed_orders = completed_orders.filter(business_location=user.business_location)
+
+    # Get the current date and month
+    today = timezone.now().date()
+    current_month = timezone.now().month
+
+    # Calculate daily sales
+    daily_sales = completed_orders.filter(created_at__date=today).aggregate(
+        total=Sum('total_amount')
+    )['total'] or 0
+
+    # Calculate monthly sales
+    monthly_sales = completed_orders.filter(created_at__month=current_month).aggregate(
+        total=Sum('total_amount')
+    )['total'] or 0
+
+    context = {
+        'completed_orders': completed_orders,
+        'daily_sales': float(daily_sales),
+        'monthly_sales': float(monthly_sales),
+    }
+
+    return render(request, 'completed_orders.html', context)
+
+
+def mark_order_as_completed(request, order_id):
+    order = get_object_or_404(Order, id=order_id)
+
+    if order.status == 'approved':
+        order.complete_order()
+        messages.success(request, f"Order {order.id} has been marked as completed.")
+    else:
+        messages.error(request, "Only approved orders can be completed.")
+
+    return redirect('order_detail', order_id=order.id)
+
+from django.template.loader import render_to_string
+from django.http import HttpResponse
+from weasyprint import HTML
+from .models import Order
+import tempfile
+
+def download_report(request):
+    # Check if the user is authenticated
+    if not request.user.is_authenticated:
+        return HttpResponse("You need to log in to download the report.", status=403)
+
+    user = request.user
+    completed_orders = Order.objects.filter(status='completed', agent=user)
+
+    # Optionally filter by user's location
+    if user.business_location:  # Ensure user has a location attribute
+        completed_orders = completed_orders.filter(business_location=user.business_location)
+
+    # Prepare the context with the completed orders
+    context = {
+        'completed_orders': completed_orders,
+        'user': user,
+    }
+
+    # Render the HTML template to a string
+    html_string = render_to_string('order_report_template.html', context)
+
+    # Convert the HTML to PDF
+    html = HTML(string=html_string)
+    pdf_content = html.write_pdf()
+
+    # Create the HTTP response with PDF content
+    response = HttpResponse(pdf_content, content_type='application/pdf')
+    response['Content-Disposition'] = 'attachment; filename="completed_orders_report.pdf"'
+
+    return response
 
 
 
@@ -959,3 +1136,122 @@ def float_request_detail(request, id):
 def partnerships(request):
     # Your logic here
     return render(request, 'mma/partnerships.html')
+
+
+
+# views.py
+from django.views.generic import ListView
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.http import HttpResponse
+from django.db.models import Sum
+from django.utils import timezone
+from django_filters import FilterSet, DateFromToRangeFilter, ChoiceFilter
+import django_filters
+from reportlab.pdfgen import canvas
+from reportlab.lib import colors
+from reportlab.lib.pagesizes import letter
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph
+from reportlab.lib.styles import getSampleStyleSheet
+import io
+
+class OrderFilter(FilterSet):
+    created_at = DateFromToRangeFilter()
+    status = ChoiceFilter(choices=Order.STATUS_CHOICES)
+
+    class Meta:
+        model = Order
+        fields = ['agent', 'status', 'created_at']
+
+class OrderListView(LoginRequiredMixin, ListView):
+    model = Order
+    template_name = 'order_list.html'
+    context_object_name = 'orders'
+    paginate_by = 20
+
+    def get_queryset(self):
+        queryset = Order.objects.select_related('agent').prefetch_related('items__product')
+        self.filterset = OrderFilter(self.request.GET, queryset=queryset)
+        return self.filterset.qs
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['filter'] = self.filterset
+
+        # Calculate totals for filtered results
+        filtered_orders = self.filterset.qs
+        context['total_amount'] = filtered_orders.aggregate(Sum('total_amount'))['total_amount__sum'] or 0
+        context['total_deposits'] = filtered_orders.aggregate(Sum('deposit_amount'))['deposit_amount__sum'] or 0
+
+        return context
+
+# views.py
+from django.template.loader import render_to_string
+from django.http import HttpResponse
+from weasyprint import HTML, CSS
+from django.conf import settings
+import tempfile
+from datetime import datetime
+from django.db.models import Sum
+import os
+
+def generate_sales_pdf(request):
+    # Get filtered queryset
+    queryset = OrderFilter(request.GET, queryset=Order.objects.all()).qs
+
+    # Calculate summary data
+    summary_data = {
+        'total_amount': queryset.aggregate(Sum('total_amount'))['total_amount__sum'] or 0,
+        'total_deposits': queryset.aggregate(Sum('deposit_amount'))['deposit_amount__sum'] or 0,
+        'total_orders': queryset.count(),
+        'report_date': datetime.now().strftime('%Y-%m-%d %H:%M'),
+        'date_range': {
+            'start': request.GET.get('created_at_after', 'All time'),
+            'end': request.GET.get('created_at_before', 'Present')
+        }
+    }
+
+    # Prepare orders data with product details
+    orders_data = []
+    for order in queryset:
+        products = ", ".join([f"{item.quantity}x {item.product.name}" for item in order.items.all()])
+        orders_data.append({
+            'date': order.created_at.strftime('%Y-%m-%d %H:%M'),
+            'agent': order.agent.username,
+            'customer': order.customer_name,
+            'products': products,
+            'total': order.total_amount,
+            'deposit': order.deposit_amount,
+            'status': order.status
+        })
+
+    # Render the HTML template
+    html_string = render_to_string('pdf_template.html', {
+        'orders': orders_data,
+        'summary': summary_data,
+        'company_name': 'SwiftStyles Co.',
+        'company_address': 'Monze',
+        'company_phone': '+260773351643',
+        'company_email': 'swiftstyles@gmail.com'
+    })
+
+    # Create HTTP response
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="sales_report_{datetime.now().strftime("%Y%m%d")}.pdf"'
+
+    # Generate PDF
+    HTML(string=html_string).write_pdf(
+        response,
+        stylesheets=[
+            CSS(string='''
+                @page {
+                    size: letter portrait;
+                    margin: 2.5cm;
+                    @top-right {
+                        content: "Page " counter(page) " of " counter(pages);
+                    }
+                }
+            ''')
+        ]
+    )
+
+    return response

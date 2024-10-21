@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Completed Orders Report</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background-color: #f8f9fa; /* Light background for contrast */
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 20px; /* Add some space below the heading */
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background-color: #fff; /* White background for the table */
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Add subtle shadow */
+        }
+        table, th, td {
+            border: 1px solid #000;
+            padding: 10px; /* Increased padding for better readability */
+        }
+        th {
+            background-color: #007bff; /* Bootstrap primary color */
+            color: white; /* White text for header */
+        }
+        td {
+            color: #333; /* Darker text color for contrast */
+        }
+        .order-info {
+            margin-bottom: 10px;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            body {
+                padding: 10px; /* Reduce padding on smaller screens */
+            }
+            h1 {
+                font-size: 1.5rem; /* Adjust heading size */
+            }
+            table, th, td {
+                font-size: 0.9rem; /* Smaller font size for mobile */
+            }
+            th, td {
+                padding: 8px; /* Adjust padding */
+            }
+        }
+
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 1.2rem; /* Further adjust for very small screens */
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>SwiftStyles Completed Orders Report</h1>
+    <p class="order-info"><strong>Agent:</strong> {{ user.username }}</p>
+    <p class="order-info"><strong>Location:</strong> {{ user.business_location }}</p>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Order ID</th>
+                <th>Product Name</th> <!-- Changed from Customer Name to Product Name -->
+                <th>Total Amount</th>
+                <th>Status</th>
+                <th>Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for order in completed_orders %}
+            {% for item in order.items.all %} <!-- Loop through each order's items -->
+            <tr>
+                <td>{{ order.id }}</td>
+                <td>{{ item.product.name }}</td> <!-- Display product name -->
+                <td>{{ order.total_amount }}</td>
+                <td>{{ order.status }}</td>
+                <td>{{ order.created_at|date:"Y-m-d H:i" }}</td>
+            </tr>
+            {% endfor %}
+            {% empty %}
+            <tr>
+                <td colspan="5">No completed orders found.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>

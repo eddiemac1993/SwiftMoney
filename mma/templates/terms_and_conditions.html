@@ -41,6 +41,27 @@
     .contact-info p {
         margin: 0;
     }
+.back-btn {
+    display: inline-block;
+    background-color: #f44336; /* Red background */
+    color: white;
+    padding: 10px 15px;
+    font-size: 14px;
+    font-weight: bold;
+    text-decoration: none;
+    border-radius: 5px; /* Rounded corners */
+    transition: background-color 0.3s ease;
+    margin-top: 20px; /* Spacing above */
+}
+
+.back-btn:hover {
+    background-color: #d32f2f; /* Darker red on hover */
+}
+
+.back-btn i {
+    margin-right: 5px; /* Spacing between icon and text */
+}
+
     .last-updated {
         font-style: italic;
         color: var(--secondary-text);
@@ -51,13 +72,19 @@
 
 {% block content %}
 <div class="content-container">
+<div class="navigation">
+    <a href="javascript:history.back()" class="back-btn">
+        <i class="fas fa-arrow-left"></i> Back
+    </a>
+</div>
+
     <h1>Terms and Conditions</h1>
     <p>Welcome to SwiftMoney. These terms and conditions outline the rules and regulations for the use of SwiftMoney's website and services.</p>
-    
+
     <h2>1. Introduction</h2>
     <p>By accessing this website and using our services, we assume you accept these terms and conditions in full. Do not continue to use SwiftMoney's website or services if you do not accept all of the terms and conditions stated on this page.</p>
     <p>The following terminology applies to these Terms and Conditions, Privacy Statement and Disclaimer Notice and any or all Agreements: "Client", "You" and "Your" refers to you, the person accessing this website and accepting the Company's terms and conditions. "The Company", "Ourselves", "We", "Our" and "Us", refers to SwiftMoney. "Party", "Parties", or "Us", refers to both the Client and ourselves, or either the Client or ourselves.</p>
-    
+
     <h2>2. License</h2>
     <p>Unless otherwise stated, SwiftMoney and/or its licensors own the intellectual property rights for all material on SwiftMoney. All intellectual property rights are reserved. You may view and/or print pages from http://www.swiftmoney.com for your own personal use subject to restrictions set in these terms and conditions.</p>
     <p>You must not:</p>
@@ -67,7 +94,7 @@
         <li>Reproduce, duplicate or copy material from http://www.swiftmoney.com</li>
         <li>Redistribute content from SwiftMoney (unless content is specifically made for redistribution)</li>
     </ul>
-    
+
     <h2>3. User Content</h2>
     <p>Certain areas of this website offer the opportunity for users to post and exchange opinions, information, material, and data ('User Content'). SwiftMoney does not screen, edit, publish, or review User Content prior to its appearance on the website, and User Content does not reflect the views or opinions of SwiftMoney, its agents, or affiliates.</p>
     <p>To the extent permitted by applicable laws, SwiftMoney shall not be liable for the User Content or any loss, liability, damages, or expenses caused and/or suffered as a result of any use of and/or posting of and/or appearance of the User Content on this website.</p>
@@ -80,7 +107,7 @@
         <li>The User Content will not be used to solicit or promote business or custom or present commercial activities or unlawful activity.</li>
     </ul>
     <p>You hereby grant to SwiftMoney a non-exclusive royalty-free license to use, reproduce, edit and authorize others to use, reproduce and edit any of your User Content in any and all forms, formats or media.</p>
-    
+
     <h2>4. Mobile Money Use</h2>
     <p>The mobile money requested through our services is strictly for the intended mobile money use and must not be used for other business purposes. Agents are required to use these funds exclusively for mobile money transactions and related activities.</p>
     <p>Prohibited uses of mobile money include but are not limited to:</p>
@@ -90,7 +117,7 @@
         <li>Investment in other financial products or services</li>
         <li>Any illegal activities or transactions</li>
     </ul>
-    
+
     <h2>5. Agent Responsibilities</h2>
     <p>As an agent of SwiftMoney, you are responsible for:</p>
     <ol>
@@ -102,7 +129,7 @@
         <li>Protecting customer information and maintaining confidentiality in all transactions.</li>
         <li>Attending training sessions and staying updated on SwiftMoney's policies and procedures.</li>
     </ol>
-    
+
     <h2>6. Behavior and Compliance</h2>
     <p>SwiftMoney reserves the right to terminate business with any agent who fails to uphold moral behavior or misuses the funds provided. Agents must avoid involvement in scams, criminal activities, or any form of misconduct.</p>
     <p>Compliance with the laws of Zambia is mandatory, and agents are expected to address and resolve any issues promptly to prevent escalation.</p>
@@ -115,11 +142,11 @@
         <li>Engaging in money laundering or financing of illegal activities</li>
         <li>Misrepresenting SwiftMoney's services or policies to customers</li>
     </ul>
-    
+
     <h2>7. Dispute Resolution</h2>
     <p>In the event of any dispute arising out of or in connection with these terms and conditions, including any question regarding its existence, validity, or termination, the parties shall first seek to resolve the dispute through friendly negotiations.</p>
     <p>If the dispute is not resolved through negotiations within 30 days, either party may submit the dispute to arbitration in accordance with the Arbitration Act of Zambia. The arbitration shall be conducted in Lusaka, Zambia, in the English language.</p>
-    
+
     <h2>8. Limitation of Liability</h2>
     <p>To the fullest extent permitted by applicable law, SwiftMoney shall not be liable for any indirect, incidental, special, consequential, or punitive damages, or any loss of profits or revenues, whether incurred directly or indirectly, or any loss of data, use, goodwill, or other intangible losses, resulting from:</p>
     <ol>
@@ -128,17 +155,17 @@
         <li>Any content obtained from the services;</li>
         <li>Unauthorized access, use or alteration of your transmissions or content.</li>
     </ol>
-    
+
     <h2>9. Modifications to Terms</h2>
     <p>SwiftMoney reserves the right to modify these terms and conditions at any time. We will notify users of any changes by posting the new Terms and Conditions on this page and updating the "Last Updated" date at the bottom of this page.</p>
     <p>You are advised to review these Terms and Conditions periodically for any changes. Changes to these Terms and Conditions are effective when they are posted on this page.</p>
-    
+
     <h2>10. Governing Law</h2>
     <p>These terms and conditions are governed by and construed in accordance with the laws of Zambia. You irrevocably submit to the exclusive jurisdiction of the courts in Zambia for any disputes arising from these terms and conditions.</p>
-    
+
     <h2>11. Severability</h2>
     <p>If any provision of these Terms and Conditions is found to be unenforceable or invalid under any applicable law, such unenforceability or invalidity shall not render these Terms and Conditions unenforceable or invalid as a whole, and such provisions shall be deleted without affecting the remaining provisions herein.</p>
-    
+
     <h2>12. Contact Information</h2>
     <div class="contact-info">
         <p>If you have any questions about our Terms and Conditions, please contact us at:</p>
@@ -148,7 +175,7 @@
         Email: <a href="mailto:support@swiftmoney.com">support@swiftmoney.com</a><br>
         Phone: +260 123 456 789</p>
     </div>
-    
+
     <p class="last-updated">Last Updated: [Insert Date]</p>
 </div>
 {% endblock %}

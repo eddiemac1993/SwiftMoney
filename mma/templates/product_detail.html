@@ -2,11 +2,92 @@
 {% block title %}{{ product.name }} | Product Details{% endblock %}
 {% block extra_css %}
 <style>
+         header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 5px; /* Adjusted padding for space */
+            background-color: var(--background-color);
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 100;
+        }
+
+        .logo img {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+        }
+
+        .search-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .search-form {
+            display: flex;
+            align-items: center;
+            position: relative;
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 10px 40px; /* Space for icon inside the field */
+            font-size: 1rem;
+            border: 1px solid var(--primary-color);
+            border-radius: 25px;
+            outline: none;
+            background-color: var(--card-background);
+            color: var(--text-color);
+        }
+
+        .search-input:focus {
+            border-color: var(--secondary-color);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 15px;
+            color: var(--secondary-text);
+        }
+
+        /* Navbar items spacing */
+        .navbar-items {
+            display: flex;
+            align-items: center;
+        }
+
+        .navbar-items a {
+            color: var(--text-color);
+            margin-right: 20px; /* Space between items */
+            padding: 10px 0;
+            text-decoration: none;
+        }
+
+        .navbar-items a:hover {
+            color: var(--secondary-color);
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 600px) {
+            .search-form {
+                max-width: 100%;
+            }
+
+            .navbar-items a {
+                margin-right: 10px;
+            }
+        }
     /* Product Detail Page Styles */
     .product-detail-container {
-        max-width: 1200px;
+        max-width: 1400px;
         margin: 0 auto;
-        padding: 40px 20px;
     }
     .product-detail-card {
         display: flex;
@@ -54,28 +135,38 @@
         opacity: 1;
         transform: scale(1.1);
     }
-    .product-info-section {
-        flex: 1;
-        padding: 40px;
-    }
-    .product-title {
-        font-size: 2.5rem;
-        font-weight: 700;
-        color: #333;
-        margin-bottom: 15px;
-    }
-    .product-price {
-        font-size: 2rem;
-        font-weight: 600;
-        color: #27ae60;
-        margin-bottom: 25px;
-    }
-    .product-description {
-        font-size: 1.1rem;
-        line-height: 1.6;
-        color: #555;
-        margin-bottom: 30px;
-    }
+
+.product-info-section {
+    flex: 1;
+    padding: 40px;
+    color: white; /* General white text for the entire section */
+}
+
+.product-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: white; /* White text */
+    margin-bottom: 15px;
+}
+
+.product-price {
+    font-size: 2rem;
+    font-weight: 600;
+    color: white; /* White text */
+    margin-bottom: 25px;
+}
+
+.product-description {
+    font-size: 1.1rem;
+    line-height: 1.6;
+    color: white; /* White text */
+    margin-bottom: 30px;
+}
+
+.rating .count {
+    color: white; /* White text for the rating count */
+    font-size: 0.9rem;
+}
     .rating {
         display: flex;
         align-items: center;
@@ -90,35 +181,7 @@
         color: #777;
         font-size: 0.9rem;
     }
-    .animated-stars {
-        transition: transform 0.4s ease;
-    }
-    .animated-stars:hover {
-        transform: scale(1.1);
-    }
-    .product-meta {
-        font-size: 1rem;
-        color: #777;
-        margin-bottom: 30px;
-    }
-    .product-meta p {
-        margin: 10px 0;
-        display: flex;
-        align-items: center;
-    }
-    .product-meta i {
-        margin-right: 10px;
-        font-size: 1.2rem;
-    }
-    .size-selector, .quantity-selector {
-        margin-bottom: 20px;
-    }
-    .size-selector select, .quantity-selector input {
-        padding: 5px 10px;
-        border-radius: 5px;
-        border: 1px solid #ddd;
-        width: 100%;
-    }
+
     .button-group {
         display: flex;
         flex-wrap: wrap;
@@ -164,81 +227,34 @@
     .btn-share-facebook:hover {
         background-color: #2d4373;
     }
-    /* Related Products Carousel */
-    .related-products {
-        margin-top: 50px;
-    }
-    .related-title {
-        font-size: 1.8rem;
+    .return-button {
+        display: inline-block;
         margin-bottom: 20px;
-    }
-    .related-items {
-        display: flex;
-        gap: 15px;
-        overflow-x: auto;
-    }
-    .related-item {
-        background-color: var(--card-background);
-        padding: 15px;
-        border-radius: 10px;
-        min-width: 200px;
-        text-align: center;
-        transition: transform 0.3s ease;
-    }
-    .related-item:hover {
-        transform: translateY(-10px);
-    }
-    .related-item img {
-        width: 100%;
-        height: 150px;
-        object-fit: cover;
-        border-radius: 5px;
-        margin-bottom: 10px;
-    }
-    /* Reviews */
-    .review-section {
-        margin-top: 50px;
-    }
-    .review-title {
-        font-size: 1.8rem;
-        margin-bottom: 20px;
-    }
-    .review-list {
-        margin-bottom: 20px;
-    }
-    .review-item {
-        margin-bottom: 15px;
-        padding-bottom: 10px;
-        border-bottom: 1px solid #ddd;
-    }
-    .review-item .reviewer {
-        font-weight: bold;
-    }
-    .review-item .review-text {
-        font-size: 1rem;
-        color: #555;
-    }
-    .write-review {
-        margin-top: 20px;
-    }
-    .write-review textarea {
-        width: 100%;
-        padding: 10px;
-        border-radius: 5px;
-        border: 1px solid #ddd;
-        margin-bottom: 10px;
-    }
-    .write-review button {
-        padding: 10px 15px;
-        background-color: #27ae60;
+        padding: 10px 20px;
+        background-color: var(--primary-color);
         color: white;
-        border: none;
+        text-decoration: none;
         border-radius: 5px;
-        cursor: pointer;
+        transition: background-color 0.3s ease;
     }
-    .write-review button:hover {
-        background-color: #219150;
+
+    .return-button:hover {
+        background-color: var(--primary-color-dark);
     }
+.btn-primary {
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1em;
+    transition: background-color 0.3s ease;
+}
+
+.btn-primary:hover {
+    background-color: var(--primary-color-dark);
+}
     /* Responsive Design */
     @media (max-width: 992px) {
         .product-detail-card {
@@ -262,13 +278,18 @@
             flex-direction: column;
         }
         .btn {
-            width: 100%;
+            width: 80%;
         }
     }
 </style>
 {% endblock %}
 {% block content %}
 <div class="product-detail-container">
+    <a href="javascript:history.back()" class="return-button">
+        <i class="fas fa-arrow-left"></i> Return to Previous Page
+    </a>
+
+
     <div class="product-detail-card" itemscope itemtype="https://schema.org/Product">
         <div class="image-section">
             <span class="product-badge">New Arrival</span>
@@ -280,7 +301,7 @@
         </div>
         <div class="product-info-section">
             <h1 class="product-title" itemprop="name">{{ product.name }}</h1>
-            <p class="product-price" itemprop="price"> k{{ product.price }}</p>
+            <p class="product-price" itemprop="price">K{{ product.price }}</p>
             <p class="product-description" itemprop="description">{{ product.description }}</p>
             <div class="rating">
                 <div class="stars animated-stars">★★★★☆</div>
@@ -295,12 +316,22 @@
             <div class="button-group">
                 <a href="#" class="btn btn-share-whatsapp"
                    onclick="window.open('https://api.whatsapp.com/send?text={{ request.build_absolute_uri }}', '_blank')">
-                    WhatsApp
+                    <i class="fab fa-whatsapp"></i>
                 </a>
+                <a href="https://www.facebook.com/sharer/sharer.php?u={{ request.build_absolute_uri }}"
+                   class="btn btn-share-facebook" target="_blank">
+                   <i class="fab fa-facebook-f"></i>
+                </a>
+                    <!-- Show the edit button only to the product owner -->
+    {% if user.is_authenticated and user == product.added_by %}
+        <a href="{% url 'product_edit' product.id %}" class="btn-primary">Edit Product</a>
+    {% endif %}
             </div>
         </div>
     </div>
-
 </div>
-
+<br/>
+<br/>
+<br/>
 {% endblock %}
+

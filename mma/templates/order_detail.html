@@ -26,22 +26,30 @@
     <p>Total Amount: k{{ order.total_amount }}</p>
     <p>Deposit Paid: k{{ order.deposit_amount }}</p>
 
+
     <div class="button-group">
         {% if order.status == 'pending' %}
             <a href="{% url 'pay_deposit' order.id %}" class="btn">Order Confirmation</a>
             <a href="{% url 'cancel_order' order.id %}" class="btn">Cancel Order</a>
         {% endif %}
        {% if order.status == 'approved' %}
+
+    <form method="POST" action="{% url 'complete_order' order.id %}">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-primary">Complete Order</button>
+
+</form>
+
     <a href="{% url 'generate_document' order.id 'invoice' %}" class="btn btn-sm btn-primary">
         <i class="fas fa-file-invoice"></i> Generate Invoice
+
     </a>
+    <a href="{% url 'generate_document' order.id 'receipt' %}" class="btn btn-sm btn-success">
+    <i class="fas fa-receipt"></i> Generate Receipt
+</a>
 {% endif %}
 <a href="{% url 'generate_document' order.id 'quotation' %}" class="btn btn-sm btn-secondary">
     <i class="fas fa-file-alt"></i> Generate Quotation
 </a>
-<a href="{% url 'generate_document' order.id 'receipt' %}" class="btn btn-sm btn-success">
-    <i class="fas fa-receipt"></i> Generate Receipt
-</a>
-
     </div>
 {% endblock %}

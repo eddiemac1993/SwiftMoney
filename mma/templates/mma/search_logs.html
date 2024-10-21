@@ -1,0 +1,29 @@
+{% extends 'mma/base.html' %}
+
+{% block title %}Search Logs{% endblock %}
+
+{% block content %}
+    <h1>Search Logs</h1>
+    <table style="width: 100%; border-collapse: collapse;">
+        <thead>
+            <tr>
+                <th style="text-align: left;">Search Term</th>
+                <th style="text-align: left;">Search Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for log in search_logs %}
+                {% if log.search_term != "N/A" %}
+                <tr>
+                    <td style="font-size: 12px;">{{ log.search_term }}</td>
+                    <td style="font-size: 12px;">{{ log.search_date }}</td>
+                </tr>
+                {% endif %}
+            {% empty %}
+            <tr>
+                <td colspan="2" style="font-size: 12px; text-align: center;">No search logs available.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

@@ -23,7 +23,7 @@
         }
 
         .login-container h2 {
-            color: var(--primary-color); 
+            color: var(--primary-color);
             margin-bottom: 20px;
             font-size: 1.5rem;
         }
@@ -149,11 +149,7 @@
             </div>
 
             <button type="submit" class="btn-primary">Login</button>
-            <a href="{% url 'password_reset' %}" class="forgot-password">Forgot password?</a>
 
-            <a href="{% url 'register' %}">
-                <button type="button" class="btn-secondary">Create new account</button>
-            </a>
         </form>
 
         <div class="footer-links">
@@ -171,7 +167,7 @@
             // Toggle the type attribute of the password input field
             const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
             password.setAttribute('type', type);
-            
+
             // Toggle the eye icon
             this.classList.toggle('fa-eye-slash');
         });

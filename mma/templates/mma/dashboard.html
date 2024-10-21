@@ -131,6 +131,17 @@
         .balance-label {
             font-size: 0.8em;
         }
+.button {
+    padding: 10px 20px;
+    border-radius: 5px;
+    text-decoration: none; /* Remove underline */
+    color: white; /* Text color */
+    display: inline-block; /* Ensure proper spacing */
+}
+
+.button:hover {
+    background-color: #0056b3; /* Darker shade on hover for primary */
+}
 
         .balance-amount {
             font-size: 1.1em;
@@ -148,7 +159,11 @@
     <div class="left-column">
 
  <div class="card">
-    <h3>Current Cash Request</h3>
+ <div class="button-container">
+    <a href="{% url 'order_list' %}" class="button btn btn-primary">View Orders</a>
+    <a href="{% url 'search_logs' %}" class="button btn btn-secondary">View Search Logs</a>
+</div>
+<h3>Current Cash Request</h3>
     {% if current_cash_request %}
         <div class="cash-request">
             <p>Amount: K{{ current_cash_request.amount|floatformat:2 }}</p>

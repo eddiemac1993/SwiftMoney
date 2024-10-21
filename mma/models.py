@@ -6,22 +6,69 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.contrib.auth import get_user_model
 
+class Synonym(models.Model):
+    term = models.CharField(max_length=255, unique=True)
+    main_term = models.CharField(max_length=255)
+
+    def __str__(self):
+        return f"{self.term} -> {self.main_term}"
+
+class SearchLog(models.Model):
+    user = models.ForeignKey(CustomUser, on_delete=models.SET_NULL, null=True, blank=True)
+    search_term = models.CharField(max_length=255)
+    search_date = models.DateTimeField()
+
+    def __str__(self):
+        return f"{self.user} searched for {self.search_term} on {self.search_date}"
+
 class Product(models.Model):
     CATEGORY_CHOICES = [
+        ('groceries', 'Groceries'),
+        ('hardware', 'Hardware'),
         ('electronics', 'Electronics'),
         ('clothing', 'Clothing'),
+        ('furniture', 'Furniture'),
+        ('automotive', 'Automotive'),
+        ('beauty_health', 'Beauty & Health'),
+        ('toys', 'Toys'),
+        ('sports', 'Sports & Outdoors'),
         ('books', 'Books'),
-        ('home', 'Home & Garden'),
-        ('toys', 'Toys & Games'),
-        ('other', 'Other'),
+        ('home_appliances', 'Home Appliances'),
+        ('stationery', 'Stationery'),
+        ('pharmacy', 'Pharmacy'),
+        ('jewelry', 'Jewelry & Accessories'),
+        ('footwear', 'Footwear'),
+        ('gardening', 'Gardening & Outdoor'),
+        ('baby_products', 'Baby Products'),
+        ('pet_supplies', 'Pet Supplies'),
+        ('music_instruments', 'Musical Instruments'),
+        ('office_supplies', 'Office Supplies'),
+        ('gaming', 'Gaming'),
+        ('kitchenware', 'Kitchenware'),
+        ('building_materials', 'Building Materials'),
+        ('tools', 'Tools & Equipment'),
+        ('computer_accessories', 'Computer & Accessories'),
     ]
 
     name = models.CharField(max_length=200)
     description = models.TextField()
-    category = models.CharField(max_length=100)
+    category = models.CharField(max_length=100, choices=CATEGORY_CHOICES, default='other')
     price = models.DecimalField(max_digits=10, decimal_places=2)
     delivery_time = models.PositiveIntegerField()
     image = models.ImageField(upload_to='product_images/', null=True, blank=True, default='product_default.png')
+    verified = models.BooleanField(default=False)
+    added_by = models.ForeignKey(CustomUser, on_delete=models.SET_NULL, null=True, blank=True)
+
+    created = models.DateTimeField(auto_now_add=True)
+
+    def save(self, *args, **kwargs):
+        # Check if the product is being added by a logged-in user
+        if self.added_by and self.added_by.is_authenticated:
+            self.verified = True  # Mark as verified if user is logged in
+        else:
+            self.verified = False  # Not verified if no user or anonymous user
+
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return self.name
@@ -44,10 +91,21 @@ class CartItem(models.Model):
     def __str__(self):
         return f"{self.quantity} x {self.product.name}"
 
+class Sale(models.Model):
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    user = models.ForeignKey(CustomUser, on_delete=models.SET_NULL, null=True, blank=True)
+    quantity = models.PositiveIntegerField()
+    total_price = models.DecimalField(max_digits=10, decimal_places=2)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.quantity} x {self.product.name} sold"
+
 class Order(models.Model):
     STATUS_CHOICES = (
         ('pending', 'Pending'),
         ('approved', 'Approved'),
+        ('completed', 'Completed'),  # Add 'completed' status
         ('cancelled', 'Cancelled'),
     )
 
@@ -58,6 +116,7 @@ class Order(models.Model):
     deposit_amount = models.DecimalField(max_digits=10, decimal_places=2)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
     created_at = models.DateTimeField(auto_now_add=True)
+    business_location = models.CharField(max_length=200, null=True, blank=True)
     delivery_date = models.DateField(null=True, blank=True)
     is_approved = models.BooleanField(default=False)
 
@@ -77,6 +136,18 @@ class Order(models.Model):
 
     def __str__(self):
         return f"Order {self.id} by {self.customer_name}"
+
+    def complete_order(self):
+        # Create sales records for each item in the order
+        for item in self.items.all():
+            Sale.objects.create(
+                product=item.product,
+                user=self.agent,  # Ensure this is the correct agent
+                quantity=item.quantity,
+                total_price=item.subtotal(),
+            )
+        self.status = 'completed'  # Update the status to completed
+        self.save()
 
 @receiver(post_save, sender=Order)
 def update_order_delivery_date(sender, instance, **kwargs):

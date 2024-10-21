@@ -1,0 +1,185 @@
+<!-- templates/orders/pdf_template.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <style>
+        @page {
+            margin: 2.5cm;
+        }
+        
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+        }
+
+        .header {
+            margin-bottom: 30px;
+        }
+
+        .company-info {
+            float: left;
+            width: 50%;
+        }
+
+        .report-info {
+            float: right;
+            width: 50%;
+            text-align: right;
+        }
+
+        .clear {
+            clear: both;
+        }
+
+        .summary-box {
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 20px 0;
+            page-break-inside: avoid;
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+        }
+
+        .summary-item {
+            text-align: center;
+        }
+
+        .summary-item h3 {
+            margin: 0;
+            color: #666;
+            font-size: 14px;
+        }
+
+        .summary-item p {
+            margin: 5px 0 0;
+            font-size: 18px;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            font-size: 12px;
+        }
+
+        th {
+            background-color: #2c3e50;
+            color: white;
+            padding: 12px 8px;
+            text-align: left;
+        }
+
+        td {
+            padding: 8px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f8f9fa;
+        }
+
+        .status {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: bold;
+        }
+
+        .status-completed { background-color: #d4edda; color: #155724; }
+        .status-pending { background-color: #fff3cd; color: #856404; }
+        .status-cancelled { background-color: #f8d7da; color: #721c24; }
+
+        .footer {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #ddd;
+            font-size: 10px;
+            color: #666;
+            text-align: center;
+        }
+
+        @media print {
+            .page-break {
+                page-break-before: always;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="company-info">
+            <h1>{{ SwiftStyles }}</h1>
+            <p>{{ Monze  }}<br>
+               Phone: {{ company_phone }}<br>
+               Email: {{ company_email }}</p>
+        </div>
+        <div class="report-info">
+            <h2>Sales Report</h2>
+            <p>Generated: {{ summary.report_date }}<br>
+               Period: {{ summary.date_range.start }} to {{ summary.date_range.end }}</p>
+        </div>
+        <div class="clear"></div>
+    </div>
+
+    <div class="summary-box">
+        <div class="summary-grid">
+            <div class="summary-item">
+                <h3>Total Orders</h3>
+                <p>{{ summary.total_orders }}</p>
+            </div>
+            <div class="summary-item">
+                <h3>Total Amount</h3>
+                <p>k {{ summary.total_amount|floatformat:2 }}</p>
+            </div>
+            <div class="summary-item">
+                <h3>Total Deposits</h3>
+                <p>k {{ summary.total_deposits|floatformat:2 }}</p>
+            </div>
+        </div>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Agent</th>
+                <th>Customer</th>
+                <th>Products</th>
+                <th>Total</th>
+                <th>Deposit</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for order in orders %}
+            <tr>
+                <td>{{ order.date }}</td>
+                <td>{{ order.agent }}</td>
+                <td>{{ order.customer }}</td>
+                <td>{{ order.products }}</td>
+                <td>k {{ order.total|floatformat:2 }}</td>
+                <td>k {{ order.deposit|floatformat:2 }}</td>
+                <td>
+                    <span class="status status-{{ order.status }}">
+                        {{ order.status|title }}
+                    </span>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <div class="footer">
+        <p>This is an automatically generated report. Please contact {{ company_email }} for any queries.</p>
+    </div>
+</body>
+</html>

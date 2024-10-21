@@ -1,0 +1,294 @@
+{% extends "mma/base.html" %}
+{% load widget_tweaks %}
+
+{% block title %}Order list{% endblock %}
+
+{% block extra_css %}
+<style>
+    .dashboard-container {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .card {
+        background-color: var(--card-background);
+        border-radius: 15px;
+        padding: 20px;
+        margin-bottom: 20px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    h2 {
+        color: var(--text-color);
+        margin-bottom: 15px;
+        font-size: 1.2rem;
+    }
+
+    .balance-section {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        gap: 10px;
+    }
+
+    .balance-item {
+        flex: 1;
+        min-width: 200px;
+        text-align: center;
+        padding: 10px;
+        background-color: rgba(255, 255, 255, 0.1);
+        border-radius: 10px;
+        box-sizing: border-box;
+    }
+
+    .balance-label {
+        color: var(--secondary-text);
+        font-size: 0.9em;
+        margin-bottom: 5px;
+    }
+
+    .balance-amount {
+        color: var(--primary-color);
+        font-size: 1.2em;
+        font-weight: bold;
+    }
+
+    .btn-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .btn {
+        padding: 10px 15px; /* Add padding for better size */
+        border: none; /* Remove default border */
+        border-radius: 5px; /* Rounded corners */
+        background-color: var(--primary-color); /* Use your primary color */
+        color: white; /* White text color */
+        text-decoration: none; /* Remove underline for links */
+        cursor: pointer; /* Change cursor to pointer */
+        transition: background-color 0.3s; /* Smooth background transition */
+    }
+
+    .btn:hover {
+        background-color: darken(var(--primary-color), 10%); /* Darken on hover */
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.7em; /* Reduced font size */
+    }
+
+    th, td {
+        padding: 8px; /* Adjust padding as needed */
+        text-align: left;
+        border-bottom: 1px solid var(--secondary-text);
+    }
+
+    th {
+        color: var(--secondary-text);
+        font-weight: normal;
+    }
+
+    .status-approved {
+        color: #4CAF50;
+    }
+
+    .status-pending {
+        color: #FFC107;
+    }
+
+    @media (min-width: 768px) {
+        .dashboard-container {
+            flex-direction: row;
+        }
+
+        .left-column, .right-column {
+            flex: 1;
+        }
+
+        .left-column {
+            max-width: 300px;
+        }
+    }
+
+    @media (max-width: 767px) {
+        .balance-section {
+            flex-direction: column;
+        }
+
+        .balance-item {
+            width: 100%;
+        }
+
+        table {
+            font-size: 0.6em; /* Further reduced font size for small screens */
+        }
+
+        th, td {
+            padding: 8px 5px;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .balance-item {
+            min-width: auto;
+            padding: 8px;
+        }
+
+        .balance-label {
+            font-size: 0.8em;
+        }
+
+        .balance-amount {
+            font-size: 1.1em;
+        }
+
+        h2 {
+            font-size: 1rem;
+        }
+    }
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-control {
+    border: 1px solid #ccc; /* Border color */
+    border-radius: 20px; /* Rounded corners */
+    padding: 10px 15px; /* Padding */
+    width: 100%; /* Full width */
+    box-sizing: border-box; /* Ensure padding is included in width */
+    font-size: 0.9em; /* Font size */
+    transition: border-color 0.3s; /* Smooth border color transition */
+}
+
+.form-control:focus {
+    border-color: var(--primary-color); /* Change border color on focus */
+    outline: none; /* Remove outline */
+}
+
+.button-container {
+    display: flex; /* Flexbox for button alignment */
+    gap: 10px; /* Space between buttons */
+}
+
+.btn {
+    display: flex; /* Flexbox for icon alignment */
+    align-items: center; /* Center icons vertically */
+    padding: 10px 15px; /* Padding for buttons */
+    border: none; /* Remove default border */
+    border-radius: 20px; /* Rounded corners */
+    background-color: var(--primary-color); /* Primary background color */
+    color: white; /* White text color */
+    text-decoration: none; /* Remove underline for links */
+    cursor: pointer; /* Pointer cursor */
+    transition: background-color 0.3s; /* Smooth background transition */
+}
+
+.btn:hover {
+    background-color: darken(var(--primary-color), 10%); /* Darken on hover */
+}
+
+/* Custom styles for the green button */
+.btn-green {
+    background-color: #28a745; /* Green background */
+}
+
+.btn-green:hover {
+    background-color: darken(#28a745, 10%); /* Darken on hover */
+}
+
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+    <div class="left-column">
+        <div class="card">
+            <div class="filter-section">
+                <h2 class="filter-heading">Filter Orders</h2>
+<form method="get" class="form-grid">
+    {% for field in filter.form %}
+        <div class="form-group">
+            {{ field.label_tag }}
+            {{ field|add_class:"form-control" }}
+            {% if field.field.widget.attrs.placeholder is not defined %}
+                {% with placeholder="Enter {{ field.label|lower }}" %}
+                    {{ field|add_class:"form-control"|attr:"placeholder:placeholder" }}
+                {% endwith %}
+            {% endif %}
+        </div>
+    {% endfor %}
+    <div class="button-container">
+        <button type="submit" class="btn btn-primary">
+            <i class="fas fa-filter"></i> Apply Filters
+        </button>
+        <a href="{% url 'generate_sales_pdf' %}?{{ request.GET.urlencode }}" class="btn btn-green">
+            <i class="fas fa-download"></i> Download PDF
+        </a>
+    </div>
+</form>
+
+
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="summary-section">
+                <div>
+                    <h3 class="summary-title">Total Amount</h3>
+                    <p class="summary-value">k{{ total_amount|floatformat:2 }}</p>
+                </div>
+                <div>
+                    <h3 class="summary-title">Total Deposits</h3>
+                    <p class="summary-value">k{{ total_deposits|floatformat:2 }}</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>Make a Request</h2>
+            <!-- Add any additional content or forms for making a request here -->
+        </div>
+    </div>
+
+    <div class="right-column">
+        <div class="card">
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Agent</th>
+                            <th>Products</th>
+                            <th>Total Amount</th>
+                            <th>Deposit</th>
+                            <th>Created</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for order in orders %}
+                        <tr>
+                            <td>{{ order.agent.username }}</td>
+                            <td>
+                                {% for item in order.items.all %}
+                                    {{ item.product.name }}{% if not forloop.last %}, {% endif %}
+                                {% endfor %}
+                            </td>
+                            <td>k{{ order.total_amount }}</td>
+                            <td>k{{ order.deposit_amount }}</td>
+                            <td>{{ order.created_at|date:"d/m/Y" }}</td> <!-- Date in DD/MM/YYYY format -->
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="5">No orders found</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

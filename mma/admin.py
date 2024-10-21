@@ -1,5 +1,11 @@
 from django.contrib import admin
-from .models import Product, Cart, CartItem, Order, OrderItem, Invoice, Refund, FloatRequest, CashRequest, CashoutRequest, Balance, Transaction
+from .models import Product, SearchLog, Cart, CartItem, Order, OrderItem, Invoice, Refund, FloatRequest, CashRequest, CashoutRequest, Balance, Transaction
+
+@admin.register(SearchLog)
+class SearchLogAdmin(admin.ModelAdmin):
+    list_display = ('user', 'search_term', 'search_date')
+    search_fields = ('user__username', 'search_term')
+    list_filter = ('search_date',)
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
@@ -20,12 +26,27 @@ class CartItemAdmin(admin.ModelAdmin):
     search_fields = ('cart__agent__username', 'product__name')
     readonly_fields = ('subtotal',)
 
+class OrderItemInline(admin.TabularInline):
+    model = OrderItem
+    extra = 0
+
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
-    list_display = ('agent', 'customer_name', 'total_amount', 'deposit_amount', 'status', 'created_at', 'delivery_date')
+    list_display = ('id', 'agent', 'get_products', 'total_amount', 'deposit_amount',
+                   'status', 'created_at', 'delivery_date')
+    list_filter = ('status', 'created_at', 'delivery_date')
     search_fields = ('agent__username', 'customer_name')
-    list_filter = ('status',)
-    readonly_fields = ('delivery_date',)
+    date_hierarchy = 'created_at'
+    inlines = [OrderItemInline]
+
+    def get_products(self, obj):
+        return ", ".join([item.product.name for item in obj.items.all()])
+    get_products.short_description = 'Products'
+
+    def save_model(self, request, obj, form, change):
+        if form.cleaned_data['status'] == 'completed':
+            obj.complete_order()  # Call the completion logic
+        super().save_model(request, obj, form, change)
 
 @admin.register(OrderItem)
 class OrderItemAdmin(admin.ModelAdmin):

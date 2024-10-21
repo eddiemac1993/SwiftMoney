@@ -3,8 +3,15 @@ from . import views
 
 urlpatterns = [
     path('home/', views.index, name='home'),
+    path('orders/', views.OrderListView.as_view(), name='order_list'),
+    path('orders/pdf/', views.generate_sales_pdf, name='generate_sales_pdf'),
+    path('download-report/', views.download_report, name='download_report'),
+    path('completed-orders/', views.completed_orders, name='completed_orders'),
+    path('complete_order/<int:order_id>/', views.complete_order, name='complete_order'),
+    path('search-logs/', views.search_log_view, name='search_logs'),
     path('products/<int:product_id>/', views.product_detail, name='product_detail'),
     path('add-product/', views.add_product, name='add_product'),
+    path('product/<int:product_id>/edit/', views.product_edit, name='product_edit'),
     path('partnerships/', views.partnerships, name='partnerships'),
     path('logout/', views.custom_logout, name='custom_logout'),
     path('dashboard/', views.dashboard, name='dashboard'),

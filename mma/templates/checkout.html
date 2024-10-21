@@ -78,6 +78,7 @@
         }
 
         .checkout-form button {
+            width: 100%; /* Make button full width for better mobile experience */
             padding: 12px;
             font-size: 1.1rem;
         }
@@ -100,6 +101,13 @@
             padding: 14px;
             font-size: 1.2rem;
         }
+    }
+
+    /* Ensures buttons and form elements are always visible */
+    .checkout-form {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
     }
 </style>
 {% endblock %}
@@ -126,7 +134,9 @@
                 <button type="submit" class="btn btn-primary">Billing Information</button>
             </form>
         </div>
+        <div class="checkout-form">
+            <h2>Information</h2>
+
+        </div>
     </div>
-    <br/>
-    <br/>
 {% endblock %}

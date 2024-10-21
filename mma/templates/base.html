@@ -34,33 +34,25 @@
             background-color: var(--background-color);
             color: var(--text-color);
             margin: 0;
-            padding: 0;
-            padding-top: var(--nav-height);
-            padding-bottom: 70px;
+            padding-top: 70px;
         }
 
         header {
-            background-color: var(--card-background);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 5px; /* Adjusted padding for space */
+            background-color: var(--background-color);
             position: fixed;
             top: 0;
-            left: 0;
-            right: 0;
-            height: var(--nav-height);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0 20px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-            z-index: 1000;
+            width: 100%;
+            z-index: 100;
         }
 
-        .logo {
-            font-size: 1.5em;
-            font-weight: 700;
-            color: var(--primary-color);
-            text-decoration: none;
-            text-transform: uppercase;
-            letter-spacing: 1px;
+        .logo img {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
         }
 
         .top-nav {
@@ -334,31 +326,141 @@ button:hover {
     vertical-align: top;
 
     position: absolute; /* Ensures the badge is positioned relative to the cart icon */
+    /* Search and Filter Section */
+    .search-filter-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        margin-bottom: 30px;
+        background-color: white;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
 
+.search-container {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
 }
+
+.search-form {
+    position: relative;
+    width: 400px; /* Default width */
+    max-width: 100%; /* Ensure it does not overflow on small screens */
+}
+
+.search-input {
+    width: 100%;
+    padding: 10px 50px 10px 15px; /* Extra padding for the icon */
+    border: 2px solid #ddd;
+    border-radius: 30px; /* Rounded search bar */
+    font-size: 16px;
+    outline: none;
+}
+
+.search-icon-btn {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #888;
+    font-size: 18px;
+}
+
+.search-icon-btn:hover {
+    color: #333;
+}
+
+.search-icon-btn i {
+    pointer-events: none;
+}
+
+/* RESPONSIVE DESIGN */
+@media (max-width: 768px) {
+    .search-form {
+        width: 300px; /* Adjust width for tablets */
+    }
+
+    .search-input {
+        padding: 10px 45px 10px 10px; /* Adjust padding */
+        font-size: 14px; /* Slightly smaller font for smaller screens */
+    }
+
+    .search-icon-btn {
+        right: 8px; /* Adjust icon position */
+        font-size: 16px;
+    }
+}
+
+@media (max-width: 480px) {
+    .search-form {
+        width: 250px; /* Smaller width for mobile */
+    }
+
+    .search-input {
+        padding: 10px 40px 10px 10px; /* Adjust padding */
+        font-size: 13px; /* Further reduce font size */
+    }
+
+    .search-icon-btn {
+        right: 5px; /* Adjust icon position */
+        font-size: 14px;
+    }
+}
+
+
+        /* Navbar items spacing */
+        .navbar-items {
+            display: flex;
+            align-items: center;
+        }
+
+        .navbar-items a {
+            color: var(--text-color);
+            margin-right: 20px; /* Space between items */
+            padding: 10px 0;
+            text-decoration: none;
+        }
+
+        .navbar-items a:hover {
+            color: var(--secondary-color);
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 600px) {
+            .search-form {
+                max-width: 100%;
+            }
+
+            .navbar-items a {
+                margin-right: 10px;
+            }
+        }
+
     </style>
     {% block extra_css %}{% endblock %}
 </head>
 <body>
 <header>
-<a href="{% url 'home' %}" class="logo">
+<a href="{% url 'product_list' %}" class="logo">
     <img src="{% static 'logo.png' %}" alt="SwiftStyles Logo" style="width: 50px; height: 50px; border-radius: 50%;">
 </a>
+<div class="search-container">
+    <form class="search-form" method="get">
+        <input type="text" name="q" class="search-input" placeholder="Search for items...">
+        <button type="submit" class="search-btn">
+            <i class="fas fa-search"></i>
+        </button>
+    </form>
+</div>
     <nav class="top-nav">
-        {% if user.is_authenticated %}
-            <a href="{% url 'product_list' %}" class="top-nav-item {% if request.resolver_match.url_name == 'product_list' %}active-page{% endif %}"><i class="fas fa-box"></i></a>
-            <a href="{% url 'view_cart' %}" class="top-nav-item {% if request.resolver_match.url_name == 'view_cart' %}active-page{% endif %}">
-                <i class="fas fa-shopping-cart"></i>
-                {% if cart_item_count > 0 %}
-                    <span class="badge">{{ cart_item_count }}</span>
-                {% endif %}
-            </a>
 
 
-        {% else %}
-
-
-        {% endif %}
     </nav>
 </header>
 <div class="messages">

@@ -100,7 +100,7 @@
 
 {% block content %}
 <div class="order-confirmation">
-    <h1>Pay Deposit for Order #{{ order.id }}</h1>
+    <h4>Pay Deposit for Order #{{ order.id }}</h4>
 
     <p>Hello {{ order.customer_name }},</p>
     <p>Please pay a deposit of <strong>k{{ order.deposit_amount }}</strong> to confirm your order.</p>
@@ -119,5 +119,8 @@
         <p class="deposit-amount">Deposit Amount: k{{ order.deposit_amount }}</p>
     </div>
     <p><a href="{% url 'order_detail' order.id %}" class="cancel-link">Place the Order</a></p>
+</div><div class="order-confirmation">
+    <h1>Pay Deposit for Order #{{ order.id }}</h1>
+
 </div>
 {% endblock %}
