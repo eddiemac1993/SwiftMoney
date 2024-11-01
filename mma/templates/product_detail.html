@@ -310,8 +310,16 @@
             <div class="product-meta">
                 <p><i class="fas fa-tag"></i> Category: {{ product.category.name }}</p>
                 <p><i class="fas fa-box"></i> In stock: {{ product.stock }}</p>
-                <p><i class="fas fa-truck"></i> Delivery in 2-3 days</p>
-                <p><i class="fas fa-sync-alt"></i> Free returns within 30 days</p>
+{% if product.get_google_maps_link %}
+    <p>Find this product at:
+        <a href="{{ product.get_google_maps_link }}" target="_blank">
+            {{ product.store_name }} - {{ product.store_address }}
+        </a>
+    </p>
+{% else %}
+    <p>Location information not available.</p>
+{% endif %}
+
             </div>
             <div class="button-group">
                 <a href="#" class="btn btn-share-whatsapp"

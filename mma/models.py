@@ -5,6 +5,7 @@ from decimal import Decimal
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.contrib.auth import get_user_model
+from django.core.exceptions import ValidationError
 
 class Synonym(models.Model):
     term = models.CharField(max_length=255, unique=True)
@@ -60,18 +61,41 @@ class Product(models.Model):
     added_by = models.ForeignKey(CustomUser, on_delete=models.SET_NULL, null=True, blank=True)
 
     created = models.DateTimeField(auto_now_add=True)
+    # Add stock field
+    stock_count = models.PositiveIntegerField(default=0)
+    created = models.DateTimeField(auto_now_add=True)
+    store_address = models.CharField(max_length=255, null=True, blank=True)
+
+    def get_google_maps_link(self):
+        if self.store_address:
+            # Use store_address to generate a Google Maps link
+            return f"https://www.google.com/maps/search/?api=1&query={self.store_address.replace(' ', '+')}"
+        return None
 
     def save(self, *args, **kwargs):
-        # Check if the product is being added by a logged-in user
         if self.added_by and self.added_by.is_authenticated:
-            self.verified = True  # Mark as verified if user is logged in
+            self.verified = True
         else:
-            self.verified = False  # Not verified if no user or anonymous user
-
+            self.verified = False
         super().save(*args, **kwargs)
 
+    def update_stock(self, quantity, operation='decrease'):
+        """
+        Update product stock count
+        operation: 'decrease' for sales, 'increase' for restocking
+        """
+        if operation == 'decrease':
+            if self.stock_count >= quantity:
+                self.stock_count -= quantity
+            else:
+                raise ValidationError(f"Insufficient stock for {self.name}. Available: {self.stock_count}")
+        else:
+            self.stock_count += quantity
+        self.save()
+
     def __str__(self):
-        return self.name
+        return f"{self.name} (Stock: {self.stock_count})"
+
 
 class Cart(models.Model):
     agent = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='carts')
@@ -120,6 +144,33 @@ class Order(models.Model):
     delivery_date = models.DateField(null=True, blank=True)
     is_approved = models.BooleanField(default=False)
 
+
+    def complete_order(self):
+        try:
+            # Check stock availability for all items
+            for item in self.items.all():
+                if item.product.stock_count < item.quantity:
+                    raise ValidationError(
+                        f"Insufficient stock for {item.product.name}. "
+                        f"Required: {item.quantity}, Available: {item.product.stock_count}"
+                    )
+
+            # Update stock counts and create sales records
+            for item in self.items.all():
+                item.product.update_stock(item.quantity, 'decrease')
+                Sale.objects.create(
+                    product=item.product,
+                    user=self.agent,
+                    quantity=item.quantity,
+                    total_price=item.subtotal(),
+                )
+
+            self.status = 'completed'
+            self.save()
+
+        except ValidationError as e:
+            raise ValidationError(f"Cannot complete order: {str(e)}")
+
     def calculate_delivery_date(self):
         if self.pk and self.items.exists():
             additional_delay = 2
@@ -137,17 +188,13 @@ class Order(models.Model):
     def __str__(self):
         return f"Order {self.id} by {self.customer_name}"
 
-    def complete_order(self):
-        # Create sales records for each item in the order
-        for item in self.items.all():
-            Sale.objects.create(
-                product=item.product,
-                user=self.agent,  # Ensure this is the correct agent
-                quantity=item.quantity,
-                total_price=item.subtotal(),
-            )
-        self.status = 'completed'  # Update the status to completed
-        self.save()
+
+@receiver(post_save, sender=Order)
+def handle_order_status(sender, instance, **kwargs):
+    # If the order status changes to cancelled, restore the stock
+    if instance.status == 'cancelled':
+        for item in instance.items.all():
+            item.product.update_stock(item.quantity, 'increase')
 
 @receiver(post_save, sender=Order)
 def update_order_delivery_date(sender, instance, **kwargs):

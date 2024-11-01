@@ -619,6 +619,67 @@
         }
     }
 
+    .product-location {
+        margin-top: 10px;
+        font-size: 1em;
+    }
+
+    .product-location a {
+        color: #007BFF;
+        text-decoration: none;
+    }
+
+    .product-location a:hover {
+        text-decoration: underline;
+    }
+
+    .product-location i {
+        margin-right: 5px;
+        color: #FF5733; /* Color of the map marker icon */
+    }
+/* General stock indicator styles */
+.stock-indicator {
+    font-size: 1rem;
+    margin-top: 10px;
+    padding: 10px;
+    border-radius: 5px;
+    display: inline-block;
+}
+
+/* In Stock styling */
+.stock-indicator.in-stock {
+    background-color: #d4edda;
+    border: 1px solid #c3e6cb;
+    color: #155724;
+}
+
+/* Low Stock styling */
+.stock-indicator.low-stock {
+    background-color: #fff3cd;
+    border: 1px solid #ffeeba;
+    color: #856404;
+}
+
+/* Out of Stock styling */
+.stock-indicator.out-of-stock {
+    background-color: #f8d7da;
+    border: 1px solid #f5c6cb;
+    color: #721c24;
+}
+
+/* Specific stock label styles */
+.stock-label {
+    font-weight: bold;
+}
+
+.stock-label.low {
+    color: #856404; /* Low stock color */
+}
+
+.stock-label.out {
+    color: #721c24; /* Out of stock color */
+}
+
 </style>
 {% endblock %}
 
@@ -707,6 +768,17 @@
                     {% endif %}
                 </span>
             </div>
+            <hr/>
+                        {% if product.get_google_maps_link %}
+                <p class="product-location">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <a href="{{ product.get_google_maps_link }}" target="_blank">
+                        {{ product.store_name }} - {{ product.store_address }}
+                    </a>
+                </p>
+            {% else %}
+                <p>Location information not available.</p>
+            {% endif %}
         </div>
         <h2 class="card-title" itemprop="name">{{ product.name }}</h2>
         <div class="image-container">
@@ -721,8 +793,31 @@
             <span class="new-arrival-badge">New Arrival</span>
             {% endif %}
             <span class="price-tag" itemprop="price">K {{ product.price }}</span>
+
         </div>
-        <p class="card-content" itemprop="description">{{ product.description }}</p>
+        <p class="card-content" itemprop="description">{{ product.description|truncatewords:20 }}</p>
+
+  {% if product.added_by %}
+        <!-- Check if the user is authenticated first -->
+        {% if user.is_authenticated %}
+        {% if product.added_by.username != "Unverified User" %}
+                        <!-- Stock Status Display -->
+                    <div class="stock-indicator {% if product.stock_count <= low_stock_threshold %}low-stock{% elif product.stock_count == 0 %}out-of-stock{% else %}in-stock{% endif %}">
+                        {% if product.stock_count == 0 %}
+                            <span class="stock-label out">Out of Stock</span>
+                        {% elif product.stock_count <= low_stock_threshold %}
+                            <span class="stock-label low">Low Stock: {{ product.stock_count }} left</span>
+                        {% else %}
+                            <span class="stock-label">In Stock: {{ product.stock_count }}</span>
+                        {% endif %}
+                    </div>
+                    <hr/>
+            {% else %}
+                <span class="stock-label out">Advertisement</span>
+            {% endif %}
+     {% endif %}
+    {% endif %}
+
         <div class="card-actions">
             <a href="{% url 'product_detail' product.id %}" class="action-button">
                 <i class="fas fa-share-alt"></i> View

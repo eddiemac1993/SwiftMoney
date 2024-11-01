@@ -1,6 +1,6 @@
 {
   "name": "SWIFTMONEY",
-  "short_name": "SM",
+  "short_name": "SmApp",
   "description": "Money Instantly",
   "start_url": "/",
   "display": "standalone",
@@ -19,5 +19,34 @@
     }
   ],
   "scope": "/",
-  "orientation": "portrait"
+  "orientation": "portrait",
+  "id": "/",
+  "screenshots": [
+    {
+      "src": "/static/images/screenshot1.png",
+      "sizes": "1280x720",
+      "type": "image/png"
+    }
+  ],
+  "launch_handler": {
+    "client_mode": "navigate"
+  },
+  "display_override": ["window-controls-overlay"],
+  "file_handlers": {
+    "images": {
+      "extensions": [".png", ".jpg", ".jpeg"]
+    }
+  },
+  "handle_links": "preferred",
+  "protocol_handlers": [{
+    "protocol": "web+swiftmoney",
+    "url": "/?action=%s"
+  }],
+  "dir": "ltr",
+  "lang": "en",
+  "iarc_rating_id": "your-iarc-rating-id",
+  "prefer_related_applications": false,
+  "scope_extensions": [{
+    "origin": "https://example.com"
+  }]
 }

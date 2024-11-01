@@ -97,16 +97,40 @@
             {% csrf_token %}
             {% for field in form %}
                 <div class="form-group">
-                    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
-                    {{ field }}
+                    <label for="{{ field.id_for_label }}">
+                        {{ field.label }}
+                        {% if field.field.required %}
+                            <span class="required-asterisk">*</span>
+                        {% endif %}
+                    </label>
+
+                    {% if field.name == 'stock_count' %}
+                        <div class="stock-input-wrapper">
+                            {{ field }}
+                            <div class="stock-hint">Enter initial quantity available</div>
+                        </div>
+                    {% else %}
+                        {{ field }}
+                    {% endif %}
+
                     {% if field.help_text %}
                         <small class="form-text text-muted">{{ field.help_text }}</small>
                     {% endif %}
+
                     {% for error in field.errors %}
                         <div class="error-message">{{ error }}</div>
                     {% endfor %}
                 </div>
             {% endfor %}
+
+            {% if form.non_field_errors %}
+                <div class="form-group">
+                    {% for error in form.non_field_errors %}
+                        <div class="error-message">{{ error }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
             <button type="submit" class="btn-primary">Add Product</button>
         </form>
     </div>

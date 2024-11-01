@@ -19,19 +19,44 @@ from .models import Product
 class ProductForm(forms.ModelForm):
     class Meta:
         model = Product
-        fields = ['name', 'description', 'category', 'price', 'delivery_time', 'image']
+        fields = ['name', 'description', 'category', 'store_address', 'price', 'delivery_time', 'image', 'stock_count']
         widgets = {
             'name': forms.TextInput(attrs={'class': 'form-control'}),
             'description': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
             'category': forms.Select(attrs={'class': 'form-control'}),
+            'store_address': forms.TextInput(attrs={'class': 'form-control'}),
             'price': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.01'}),
             'delivery_time': forms.NumberInput(attrs={'class': 'form-control'}),
             'image': forms.FileInput(attrs={'class': 'form-control'}),
+            'stock_count': forms.NumberInput(attrs={
+                'class': 'form-control',
+                'min': '0',
+                'step': '1',
+                'placeholder': 'Enter initial stock quantity'
+            }),
         }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['category'].empty_label = None
+
+        # Add help text for stock count
+        self.fields['stock_count'].help_text = 'Enter the initial quantity available in stock'
+
+        # Make stock count required
+        self.fields['stock_count'].required = True
+
+    def clean_stock_count(self):
+        stock_count = self.cleaned_data.get('stock_count')
+        if stock_count is not None and stock_count < 0:
+            raise forms.ValidationError("Stock count cannot be negative.")
+        return stock_count
+
+    def clean_price(self):
+        price = self.cleaned_data.get('price')
+        if price is not None and price <= 0:
+            raise forms.ValidationError("Price must be greater than zero.")
+        return price
 
 class OrderForm(forms.ModelForm):
     class Meta:

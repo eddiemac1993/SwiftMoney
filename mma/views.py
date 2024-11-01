@@ -161,9 +161,9 @@ def product_list_anonymous(request):
     if query:
         products = Product.objects.filter(
             Q(name__icontains=query) | Q(category__icontains=query)
-        ).order_by('category', 'name')
+        ).order_by('-created')
     else:
-        products = Product.objects.all().order_by('category', 'name')
+        products = Product.objects.all().order_by('-created')
 
     # Filter products by category if a category is selected
     if category_filter:
@@ -283,6 +283,8 @@ def product_list(request):
 
     can_add_product = True  # Allow all users to add a product
 
+    low_stock_threshold = 5
+
     context = {
         'products': products,  # Keep this for the total products (not paginated)
         'query': query,
@@ -292,6 +294,7 @@ def product_list(request):
         'max_price': max_price,
         'categories': categories,
         'cart_item_count': cart_item_count,
+        'low_stock_threshold': low_stock_threshold,
         'can_add_product': can_add_product,
         'verified_filter': verified_filter,
     }
