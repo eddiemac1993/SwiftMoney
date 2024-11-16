@@ -1,5 +1,18 @@
 from django.contrib import admin
 from .models import Product, SearchLog, Cart, CartItem, Order, OrderItem, Invoice, Refund, FloatRequest, CashRequest, CashoutRequest, Balance, Transaction
+from mma.models import QuizQuestion, QuizScore
+
+@admin.register(QuizQuestion)
+class QuizQuestionAdmin(admin.ModelAdmin):
+    # Replace "question_text" and "created_at" with actual field names from your model
+    list_display = ("id", "question_text")  # Include fields available in your model
+    search_fields = ("question_text",)
+
+@admin.register(QuizScore)
+class QuizScoreAdmin(admin.ModelAdmin):
+    list_display = ('phone_number', 'score')  # Columns to display in the admin list view
+    search_fields = ('phone_number',)
+    ordering = ('-score',)
 
 @admin.register(SearchLog)
 class SearchLogAdmin(admin.ModelAdmin):

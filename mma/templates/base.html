@@ -317,6 +317,7 @@ button:hover {
     color: #721c24;
     cursor: pointer;
 }
+
 .badge {
     background-color: red;
     color: white;
@@ -326,92 +327,46 @@ button:hover {
     vertical-align: top;
 
     position: absolute; /* Ensures the badge is positioned relative to the cart icon */
-    /* Search and Filter Section */
-    .search-filter-container {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        flex-wrap: wrap;
-        margin-bottom: 30px;
-        background-color: white;
-        padding: 20px;
-        border-radius: 10px;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    }
 
+    }
 .search-container {
-    display: flex;
-    justify-content: center;
-    margin-top: 20px;
+    width: 100%; /* Full width of the container */
+    padding: 0 20px; /* Add padding to the left and right */
+    box-sizing: border-box;
 }
 
 .search-form {
-    position: relative;
-    width: 400px; /* Default width */
-    max-width: 100%; /* Ensure it does not overflow on small screens */
+    position: relative; /* Needed for absolute positioning of the icon */
+    width: 400px; /* Set the desired width for the search input */
+    max-width: 100%; /* Ensure it doesn't overflow */
 }
 
 .search-input {
-    width: 100%;
-    padding: 10px 50px 10px 15px; /* Extra padding for the icon */
-    border: 2px solid #ddd;
-    border-radius: 30px; /* Rounded search bar */
-    font-size: 16px;
-    outline: none;
+    width: 100%; /* Full width */
+    padding: 10px 40px 10px 15px; /* Add padding to accommodate the icon */
+    border: 2px solid #ddd; /* Border styling */
+    border-radius: 30px; /* Rounded corners */
+    font-size: 16px; /* Font size */
+    outline: none; /* Remove outline */
 }
 
-.search-icon-btn {
-    position: absolute;
-    right: 10px;
-    top: 50%;
-    transform: translateY(-50%);
-    background: none;
-    border: none;
-    cursor: pointer;
-    color: #888;
-    font-size: 18px;
+.search-btn {
+    position: absolute; /* Positioning the button */
+    right: 10px; /* Space from the right edge */
+    top: 50%; /* Center vertically */
+    transform: translateY(-50%); /* Adjust for perfect centering */
+    background-color: transparent; /* Transparent background */
+    border: none; /* No border */
+    cursor: pointer; /* Pointer cursor on hover */
+    color: var(--primary-color); /* Use your primary color */
+    font-size: 20px; /* Icon size */
 }
 
-.search-icon-btn:hover {
-    color: #333;
+/* Optional hover effect for button */
+.search-btn:hover {
+    color: #0056b3; /* Change color on hover */
 }
 
-.search-icon-btn i {
-    pointer-events: none;
-}
-
-/* RESPONSIVE DESIGN */
-@media (max-width: 768px) {
-    .search-form {
-        width: 300px; /* Adjust width for tablets */
-    }
-
-    .search-input {
-        padding: 10px 45px 10px 10px; /* Adjust padding */
-        font-size: 14px; /* Slightly smaller font for smaller screens */
-    }
-
-    .search-icon-btn {
-        right: 8px; /* Adjust icon position */
-        font-size: 16px;
-    }
-}
-
-@media (max-width: 480px) {
-    .search-form {
-        width: 250px; /* Smaller width for mobile */
-    }
-
-    .search-input {
-        padding: 10px 40px 10px 10px; /* Adjust padding */
-        font-size: 13px; /* Further reduce font size */
-    }
-
-    .search-icon-btn {
-        right: 5px; /* Adjust icon position */
-        font-size: 14px;
-    }
-}
 
 
         /* Navbar items spacing */
@@ -450,14 +405,16 @@ button:hover {
 <a href="{% url 'product_list' %}" class="logo">
     <img src="{% static 'logo.png' %}" alt="SwiftStyles Logo" style="width: 50px; height: 50px; border-radius: 50%;">
 </a>
-<div class="search-container">
-    <form class="search-form" method="get">
-        <input type="text" name="q" class="search-input" placeholder="Search for items...">
-        <button type="submit" class="search-btn">
-            <i class="fas fa-search"></i>
-        </button>
-    </form>
-</div>
+{% if request.resolver_match.url_name == 'product_list' %}
+    <div class="search-container">
+        <form class="search-form" method="get">
+            <input type="text" name="q" class="search-input" placeholder="Search for items...">
+            <button type="submit" class="search-btn">
+                <i class="fas fa-search"></i>
+            </button>
+        </form>
+    </div>
+{% endif %}
     <nav class="top-nav">
 
 

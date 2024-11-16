@@ -7,6 +7,26 @@ from django.dispatch import receiver
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 
+class QuizQuestion(models.Model):
+    question_text = models.TextField()
+    option_a = models.CharField(max_length=255)
+    option_b = models.CharField(max_length=255)
+    option_c = models.CharField(max_length=255)
+    option_d = models.CharField(max_length=255)
+    correct_answer = models.CharField(max_length=1, choices=[('A', 'A'), ('B', 'B'), ('C', 'C'), ('D', 'D')])
+
+    def __str__(self):
+        return self.question_text
+
+class QuizScore(models.Model):
+    username = models.CharField(max_length=255)
+    phone_number = models.CharField(max_length=15)
+    score = models.IntegerField(default=0)
+    date_submitted = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.phone_number} - {self.score} points"
+
 class Synonym(models.Model):
     term = models.CharField(max_length=255, unique=True)
     main_term = models.CharField(max_length=255)
@@ -25,6 +45,8 @@ class SearchLog(models.Model):
 class Product(models.Model):
     CATEGORY_CHOICES = [
         ('groceries', 'Groceries'),
+        ('service', 'Service'),
+        ('job', 'Job'),
         ('hardware', 'Hardware'),
         ('electronics', 'Electronics'),
         ('clothing', 'Clothing'),
@@ -65,6 +87,8 @@ class Product(models.Model):
     stock_count = models.PositiveIntegerField(default=0)
     created = models.DateTimeField(auto_now_add=True)
     store_address = models.CharField(max_length=255, null=True, blank=True)
+    phone_number = models.CharField(max_length=15, default="000-000-0000", help_text="Enter the store owner's contact number")
+
 
     def get_google_maps_link(self):
         if self.store_address:

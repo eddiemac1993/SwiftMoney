@@ -27,6 +27,48 @@ from django.views.generic import ListView
 from .forms import RefundForm  # Assuming you have a form for handling refunds
 from django.contrib.auth.models import AnonymousUser
 from django.core.paginator import Paginator
+import random
+from .models import QuizQuestion, QuizScore
+from .forms import SubmitScoreForm
+
+def quiz_view(request):
+    question = random.choice(QuizQuestion.objects.all())  # Random question
+    score = request.session.get('score', 0)
+    top_scores = QuizScore.objects.all().order_by('-score')[:3]# Retrieve session score, default is 0
+
+    if request.method == 'POST':
+        selected_answer = request.POST.get('answer')
+        correct_answer = request.POST.get('correct_answer')
+
+        # Update score based on the answer
+        if selected_answer == correct_answer:
+            score += 0.5  # Add 10 points for correct answer
+        else:
+            score -= 0.3  # Subtract 5 points for incorrect answer
+
+        request.session['score'] = score  # Save score in session
+
+        # Check if the user clicked the "Submit Score" button
+        if 'submit_score' in request.POST:
+            return redirect('submit_score')  # Redirect to submit_score page
+
+        return redirect('quiz')  # Continue quiz after answering the question
+
+    return render(request, 'quiz.html', {'question': question, 'top_scores': top_scores, 'score': score})
+
+def submit_score_view(request):
+    score = request.session.get('score', 0)  # Retrieve session score
+    if request.method == 'POST':
+        form = SubmitScoreForm(request.POST)
+        if form.is_valid():
+            submission = form.save(commit=False)
+            submission.score = score
+            submission.save()
+            request.session['score'] = 0  # Reset session score
+            return redirect('quiz')  # Redirect to the quiz page
+    else:
+        form = SubmitScoreForm()
+    return render(request, 'submit_score.html', {'form': form, 'score': score})
 
 def search_log_view(request):
     # Retrieve all search logs, ordered by date (newest first)

@@ -594,7 +594,29 @@
             transform: scale(1.1); /* Scale effect on hover */
         }
 
-        .fixed-terms-btnz i {
+        .fixed-terms-btnsz i {
+            font-size: 1.2rem; /* Icon size */
+        }
+                .fixed-terms-btnsz {
+            position: fixed;
+            top: 470px; /* Adjust position as needed */
+            right: 20px;
+            z-index: 1000;
+            color: white;
+            background-color: var(--card-background);
+            padding: 10px 15px;
+            text-decoration: none;
+            border: 2px solid white; /* White border */
+            border-radius: 20px; /* Rounded corners */
+            box-sizing: border-box; /* Ensures padding is inside the border */
+            transition: transform 0.2s ease; /* Smooth scaling transition */
+        }
+
+        .fixed-terms-btnsz:hover {
+            transform: scale(1.1); /* Scale effect on hover */
+        }
+
+        .fixed-terms-btnsz i {
             font-size: 1.2rem; /* Icon size */
         }
 .badge-btn:before {
@@ -689,6 +711,10 @@
     <a href="{% url 'add_product' %}" class="fixed-terms-btns">
         <i class="fas fa-plus-circle"></i>
     </a>
+    <a href="{% url 'quiz' %}" class="fixed-terms-btnsz">
+        <i class="fas fa-question-circle"></i>
+    </a>
+
 {% if user.is_authenticated %}
     <!-- If the user is logged in, show the Logout button with the same style as the Login button -->
     <a href="{% url 'custom_logout' %}" class="fixed-terms-btnss top-nav-item {% if request.resolver_match.url_name == 'custom_logout' %}active-page{% endif %}" title="Logout">
@@ -763,7 +789,7 @@
 
                         <span class="verified-badge" title="Verified Product" style="color: green;">✓</span>
                     {% else %}
-                        Unverified User
+                        Service User
                         <i class="fas fa-check-circle" style="color: red;" title="Unverified User"></i>
                     {% endif %}
                 </span>
@@ -792,8 +818,10 @@
             {% if product in new_arrivals %}
             <span class="new-arrival-badge">New Arrival</span>
             {% endif %}
-            <span class="price-tag" itemprop="price">K {{ product.price }}</span>
 
+          {% if product.category != "service" %}
+    <span class="price-tag" itemprop="price">K {{ product.price }}</span>
+{% endif %}
         </div>
         <p class="card-content" itemprop="description">{{ product.description|truncatewords:20 }}</p>
 
@@ -819,9 +847,9 @@
     {% endif %}
 
         <div class="card-actions">
-            <a href="{% url 'product_detail' product.id %}" class="action-button">
-                <i class="fas fa-share-alt"></i> View
-            </a>
+            <a href="tel:{{ product.phone_number }}" class="action-button">
+            <i class="fas fa-phone-alt"></i> Call
+        </a>
     {% if product.added_by %}
         <!-- Check if the user is authenticated first -->
         {% if user.is_authenticated %}

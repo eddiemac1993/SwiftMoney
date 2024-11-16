@@ -1,17 +1,29 @@
 from django import forms
 from .models import FloatRequest, CashRequest
-from django import forms
 from .models import Order
-# mma/forms.py
-from django import forms
 from .models import Refund
+from .models import QuizScore
+
+class SubmitScoreForm(forms.ModelForm):
+    class Meta:
+        model = QuizScore
+        fields = ['username', 'phone_number']  # Include username
+        widgets = {
+            'username': forms.TextInput(attrs={
+                'placeholder': 'Enter your username',
+                'class': 'form-control',
+            }),
+            'phone_number': forms.TextInput(attrs={
+                'placeholder': 'Enter your phone number',
+                'class': 'form-control',
+            }),
+        }
+
 
 class RefundForm(forms.ModelForm):
     class Meta:
         model = Refund
         fields = ['order']  # Exclude 'amount' as it's auto-calculated
-
-# In forms.py
 
 from django import forms
 from .models import Product
@@ -19,7 +31,10 @@ from .models import Product
 class ProductForm(forms.ModelForm):
     class Meta:
         model = Product
-        fields = ['name', 'description', 'category', 'store_address', 'price', 'delivery_time', 'image', 'stock_count']
+        fields = [
+            'name', 'description', 'category', 'store_address', 'price',
+            'delivery_time', 'image', 'stock_count', 'phone_number'
+        ]
         widgets = {
             'name': forms.TextInput(attrs={'class': 'form-control'}),
             'description': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
@@ -34,16 +49,13 @@ class ProductForm(forms.ModelForm):
                 'step': '1',
                 'placeholder': 'Enter initial stock quantity'
             }),
+            'phone_number': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter contact number'}),
         }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['category'].empty_label = None
-
-        # Add help text for stock count
         self.fields['stock_count'].help_text = 'Enter the initial quantity available in stock'
-
-        # Make stock count required
         self.fields['stock_count'].required = True
 
     def clean_stock_count(self):
