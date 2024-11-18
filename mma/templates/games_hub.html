@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<style>
+.game-links-container {
+    display: flex;
+    flex-wrap: wrap; /* Ensures responsiveness for smaller screens */
+    gap: 15px; /* Space between items */
+    justify-content: center; /* Center-align items */
+    padding: 20px;
+}
+
+.game-link-btn {
+    color: white;
+    background-color: var(--card-background);
+    padding: 10px 15px;
+    text-decoration: none;
+    border: 2px solid white; /* White border */
+    border-radius: 20px; /* Rounded corners */
+    box-sizing: border-box; /* Ensures padding is inside the border */
+    transition: transform 0.2s ease; /* Smooth scaling transition */
+}
+
+.game-link-btn:hover {
+    transform: scale(1.1); /* Scale effect on hover */
+}
+
+.game-link-btn i {
+    font-size: 1.2rem; /* Icon size */
+    margin-right: 5px; /* Space between icon and text */
+}
+@media (max-width: 600px) {
+    .game-link-btn {
+        padding: 8px 12px;
+        font-size: 0.9rem;
+    }
+}
+
+</style>
+<div class="container" style="max-width: 600px; margin: auto; padding: 20px;">
+    <h1 style="text-align: center; font-family: Arial, sans-serif;">Games</h1>
+    <hr style="border: none; height: 1px; background: #ddd; margin: 20px 0;">
+
+    <div class="game-links-container">
+        <a href="{% url 'quiz' %}" class="game-link-btn">
+            <i class="fas fa-question-circle"></i> Bible
+        </a>
+
+        <!-- Add more game links as needed -->
+    </div>
+</div>
+
+{% endblock %}

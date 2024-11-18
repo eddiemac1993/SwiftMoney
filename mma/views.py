@@ -30,6 +30,90 @@ from django.core.paginator import Paginator
 import random
 from .models import QuizQuestion, QuizScore
 from .forms import SubmitScoreForm
+from django.shortcuts import render, redirect, get_object_or_404
+from .models import ChatRoom, Message
+from django.http import JsonResponse
+from django.shortcuts import render, redirect
+from .models import ChatRoom
+import string
+from django.shortcuts import render
+
+def games_hub(request):
+    # Add any context data if needed
+    return render(request, 'games_hub.html')
+
+def chat_home(request):
+    if request.method == "POST":
+        # Create a new room
+        room_name = request.POST.get('room_name')
+        if room_name:
+            ChatRoom.objects.create(name=room_name)
+            return redirect('chat_room', room_name=room_name)
+
+    # Retrieve all existing rooms
+    rooms = ChatRoom.objects.all()
+    return render(request, 'chat.html', {'rooms': rooms})
+
+def create_room(request):
+    if request.method == 'POST':
+        room_name = request.POST.get('room_name')
+        if room_name:
+            room, created = ChatRoom.objects.get_or_create(name=room_name)
+            return redirect('join_room', room_name=room.name)
+    return render(request, 'create_room.html')
+
+from uuid import uuid4
+
+def join_room(request, room_name):
+    room = get_object_or_404(ChatRoom, name=room_name)
+
+    if request.method == 'POST':
+        username = request.POST.get('username') or f"user_{uuid4().hex[:8]}"
+        user = ChatUser.objects.create(
+            room=room,
+            username=username,
+            is_originator=False,
+        )
+        return redirect('chat_room', room_name=room.name, username=user.username)
+
+    return render(request, 'join_room.html', {'room': room})
+
+from django.shortcuts import render, get_object_or_404
+from .models import ChatRoom, Message
+
+from collections import defaultdict
+
+def chat_room(request, room_name):
+    room = get_object_or_404(ChatRoom, name=room_name)
+
+    # Check if the username exists in the session, else generate one
+    if 'username' not in request.session:
+        request.session['username'] = ''.join(random.choices(string.ascii_letters + string.digits, k=6))
+
+    username = request.session['username']
+
+    if request.method == "POST":
+        message_text = request.POST.get('message')
+        # Save the message to the database with the session's username
+        Message.objects.create(room=room, username=username, text=message_text)
+
+    # Get all messages for the room, ordered by newest first
+    messages = room.messages.all().order_by('-timestamp')
+
+    # Assign unique colors to each username
+    usernames = messages.values_list('username', flat=True).distinct()
+    color_map = {username: f"hsl({index * 50 % 360}, 70%, 80%)" for index, username in enumerate(usernames)}
+
+    return render(request, 'chat_room.html', {
+        'room': room,
+        'username': username,
+        'messages': messages,
+        'color_map': color_map,
+    })
+
+
+
+
 
 def quiz_view(request):
     question = random.choice(QuizQuestion.objects.all())  # Random question

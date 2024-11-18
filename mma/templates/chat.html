@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container" style="max-width: 600px; margin: auto; padding: 20px;">
+    <h1 style="text-align: center; font-family: Arial, sans-serif;">Chat Rooms</h1>
+
+    <!-- Form to Create a New Room -->
+    <form method="post" style="margin-bottom: 20px; display: flex; gap: 10px; align-items: center;">
+        {% csrf_token %}
+        <input 
+            type="text" 
+            name="room_name" 
+            placeholder="Enter room name" 
+            required 
+            style="flex: 1; padding: 8px; border: 1px solid #ccc; border-radius: 15px; font-size: 14px; outline: none;"
+        >
+        <button 
+            type="submit" 
+            style="
+                padding: 8px 16px; 
+                background-color: #007bff; 
+                color: white; 
+                border: none; 
+                border-radius: 15px; 
+                font-size: 14px; 
+                cursor: pointer;
+            ">
+            Create Room
+        </button>
+    </form>
+
+    <hr style="border: none; height: 1px; background: #ddd; margin: 20px 0;">
+
+    <!-- List of Existing Rooms -->
+    <h2 style="font-family: Arial, sans-serif;">Available Rooms</h2>
+    <div 
+        style="
+            display: flex; 
+            flex-wrap: wrap; 
+            gap: 10px; 
+            justify-content: center; 
+            padding: 0;
+        ">
+        {% for room in rooms %}
+        <a 
+            href="{% url 'chat_room' room_name=room.name %}" 
+            style="
+                flex: 1 1 calc(33.33% - 20px); /* Three buttons per row on larger screens */
+                max-width: 200px; 
+                min-width: 120px; 
+                text-align: center; 
+                padding: 8px 16px; 
+                background-color: #28a745; 
+                color: white; 
+                text-decoration: none; 
+                border-radius: 15px; 
+                font-size: 14px;
+            ">
+            {{ room.name }}
+        </a>
+        {% empty %}
+        <p style="text-align: center; color: #666; font-size: 14px; margin-top: 20px;">No rooms available. Create one!</p>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

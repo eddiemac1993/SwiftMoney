@@ -6,6 +6,29 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
+import random
+import string
+
+# Generate a random 6-character code for each user
+def generate_random_name():
+    return ''.join(random.choices(string.ascii_letters + string.digits, k=6))
+
+class ChatRoom(models.Model):
+    name = models.CharField(max_length=255, unique=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.name
+
+class Message(models.Model):
+    room = models.ForeignKey(ChatRoom, on_delete=models.CASCADE, related_name='messages')
+    username = models.CharField(max_length=255, default=generate_random_name)
+    text = models.TextField()
+    timestamp = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.username}: {self.text[:20]}"
+
 
 class QuizQuestion(models.Model):
     question_text = models.TextField()

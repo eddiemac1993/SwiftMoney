@@ -619,6 +619,7 @@
         .fixed-terms-btnsz i {
             font-size: 1.2rem; /* Icon size */
         }
+
 .badge-btn:before {
     content: '';
     position: absolute;
@@ -701,41 +702,87 @@
 .stock-label.out {
     color: #721c24; /* Out of stock color */
 }
+.fixed-bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    background-color: var(--card-background);
+    border-top: 1px solid #ddd;
+    padding: 10px 0;
+    z-index: 1000;
+}
+
+.fixed-bottom-nav .nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-decoration: none;
+    color: white;
+    font-size: 14px;
+}
+
+.fixed-bottom-nav .nav-item .nav-text {
+    font-size: 12px;
+    margin-top: 5px;
+    color: white;
+}
+
+.fixed-bottom-nav .nav-item i {
+    font-size: 20px;
+}
+
+.fixed-bottom-nav .nav-item .badge {
+    position: absolute;
+    top: 5px;
+    right: 10px;
+    background: red;
+    color: white;
+    border-radius: 50%;
+    padding: 3px 6px;
+    font-size: 10px;
+}
 
 </style>
 {% endblock %}
 
 {% block content %}
 <div class="dashboard-container">
-       <!-- Show the Add Product button -->
-    <a href="{% url 'add_product' %}" class="fixed-terms-btns">
-        <i class="fas fa-plus-circle"></i>
-    </a>
-    <a href="{% url 'quiz' %}" class="fixed-terms-btnsz">
-        <i class="fas fa-question-circle"></i>
-    </a>
-
-{% if user.is_authenticated %}
-    <!-- If the user is logged in, show the Logout button with the same style as the Login button -->
-    <a href="{% url 'custom_logout' %}" class="fixed-terms-btnss top-nav-item {% if request.resolver_match.url_name == 'custom_logout' %}active-page{% endif %}" title="Logout">
-        <i class="fas fa-sign-out-alt"></i>
-    </a>
-
-
-
-    <!-- Show the View Cart button -->
-    <a href="{% url 'view_cart' %}" class="fixed-terms-btn" title="View Cart" aria-label="View Cart">
-        <i class="fas fa-shopping-cart"></i>
-        {% if cart_item_count > 0 %}
-            <span class="badge">{{ cart_item_count }}</span>
+<nav class="fixed-bottom-nav">
+        <a href="{% url 'games_hub' %}" class="nav-item">
+            <i class="fas fa-gamepad"></i>
+            <span class="nav-text">Games</span>
+        </a>
+        <a href="{% url 'chat_home' %}" class="nav-item">
+            <i class="fas fa-comments"></i>
+            <span class="nav-text">Rooms</span>
+        </a>
+        <a href="{% url 'add_product' %}" class="nav-item">
+            <i class="fas fa-plus-circle"></i>
+            <span class="nav-text">Add</span>
+        </a>
+        {% if user.is_authenticated %}
+            <a href="{% url 'view_cart' %}" class="nav-item" title="View Cart" aria-label="View Cart">
+                <i class="fas fa-shopping-cart"></i>
+                {% if cart_item_count > 0 %}
+                    <span class="badge">{{ cart_item_count }}</span>
+                {% endif %}
+                <span class="nav-text">Cart</span>
+            </a>
+            <a href="{% url 'custom_logout' %}" class="nav-item">
+                <i class="fas fa-sign-out-alt"></i>
+                <span class="nav-text">Logout</span>
+            </a>
+        {% else %}
+            <a href="{% url 'login' %}" class="nav-item">
+                <i class="fas fa-sign-in-alt"></i>
+                <span class="nav-text">Login</span>
+            </a>
         {% endif %}
-    </a>
-{% else %}
-    <!-- If the user is not logged in, show the Login button -->
-    <a href="{% url 'login' %}" class="fixed-terms-btnss">
-        <i class="fas fa-sign-in-alt"></i>
-    </a>
-{% endif %}
+    </nav>
 
 
 
@@ -753,9 +800,46 @@
             </button>
         </form>
     </div>
+<style>
+/* Shared styles for buttons */
+.category-buttons {
+    display: flex;
+    flex-wrap: wrap; /* Wrap buttons if they overflow */
+    gap: 3px; /* Space between buttons */
+    justify-content: center; /* Center-align buttons */
+    padding: 8px;
+}
+
+.category-btn {
+    color: white;
+    background-color: var(--card-background);
+    padding: 8px 8px;
+    text-decoration: none;
+    border: 2px solid white; /* White border */
+    border-radius: 20px; /* Rounded corners */
+    box-sizing: border-box; /* Ensures padding is inside the border */
+    transition: transform 0.2s ease; /* Smooth scaling transition */
+    font-family: Arial, sans-serif; /* Consistent font */
+}
+
+.category-btn:hover {
+    transform: scale(1.1); /* Scale effect on hover */
+}
+
+/* Style for active category button */
+.category-btn.active {
+    background-color: #007bff; /* Highlight active button */
+    color: white;
+    border-color: #0056b3; /* Adjust border to match active color */
+}
+</style>
+
 <div class="category-filter">
     <div class="category-buttons">
+        <!-- 'All' category -->
         <a href="?" class="category-btn {% if not category_filter %}active{% endif %}">All</a>
+
+        <!-- Dynamically generated categories -->
         {% for category in categories %}
             <a href="?category={{ category }}{% if query %}&q={{ query }}{% endif %}{% if min_price %}&min_price={{ min_price }}{% endif %}{% if max_price %}&max_price={{ max_price }}{% endif %}{% if verified_filter %}&verified={{ verified_filter }}{% endif %}"
                class="category-btn {% if category == category_filter %}active{% endif %}">
@@ -764,6 +848,7 @@
         {% endfor %}
     </div>
 </div>
+
 <!-- Product Cards -->
 {% if products %}
 <div class="card-container">

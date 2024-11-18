@@ -420,18 +420,6 @@ button:hover {
 
     </nav>
 </header>
-<div class="messages">
-    {% if messages %}
-        <ul class="message-list">
-            {% for message in messages %}
-                <li class="{% if message.tags %}{{ message.tags }}{% endif %}">
-                    {{ message }}
-                    <button class="close-btn" onclick="this.parentElement.style.display='none';">&times;</button>
-                </li>
-            {% endfor %}
-        </ul>
-    {% endif %}
-</div>
 
 <div class="container">
     <main>
@@ -439,6 +427,7 @@ button:hover {
     </main>
 </div>
 
+{% if request.resolver_match.url_name == 'dashboard' %}
 <nav class="bottom-nav">
     {% if user.is_authenticated %}
         <a href="{% url 'dashboard' %}" class="icon-btn {% if request.resolver_match.url_name == 'dashboard' %}active-page{% endif %}" title="Dashboard">
@@ -459,6 +448,8 @@ button:hover {
         </a>
     {% endif %}
 </nav>
+{% endif %}
+
 
 <button id="installButton" class="install-btn">Install App</button>
 

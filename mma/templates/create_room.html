@@ -1,0 +1,6 @@
+<form method="post">
+    {% csrf_token %}
+    <label for="room_name">Room Name:</label>
+    <input type="text" name="room_name" id="room_name" required>
+    <button type="submit">Create Room</button>
+</form>
