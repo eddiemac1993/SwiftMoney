@@ -118,7 +118,7 @@ def chat_room(request, room_name):
 def quiz_view(request):
     question = random.choice(QuizQuestion.objects.all())  # Random question
     score = request.session.get('score', 0)
-    top_scores = QuizScore.objects.all().order_by('-score')[:3]# Retrieve session score, default is 0
+    top_scores = QuizScore.objects.all().order_by('-score')[:5]# Retrieve session score, default is 0
 
     if request.method == 'POST':
         selected_answer = request.POST.get('answer')

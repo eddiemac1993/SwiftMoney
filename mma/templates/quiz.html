@@ -100,6 +100,13 @@
         margin: 5px 0;
         font-size: 1.1em;
     }
+.positive-score {
+    color: green;
+}
+
+.negative-score {
+    color: red;
+}
 
     @media (max-width: 768px) {
         .quiz-container {
@@ -118,8 +125,15 @@
 </style>
 <hr>
 <hr>
-<h1>Bible Quiz</h1>
-<h3>Score: K {{ score|floatformat:2 }}</h3>
+<h1>Bible Quiz</h1><h3 id="timer">Time Left: 30s</h3>
+
+<h3>
+    Score:
+    <span class="{% if score < 0 %}negative-score{% else %}positive-score{% endif %}">
+        K {{ score|floatformat:2 }}
+    </span>
+</h3>
+
 
 <div class="quiz-container">
     <form method="post" class="quiz-form">
@@ -140,10 +154,25 @@
 </div>
 
 <div class="top-scores">
-    <h4>Top 3 Highest Scores</h4>
+    <h4>Top 5 Highest Scores</h4>
     {% for score in top_scores %}
         <p>{{ score.username }} - K {{ score.score }}</p>
     {% endfor %}
 </div>
+<script>
+    let timeLeft = 30; // 30 seconds
+    const timer = document.getElementById('timer');
+    const interval = setInterval(() => {
+        if (timeLeft <= 0) {
+            clearInterval(interval);
+            alert("Time's up!");
+            document.querySelector('.quiz-form').submit(); // Auto-submit
+        } else {
+            timer.textContent = `Time Left: ${timeLeft}s`;
+            timeLeft--;
+        }
+    }, 1000);
+</script>
+
 
 {% endblock %}
