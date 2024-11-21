@@ -839,6 +839,32 @@
     border-color: #0056b3; /* Optional border color for active state */
     font-weight: bold; /* Optional bold text for active category */
 }
+.product-location {
+    font-family: Arial, sans-serif;
+    font-size: 14px;
+    color: #333; /* Text color */
+    margin: 10px 0;
+}
+
+.product-location i {
+    color: #e74c3c; /* Marker icon color */
+    margin-right: 5px;
+}
+
+.product-location a {
+    color: #3498db; /* Link color */
+    text-decoration: none; /* No underline */
+    font-weight: bold;
+}
+
+.product-location a:hover {
+    color: #1abc9c; /* Hover color */
+    text-decoration: underline; /* Optional hover underline */
+}
+
+.product-location p {
+    margin: 0;
+}
 
 </style>
 
@@ -934,7 +960,7 @@
                             <span class="stock-label">In Stock: {{ product.stock_count }}</span>
                         {% endif %}
                     </div>
-                    <hr/>
+                    <hr>
             {% else %}
                 <span class="stock-label out">Advertisement</span>
             {% endif %}
