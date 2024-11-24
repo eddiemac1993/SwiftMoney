@@ -3,6 +3,15 @@ from .models import FloatRequest, CashRequest
 from .models import Order
 from .models import Refund
 from .models import QuizScore
+from .models import BirthdayWish
+
+class BirthdayWishForm(forms.ModelForm):
+    class Meta:
+        model = BirthdayWish
+        fields = ['sender_name', 'recipient_name', 'age', 'message']
+        widgets = {
+            'message': forms.Textarea(attrs={'rows': 4, 'cols': 40}),
+        }
 
 class SubmitScoreForm(forms.ModelForm):
     class Meta:

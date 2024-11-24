@@ -36,7 +36,27 @@ from django.http import JsonResponse
 from django.shortcuts import render, redirect
 from .models import ChatRoom
 import string
-from django.shortcuts import render
+from django.http import HttpResponseRedirect
+from django.urls import reverse
+from .forms import BirthdayWishForm
+from .models import BirthdayWish
+
+def create_wish(request):
+    if request.method == 'POST':
+        form = BirthdayWishForm(request.POST)
+        if form.is_valid():
+            wish = form.save()
+            return HttpResponseRedirect(reverse('view_wish', args=[wish.id]))
+    else:
+        form = BirthdayWishForm()
+    return render(request, 'create_wish.html', {'form': form})
+
+
+def view_wish(request, wish_id):
+    wish = get_object_or_404(BirthdayWish, id=wish_id)
+    message = f"Happy Birthday! Check out this special wish: {request.build_absolute_uri()}"
+    return render(request, 'view_wish.html', {'wish': wish, 'url': message})
+
 
 def games_hub(request):
     # Add any context data if needed

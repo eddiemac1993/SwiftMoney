@@ -9,6 +9,16 @@ from django.core.exceptions import ValidationError
 import random
 import string
 
+class BirthdayWish(models.Model):
+    sender_name = models.CharField(max_length=100)
+    recipient_name = models.CharField(max_length=100)
+    age = models.PositiveIntegerField()
+    message = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Wish from {self.sender_name} to {self.recipient_name}"
+
 # Generate a random 6-character code for each user
 def generate_random_name():
     return ''.join(random.choices(string.ascii_letters + string.digits, k=6))

@@ -326,10 +326,7 @@
                    onclick="window.open('https://api.whatsapp.com/send?text={{ request.build_absolute_uri }}', '_blank')">
                     <i class="fab fa-whatsapp"></i>
                 </a>
-                <a href="https://www.facebook.com/sharer/sharer.php?u={{ request.build_absolute_uri }}"
-                   class="btn btn-share-facebook" target="_blank">
-                   <i class="fab fa-facebook-f"></i>
-                </a>
+
                     <!-- Show the edit button only to the product owner -->
     {% if user.is_authenticated and user == product.added_by %}
         <a href="{% url 'product_edit' product.id %}" class="btn-primary">Edit Product</a>
