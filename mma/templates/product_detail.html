@@ -299,6 +299,7 @@
                  itemprop="image"
                  loading="lazy">
         </div>
+
         <div class="product-info-section">
             <h1 class="product-title" itemprop="name">{{ product.name }}</h1>
             <p class="product-price" itemprop="price">K{{ product.price }}</p>
@@ -309,7 +310,16 @@
             </div>
             <div class="product-meta">
                 <p><i class="fas fa-tag"></i> Category: {{ product.category.name }}</p>
-                <p><i class="fas fa-box"></i> In stock: {{ product.stock }}</p>
+                                        <!-- Stock Status Display -->
+                    <div class="stock-indicator {% if product.stock_count <= low_stock_threshold %}low-stock{% elif product.stock_count == 0 %}out-of-stock{% else %}in-stock{% endif %}">
+                        {% if product.stock_count == 0 %}
+                            <span class="stock-label out">Out of Stock</span>
+                        {% elif product.stock_count <= low_stock_threshold %}
+                            <span class="stock-label low">Low Stock: {{ product.stock_count }} left</span>
+                        {% else %}
+                            <span class="stock-label">In Stock: {{ product.stock_count }}</span>
+                        {% endif %}
+                    </div>
 {% if product.get_google_maps_link %}
     <p>Find this product at:
         <a href="{{ product.get_google_maps_link }}" target="_blank">
