@@ -598,54 +598,44 @@
     font-weight: bold;
     z-index: 1; /* Ensure it's on top of the image */
 }
-.category-filter {
-    overflow-x: auto; /* Enables horizontal scrolling */
-    white-space: nowrap; /* Prevents content from wrapping */
-    padding: 10px 0; /* Optional: Adds spacing for better usability */
-    scrollbar-width: thin; /* Makes scrollbar thinner in Firefox */
-}
-
 .category-buttons {
-    display: flex; /* Arranges items in a row */
-    gap: 10px; /* Adds spacing between buttons */
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px; /* Reduced spacing between buttons */
 }
 
 .category-btn {
-    display: inline-flex; /* Inline button with flexible content */
-    align-items: center; /* Centers content vertically */
-    justify-content: center; /* Centers content horizontally */
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     text-decoration: none;
-    color: #333;
-    background-color: #f9f9f9;
+    color: inherit; /* Inherit text color */
+    padding: 5px 8px; /* Smaller padding for compact buttons */
+    border-radius: 5px;
     transition: background-color 0.3s ease;
 }
 
+.category-btn i {
+    font-size: 18px; /* Smaller icon size */
+}
+
+.category-title {
+    font-size: 10px; /* Smaller font for the category title */
+    margin-top: 3px; /* Reduced space between the icon and text */
+    text-align: center;
+}
+
 .category-btn.active {
-    background-color: #007bff; /* Active button background color */
-    color: #fff;
+    background-color: #007bff; /* Highlight for active category */
+    color: white;
 }
 
 .category-btn:hover {
-    background-color: #e6e6e6; /* Hover effect */
-    color: #000;
+    background-color: #0056b3; /* Hover effect */
+    color: white;
 }
 
-/* Optional: Customize scroll behavior */
-.category-filter::-webkit-scrollbar {
-    height: 6px; /* Height of scrollbar */
-}
 
-.category-filter::-webkit-scrollbar-thumb {
-    background-color: #ccc; /* Scrollbar thumb color */
-    border-radius: 5px;
-}
-
-.category-filter::-webkit-scrollbar-thumb:hover {
-    background-color: #999; /* Hover effect for scrollbar thumb */
-}
 .card-header {
     display: flex;
     justify-content: space-between;
@@ -668,17 +658,20 @@
     <div class="category-buttons">
         <!-- 'All' button -->
         <a href="?" class="category-btn {% if not request.GET.category %}active{% endif %}">
-            <i class="fas fa-th"></i> All
+            <i class="fas fa-th"></i>
+            <span class="category-title">All</span>
         </a>
         <!-- Loop through categories -->
         {% for category in categories %}
             <a href="?category={{ category }}"
                class="category-btn {% if request.GET.category == category %}active{% endif %}">
                 <i class="{{ category|category_icon }}"></i>
+                <span class="category-title">{{ category|title }}</span>
             </a>
         {% endfor %}
     </div>
 </div>
+
 
 
 <!-- Product Cards -->
@@ -724,7 +717,7 @@
                      loading="lazy">
             </a><span class="time-since-badge">{{ product.created|timesince }} ago</span>
             {% if product in new_arrivals %}
-            <span class="new-arrival-badge">New Arrival</span>
+            <span class="new-arrival-badge">New</span>
             {% endif %}
 
           {% if product.category != "service" %}
@@ -744,6 +737,16 @@
     {% endif %}
 
         <div class="card-actions">
+<!-- Like/Dislike Buttons -->
+<a class="action-buttons">
+    <button class="like-btn action-button" data-product-id="{{ product.id }}">
+        <i class="fas fa-arrow-up"></i><span class="like-count">{{ product.like_count }}</span>
+    </button>
+    <button class="dislike-btn action-button" data-product-id="{{ product.id }}">
+        <i class="fas fa-arrow-down"></i> <span class="dislike-count">{{ product.dislike_count }}</span>
+    </button>
+</a>
+
             <a href="tel:{{ product.phone_number }}" class="action-button">
             <i class="fas fa-phone-alt"></i> Call
         </a>
@@ -793,6 +796,32 @@
 <br/>
 <br/>
 <br/>
+<script>
+    // Handle like/dislike button clicks
+    document.querySelectorAll('.like-btn').forEach(btn => {
+        btn.addEventListener('click', function () {
+            const productId = this.getAttribute('data-product-id');
+            fetch(`/product/${productId}/like/`)
+                .then(response => response.json())
+                .then(data => {
+                    document.querySelector('.like-count').textContent = data.like_count;
+                    document.querySelector('.dislike-count').textContent = data.dislike_count;
+                });
+        });
+    });
+
+    document.querySelectorAll('.dislike-btn').forEach(btn => {
+        btn.addEventListener('click', function () {
+            const productId = this.getAttribute('data-product-id');
+            fetch(`/product/${productId}/dislike/`)
+                .then(response => response.json())
+                .then(data => {
+                    document.querySelector('.like-count').textContent = data.like_count;
+                    document.querySelector('.dislike-count').textContent = data.dislike_count;
+                });
+        });
+    });
+</script>
 <script>
         // JavaScript for scroll to top functionality
         const scrollToTopBtn = document.getElementById("scrollToTopBtn");

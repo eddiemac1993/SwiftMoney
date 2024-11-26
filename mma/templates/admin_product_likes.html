@@ -1,0 +1,46 @@
+{% extends "mma/base.html" %}
+
+{% block title %}likes{% endblock %}
+
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            font-size: 18px;
+            text-align: left;
+        }
+        th, td {
+            padding: 12px;
+            border: 1px solid #ddd;
+        }
+        th {
+            background-color: #f4f4f4;
+        }
+    </style>
+    {% block content %}
+</head>
+<body>
+    <h1>Admin Product Likes</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>Product Name</th>
+                <th>Phone Number</th>
+                <th>Likes</th>
+                <th>Like Points</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for product in products %}
+                <tr>
+                    <td>{{ product.name }}</td>
+                    <td>{{ product.phone_number }}</td>
+                    <td>{{ product.like_count }}</td> <!-- Display likes -->
+                    <td>{{ product.like_points }}</td> <!-- Display points calculated from likes -->
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+{% endblock content %}

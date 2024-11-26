@@ -40,6 +40,27 @@ from django.http import HttpResponseRedirect
 from django.urls import reverse
 from .forms import BirthdayWishForm
 from .models import BirthdayWish
+from .models import ProductView,  LikeDislike
+from django.db.models import Count, Q, Value, IntegerField, F, ExpressionWrapper
+from django.shortcuts import render
+from .models import Product, LikeDislike
+
+def admin_product_likes(request):
+    products = (
+        Product.objects
+        .annotate(
+            like_count=Count('likes_dislikes', filter=Q(likes_dislikes__action=LikeDislike.LIKE)),
+            like_points=ExpressionWrapper(
+                (F('like_count') / 50) * 30,  # Calculate points
+                output_field=IntegerField()
+            )
+        )
+        .exclude(phone_number="000-000-0000")  # Exclude unwanted phone numbers
+        .order_by('-created')  # Order by the newest products
+    )
+    return render(request, 'admin_product_likes.html', {'products': products})
+
+
 
 def create_wish(request):
     if request.method == 'POST':
@@ -130,9 +151,6 @@ def chat_room(request, room_name):
         'messages': messages,
         'color_map': color_map,
     })
-
-
-
 
 
 def quiz_view(request):
@@ -296,12 +314,14 @@ def agent_list(request):
         'agents': agents,
         'query': query,
     })
+from django.db.models import Count
 
 def product_list_anonymous(request):
     query = request.GET.get('q')
     min_price = request.GET.get('min_price')
     max_price = request.GET.get('max_price')
     category_filter = request.GET.get('category')
+    products = Product.objects.annotate(view_count=Count('views'))
 
     # Filter products by search query if provided
     if query:
@@ -348,14 +368,24 @@ def product_list_anonymous(request):
         except Cart.DoesNotExist:
             cart_item_count = 0
 
+    # Collect product view, like, and dislike data
+    product_data = []
+    for product in page_obj:  # Use only paginated products for efficiency
+        product_data.append({
+            'product': product,
+            'views': product.views.count(),
+            'likes': product.likes_dislikes.filter(action=1).count(),
+            'dislikes': product.likes_dislikes.filter(action=-1).count(),
+        })
+
     return render(request, 'product_list.html', {
-        'products': products,
+        'products': product_data,  # Use processed data
         'query': query,
         'page_obj': page_obj,
         'min_price': min_price,
         'max_price': max_price,
         'categories': categories,  # Pass categories to the template
-        'cart_item_count': cart_item_count  # Add the count to context
+        'cart_item_count': cart_item_count,  # Add cart item count to context
     })
 
 from django.db.models import Q
@@ -370,6 +400,7 @@ def product_list(request):
     max_price = request.GET.get('max_price')
     category_filter = request.GET.get('category')
     verified_filter = request.GET.get('verified')
+    products = Product.objects.annotate(view_count=Count('views'))
 
     # Start with all products, ordering by creation date (latest first)
     products = Product.objects.all().order_by('-created')
@@ -431,6 +462,11 @@ def product_list(request):
 
     low_stock_threshold = 5
 
+    for product in products:
+        # Count the likes and dislikes for each product
+        product.like_count = product.likes_dislikes.filter(action=1).count()
+        product.dislike_count = product.likes_dislikes.filter(action=-1).count()
+
     context = {
         'products': products,  # Keep this for the total products (not paginated)
         'query': query,
@@ -447,13 +483,30 @@ def product_list(request):
 
     return render(request, 'product_list.html', context)
 
+from django.utils.timezone import now
 
-from django.shortcuts import render, get_object_or_404
-from .models import Product
+def get_client_ip(request):
+    x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+    if x_forwarded_for:
+        ip = x_forwarded_for.split(',')[0]
+    else:
+        ip = request.META.get('REMOTE_ADDR')
+    return ip
 
 def product_detail(request, product_id):
     # Get the product by ID or return 404 if not found
     product = get_object_or_404(Product, id=product_id)
+    ip_address = get_client_ip(request)
+    session_key = request.session.session_key
+
+    if not session_key:
+        request.session.create()
+        session_key = request.session.session_key
+
+    # Track views
+    ProductView.objects.get_or_create(
+        product=product, session_key=session_key, ip_address=ip_address
+    )
 
     # Check if the user is authenticated to show cart item count
     if request.user.is_authenticated:
@@ -467,8 +520,57 @@ def product_detail(request, product_id):
 
     return render(request, 'product_detail.html', {
         'product': product,
+        'likes': product.likes_dislikes.filter(action=1).count(),
+        'dislikes': product.likes_dislikes.filter(action=-1).count(),
+        'views': product.views.count(),
         'cart_item_count': cart_item_count  # Pass the cart item count
     })
+
+from django.shortcuts import get_object_or_404, redirect
+from django.http import JsonResponse
+from .models import Product, LikeDislike
+
+def like_dislike_product(request, product_id, action):
+    # Retrieve the product object
+    product = get_object_or_404(Product, id=product_id)
+
+    # Get session key or ip_address to track anonymous users
+    session_key = request.session.session_key
+    ip_address = request.META.get('REMOTE_ADDR')
+
+    # Check if the user has already liked or disliked this product
+    existing_vote = LikeDislike.objects.filter(
+        product=product,
+        session_key=session_key,
+        ip_address=ip_address
+    ).first()
+
+    if existing_vote:
+        # If the user has already voted, update the existing vote
+        if existing_vote.action == action:
+            return JsonResponse({'message': 'You have already voted this way.'})
+        else:
+            # If the user wants to change their vote, delete the old one and create a new one
+            existing_vote.delete()
+
+    # Create a new LikeDislike entry
+    LikeDislike.objects.create(
+        product=product,
+        session_key=session_key,
+        ip_address=ip_address,
+        action=action
+    )
+
+    # Return the updated like/dislike count
+    like_count = LikeDislike.objects.filter(product=product, action=LikeDislike.LIKE).count()
+    dislike_count = LikeDislike.objects.filter(product=product, action=LikeDislike.DISLIKE).count()
+
+    return JsonResponse({
+        'message': 'Vote recorded successfully.',
+        'like_count': like_count,
+        'dislike_count': dislike_count
+    })
+
 
 @login_required
 def product_edit(request, product_id):

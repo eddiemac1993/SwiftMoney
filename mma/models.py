@@ -154,6 +154,34 @@ class Product(models.Model):
         return f"{self.name} (Stock: {self.stock_count})"
 
 
+class ProductView(models.Model):
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='views')
+    session_key = models.CharField(max_length=255, null=True, blank=True)
+    ip_address = models.GenericIPAddressField(null=True, blank=True)
+    viewed_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('product', 'session_key', 'ip_address')
+
+class LikeDislike(models.Model):
+    LIKE = 1
+    DISLIKE = -1
+
+    ACTION_CHOICES = (
+        (LIKE, 'Like'),
+        (DISLIKE, 'Dislike'),
+    )
+
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='likes_dislikes')
+    session_key = models.CharField(max_length=255, null=True, blank=True)
+    ip_address = models.GenericIPAddressField(null=True, blank=True)
+    action = models.SmallIntegerField(choices=ACTION_CHOICES)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('product', 'session_key', 'action')
+
+
 class Cart(models.Model):
     agent = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='carts')
     created_at = models.DateTimeField(auto_now_add=True)
@@ -181,6 +209,9 @@ class Sale(models.Model):
 
     def __str__(self):
         return f"{self.quantity} x {self.product.name} sold"
+
+
+
 
 class Order(models.Model):
     STATUS_CHOICES = (

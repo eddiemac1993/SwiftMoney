@@ -343,6 +343,36 @@
     {% endif %}
             </div>
         </div>
+
+<p>Views: {{ views }}</p>
+<p>Likes: <span id="like-count">{{ likes }}</span></p>
+<p>Dislikes: <span id="dislike-count">{{ dislikes }}</span></p>
+
+<div>
+    <button onclick="handleLikeDislike({{ product.id }}, 1)">👍 Like</button>
+    <button onclick="handleLikeDislike({{ product.id }}, -1)">👎 Dislike</button>
+</div>
+
+<script>
+    function handleLikeDislike(productId, action) {
+        fetch(`/product/${productId}/like-dislike/${action}/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                alert(data.error);
+            } else {
+                document.getElementById('like-count').textContent = data.likes;
+                document.getElementById('dislike-count').textContent = data.dislikes;
+            }
+        })
+        .catch(error => console.error('Error:', error));
+    }
+</script>
     </div>
 </div>
 <br/>
