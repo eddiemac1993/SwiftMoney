@@ -1,0 +1,108 @@
+{% extends "mma/base.html" %}
+
+{% block title %}View Ride Request{% endblock %}
+
+<style>
+.container {
+    max-width: 600px;
+    margin: 20px auto;
+    padding: 20px;
+    background: #f9f9f9;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+.search-bar {
+    margin-bottom: 20px;
+}
+
+.search-bar input {
+    width: 80%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.search-bar button {
+    padding: 10px 15px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.search-bar button:hover {
+    background-color: #0056b3;
+}
+
+.ride-details {
+    margin-top: 20px;
+    padding: 15px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background-color: white;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.ride-details p {
+    margin: 5px 0;
+    color: #555;
+}
+
+.actions form {
+    display: inline;
+}
+
+button {
+    padding: 8px 15px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-right: 10px;
+}
+
+button.cancel {
+    background-color: #dc3545;
+}
+
+button:hover {
+    opacity: 0.9;
+}
+</style>
+
+{% block content %}
+<div class="container">
+    <h1>View Ride Request</h1>
+
+    <div class="search-bar">
+        <form method="GET" action="">
+            <input type="text" name="booking_reference" placeholder="Enter Booking Reference" value="{{ booking_reference }}" required>
+            <button type="submit">Search</button>
+        </form>
+    </div>
+
+    {% if ride_request %}
+        <div class="ride-details">
+            <h2>Ride Details</h2>
+            <p><strong>Pickup Location:</strong> {{ ride_request.pickup_location }}</p>
+            <p><strong>Destination:</strong> {{ ride_request.destination }}</p>
+            <p><strong>Amount:</strong> K {{ ride_request.amount }}</p>
+            <p><strong>Status:</strong> {{ ride_request.status }}</p>
+
+            {% if ride_request.driver %}
+                <h3>Driver Assigned:</h3>
+                <p><strong>Name:</strong> {{ ride_request.driver.username }}</p>
+                <p><strong>Phone:</strong> {{ ride_request.driver.phone_number }}</p>
+            {% else %}
+                <p><em>No driver has accepted your ride request yet.</em></p>
+            {% endif %}
+        </div>
+    {% elif booking_reference %}
+        <p>No ride request found for the given reference.</p>
+    {% endif %}
+</div>
+{% endblock %}

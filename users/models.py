@@ -19,7 +19,8 @@ class CustomUser(AbstractUser):
     profile_pic = models.ImageField(upload_to='profile_pics/', null=True, blank=True)
     profile_pic_thumbnail = models.ImageField(upload_to='profile_pics/thumbnails/', null=True, blank=True)
     is_approved = models.BooleanField(default=False)
-    is_admin = models.BooleanField(default=False)  # Add this line
+    is_admin = models.BooleanField(default=False)
+    is_driver = models.BooleanField(default=False)  # Add this line# Add this line
 
     def is_mobilemoney(self):
         return self.username == 'mobilemoney'

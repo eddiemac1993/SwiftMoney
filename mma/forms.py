@@ -4,7 +4,46 @@ from .models import Order
 from .models import Refund
 from .models import QuizScore
 from .models import BirthdayWish
+from .models import RideRequest, Review
 
+class RideRequestForm(forms.ModelForm):
+    class Meta:
+        model = RideRequest
+        fields = ['username', 'phone_number', 'pickup_location', 'destination', 'amount']
+        widgets = {
+            'username': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Your Name',
+                'required': True
+            }),
+            'phone_number': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Your Phone Number',
+                'required': True,
+                'type': 'tel'
+            }),
+            'pickup_location': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'From (Your Location)',
+                'required': True
+            }),
+            'destination': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'To (Destination)',
+                'required': True
+            }),
+            'amount': forms.NumberInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Proposed Amount (ZMW)',
+                'required': True
+            }),
+        }
+
+
+class ReviewForm(forms.ModelForm):
+    class Meta:
+        model = Review
+        fields = ['rating']
 class BirthdayWishForm(forms.ModelForm):
     class Meta:
         model = BirthdayWish

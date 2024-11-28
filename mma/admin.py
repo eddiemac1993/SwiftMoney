@@ -1,6 +1,16 @@
 from django.contrib import admin
 from .models import Product, SearchLog, Cart, CartItem, Order, OrderItem, Invoice, Refund, FloatRequest, CashRequest, CashoutRequest, Balance, Transaction
 from mma.models import QuizQuestion, QuizScore
+from django.contrib import admin
+from .models import RideRequest, Review
+
+@admin.register(RideRequest)
+class RideRequestAdmin(admin.ModelAdmin):
+    list_display = ['pickup_location', 'destination', 'amount', 'status', 'driver']
+
+@admin.register(Review)
+class ReviewAdmin(admin.ModelAdmin):
+    list_display = ['ride_request', 'rating']
 
 @admin.register(QuizQuestion)
 class QuizQuestionAdmin(admin.ModelAdmin):

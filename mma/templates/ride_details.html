@@ -1,0 +1,90 @@
+{% extends "mma/base.html" %}
+
+{% block title %}Ride Details{% endblock %}
+
+{% block extra_css %}
+<style>
+.ride-details-card {
+    max-width: 600px;
+    margin: 30px auto;
+    padding: 25px;
+    border-radius: 15px;
+    box-shadow: 0 8px 12px rgba(0, 0, 0, 0.2);
+    text-align: left;
+    font-family: Arial, sans-serif;
+}
+
+.ride-details-card h1 {
+    font-size: 2rem;
+    color: var(--primary-color);
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+.ride-details-card p {
+    font-size: 1rem;
+    color: white;
+    margin: 10px 0;
+}
+
+.ride-details-card p strong {
+    color: var(--primary-color);
+}
+
+.action-buttons {
+    margin-top: 20px;
+    display: flex;
+    justify-content: space-around;
+}
+
+.call-button, .pdf-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px 20px;
+    background-color: var(--primary-color);
+    color: white;
+    text-decoration: none;
+    font-size: 1rem;
+    font-weight: bold;
+    border-radius: 8px;
+    transition: background-color 0.3s ease;
+    border: none;
+    cursor: pointer;
+}
+
+.call-button:hover, .pdf-button:hover {
+    background-color: #45a049;
+}
+
+.call-button i, .pdf-button i {
+    font-size: 1.2rem;
+}
+
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="ride-details-card">
+    <h1>Ride Details</h1>
+    <p><strong>Username:</strong> {{ ride_request.username }}</p>
+    <p><strong>Phone Number:</strong> {{ ride_request.phone_number }}</p>
+    <p><strong>Pickup Location:</strong> {{ ride_request.pickup_location }}</p>
+    <p><strong>Destination:</strong> {{ ride_request.destination }}</p>
+    <p><strong>Amount:</strong> ZMW {{ ride_request.amount }}</p>
+    <p><strong>Status:</strong> {{ ride_request.status }}</p>
+
+    <div class="action-buttons">
+        <!-- Call Button -->
+        <a href="tel:{{ ride_request.phone_number }}" class="call-button">
+            <i class="fas fa-phone"></i> Call {{ ride_request.username }}
+        </a>
+
+        <!-- PDF Receipt Button -->
+        <a href="{% url 'generate_pdf' ride_request.pk %}" class="pdf-button">
+            <i class="fas fa-file-pdf"></i> Download Receipt
+        </a>
+    </div>
+</div>
+{% endblock %}

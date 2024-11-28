@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        .receipt-container {
+            max-width: 600px;
+            margin: auto;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+        }
+        .receipt-container h1 {
+            text-align: center;
+            color: #333;
+        }
+        .receipt-container p {
+            font-size: 1rem;
+            margin: 8px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="receipt-container">
+        <h1>Ride Receipt</h1>
+        <p><strong>Username:</strong> {{ ride_request.username }}</p>
+        <p><strong>Phone Number:</strong> {{ ride_request.phone_number }}</p>
+        <p><strong>Pickup Location:</strong> {{ ride_request.pickup_location }}</p>
+        <p><strong>Destination:</strong> {{ ride_request.destination }}</p>
+        <p><strong>Amount:</strong> ZMW {{ ride_request.amount }}</p>
+        <p><strong>Status:</strong> {{ ride_request.status }}</p>
+    </div>
+</body>
+</html>

@@ -44,6 +44,82 @@ from .models import ProductView,  LikeDislike
 from django.db.models import Count, Q, Value, IntegerField, F, ExpressionWrapper
 from django.shortcuts import render
 from .models import Product, LikeDislike
+from django.shortcuts import render, redirect, get_object_or_404
+from .models import RideRequest, Review
+from .forms import RideRequestForm, ReviewForm
+from django.contrib.auth.decorators import login_required
+from django.http import JsonResponse
+from django.http import HttpResponse
+from django.template.loader import get_template
+from xhtml2pdf import pisa
+
+def accepted_rides(request):
+    # Ensure the user is a driver
+    if not request.user.is_authenticated or not request.user.is_driver:
+        return render(request, "error.html", {"message": "You do not have access to this page."})
+
+    # Fetch accepted rides for the logged-in driver
+    rides = RideRequest.objects.filter(driver=request.user, status="Accepted")
+    return render(request, "accepted_rides.html", {"rides": rides})
+
+
+def generate_pdf(request, pk):
+    ride_request = get_object_or_404(RideRequest, pk=pk)
+    template = get_template("ride_receipt.html")
+    context = {
+        "ride_request": ride_request,
+    }
+    html = template.render(context)
+    response = HttpResponse(content_type="application/pdf")
+    response['Content-Disposition'] = f'attachment; filename="ride_receipt_{ride_request.pk}.pdf"'
+    pisa_status = pisa.CreatePDF(html, dest=response)
+    if pisa_status.err:
+        return HttpResponse("Error generating PDF")
+    return response
+
+def accept_ride_request(request, pk):
+    ride_request = get_object_or_404(RideRequest, pk=pk)
+    if ride_request.status == "Pending":  # Ensure the ride is still pending
+        ride_request.status = "Accepted"
+        ride_request.driver = request.user  # Assign the driver
+        ride_request.save()
+    return redirect('ride_details', pk=ride_request.pk)
+
+def ride_details(request, pk):
+    ride_request = get_object_or_404(RideRequest, pk=pk, status="Accepted", driver=request.user)
+    return render(request, "ride_details.html", {"ride_request": ride_request})
+
+def create_ride_request(request):
+    if request.method == "POST":
+        form = RideRequestForm(request.POST)
+        if form.is_valid():
+            ride_request = form.save(commit=False)
+            ride_request.ip_address = get_client_ip(request)
+            ride_request.save()
+            # Redirect to the review page after creating the ride request
+            return redirect('review_ride', pk=ride_request.pk)
+    else:
+        form = RideRequestForm()
+    return render(request, "create_ride_request.html", {"form": form})
+
+
+@login_required
+def driver_dashboard(request):
+    ride_requests = RideRequest.objects.filter(status="Pending")
+    return render(request, "driver_dashboard.html", {"ride_requests": ride_requests})
+
+def review_ride(request, pk):
+    ride_request = get_object_or_404(RideRequest, pk=pk)
+    return render(request, "review_ride.html", {"ride_request": ride_request})
+
+
+def get_client_ip(request):
+    x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+    if x_forwarded_for:
+        ip = x_forwarded_for.split(',')[0]
+    else:
+        ip = request.META.get('REMOTE_ADDR')
+    return ip
 
 def admin_product_likes(request):
     products = (

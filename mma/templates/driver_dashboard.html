@@ -1,0 +1,138 @@
+{% extends "mma/base.html" %}
+
+{% block title %}Driver Dashboard{% endblock %}
+
+{% block extra_css %}
+<style>
+    .dashboard-container {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .card {
+        background-color: var(--card-background);
+        border-radius: 15px;
+        padding: 20px;
+        margin-bottom: 20px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    h2, h1 {
+        color: var(--text-color);
+        margin-bottom: 15px;
+        font-size: 1.5rem;
+    }
+
+    .ride-list {
+        list-style-type: none;
+        padding: 0;
+    }
+
+    .ride-item {
+        padding: 10px;
+        background-color: rgba(255, 255, 255, 0.1);
+        border-radius: 10px;
+        margin-bottom: 10px;
+    }
+
+    .ride-item p {
+        margin: 0;
+    }
+
+    .ride-actions {
+        margin-top: 10px;
+    }
+
+    .ride-actions a {
+        display: inline-block;
+        padding: 8px 15px;
+        background-color: #007bff;
+        color: white;
+        text-decoration: none;
+        border-radius: 5px;
+        margin-right: 10px;
+    }
+
+    .ride-actions a:hover {
+        background-color: #0056b3;
+    }
+.accepted-rides-button {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #007bff; /* Bootstrap primary color */
+    color: white;
+    text-decoration: none;
+    font-size: 1rem;
+    border-radius: 5px;
+    font-weight: bold;
+    text-align: center;
+    transition: background-color 0.3s ease;
+}
+
+.accepted-rides-button:hover {
+    background-color: #0056b3; /* Darker shade for hover effect */
+}
+
+    @media (min-width: 768px) {
+        .dashboard-container {
+            flex-direction: row;
+        }
+
+        .left-column, .right-column {
+            flex: 1;
+        }
+
+        .left-column {
+            max-width: 300px;
+        }
+    }
+
+    @media (max-width: 767px) {
+        h2, h1 {
+            font-size: 1.2rem;
+        }
+
+        .ride-item {
+            font-size: 0.9em;
+        }
+    }
+</style>
+
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+    <div class="left-column">
+        <div class="card">
+            <h1>Driver Dashboard</h1>
+            <div class="ride-list">
+                {% for ride in ride_requests %}
+                    <div class="ride-item">
+                        <p><strong>Pickup Location:</strong> {{ ride.pickup_location }}</p>
+                        <p><strong>Destination:</strong> {{ ride.destination }}</p>
+                        <p><strong>Amount:</strong> K {{ ride.amount }}</p>
+                        <div class="ride-actions">
+                            <a href="{% url 'accept_ride_request' ride.pk %}">Accept</a>
+                        </div>
+                    </div>
+                {% empty %}
+                    <p>No ride requests available.</p>
+                {% endfor %}
+            </div>
+
+        </div>
+<div class="card">
+    <h3>Manage Your Rides</h3>
+    <p>View all rides you have accepted and manage your work efficiently.</p>
+    <a href="{% url 'accepted_rides' %}" class="accepted-rides-button">View Accepted Rides</a>
+</div>
+
+
+    </div>
+
+    <div class="right-column">
+        <!-- Optionally, add more content here, e.g., a summary of completed rides or earnings -->
+    </div>
+</div>
+{% endblock %}

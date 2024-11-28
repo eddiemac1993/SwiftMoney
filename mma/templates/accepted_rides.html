@@ -1,0 +1,92 @@
+{% extends "mma/base.html" %}
+
+{% block title %}Accepted Rides{% endblock %}
+
+{% block content %}
+<style>
+
+.rides-list {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.ride-card {
+    padding: 15px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.ride-card h2 {
+    margin-bottom: 10px;
+    color:  var(--primary-color);
+}
+
+.ride-card p {
+    margin: 5px 0;
+    color: white;
+}
+
+.call-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 10px 20px;
+    background-color: #28a745;
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+    margin-top: 10px;
+    font-size: 1rem;
+}
+
+.call-button i {
+    font-size: 1.2rem;
+}
+
+.call-button:hover {
+    background-color: #218838;
+}
+
+.back-button {
+    display: inline-block;
+    margin: 20px 0;
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+    font-size: 1rem;
+    text-align: center;
+}
+
+.back-button:hover {
+    background-color: #0056b3;
+}
+</style>
+<div class="container">
+    <h1>Accepted Rides</h1>
+    {% if rides %}
+        <div class="rides-list">
+            {% for ride in rides %}
+                <div class="ride-card">
+                    <h2>Ride Details</h2>
+                    <p><strong>Pickup Location:</strong> {{ ride.pickup_location }}</p>
+                    <p><strong>Destination:</strong> {{ ride.destination }}</p>
+                    <p><strong>Amount:</strong> ZMW {{ ride.amount }}</p>
+                    <p><strong>Passenger:</strong> {{ ride.username }}</p>
+                    <p><strong>Phone:</strong> {{ ride.phone_number }}</p>
+                    <a href="tel:{{ ride.phone_number }}" class="call-button">
+                        <i class="fas fa-phone"></i> Call Passenger
+                    </a>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p>No accepted rides yet.</p>
+    {% endif %}
+    <a href="{% url 'driver_dashboard' %}" class="back-button">Back to Dashboard</a>
+</div>
+{% endblock %}

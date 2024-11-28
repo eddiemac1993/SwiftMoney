@@ -3,6 +3,13 @@ from . import views
 
 urlpatterns = [
     path('home/', views.index, name='home'),
+    path("create-ride/", views.create_ride_request, name="create_ride"),
+    path("driverdashboard/", views.driver_dashboard, name="driver_dashboard"),
+    path("accept-ride/<int:pk>/", views.accept_ride_request, name="accept_ride_request"),
+    path('review/<int:pk>/', views.review_ride, name='review_ride'),
+    path("accepted-rides/", views.accepted_rides, name="accepted_rides"),
+    path('generate-pdf/<int:pk>/', views.generate_pdf, name='generate_pdf'),
+    path('ride-details/<int:pk>/', views.ride_details, name='ride_details'),
     path('create-wish/', views.create_wish, name='create_wish'),
     path('view-wish/<int:wish_id>/', views.view_wish, name='view_wish'),
     path('games/', views.games_hub, name='games_hub'),

@@ -8,6 +8,36 @@ from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 import random
 import string
+from django.db import models
+
+class RideRequest(models.Model):
+    username = models.CharField(max_length=255, blank=True, null=True)
+    phone_number = models.CharField(max_length=15)
+    pickup_location = models.CharField(max_length=255)
+    destination = models.CharField(max_length=255)
+    amount = models.DecimalField(max_digits=10, decimal_places=2)
+    ip_address = models.GenericIPAddressField()
+    status = models.CharField(max_length=20, choices=[("Pending", "Pending"), ("Accepted", "Accepted")], default="Pending")
+    driver = models.ForeignKey(CustomUser, on_delete=models.SET_NULL, null=True, blank=True, related_name="accepted_rides")
+
+    def __str__(self):
+        return f"Ride from {self.pickup_location} to {self.destination} (${self.amount})"
+
+class Review(models.Model):
+    RATING_CHOICES = [
+        ("Very Good", "Very Good"),
+        ("Good", "Good"),
+        ("Medium", "Medium"),
+        ("Bad", "Bad"),
+        ("Very Bad", "Very Bad"),
+        ("Late", "Late"),
+    ]
+    ride_request = models.OneToOneField(RideRequest, on_delete=models.CASCADE, related_name="review")
+    rating = models.CharField(max_length=20, choices=RATING_CHOICES)
+
+    def __str__(self):
+        return f"Review: {self.rating}"
+
 
 class BirthdayWish(models.Model):
     sender_name = models.CharField(max_length=100)

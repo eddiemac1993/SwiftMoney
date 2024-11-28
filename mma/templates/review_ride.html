@@ -1,0 +1,56 @@
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Submit Review</button>
+</form>
+{% extends "mma/base.html" %}
+
+{% block title %}Review Ride Request{% endblock %}
+
+<style>
+.review-container {
+    max-width: 600px;
+    margin: 20px auto;
+    padding: 20px;
+    background: #f9f9f9;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+.review-container h2 {
+    font-size: 2rem;
+    margin-bottom: 20px;
+}
+
+.review-container p {
+    font-size: 1.2rem;
+    margin: 10px 0;
+}
+
+.status-button {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: white;
+    text-decoration: none;
+    font-size: 1rem;
+    border-radius: 5px;
+    margin-top: 20px;
+    transition: background-color 0.3s ease;
+}
+
+.status-button:hover {
+    background-color: #0056b3;
+}
+</style>
+
+{% block content %}
+<div class="review-container">
+    <h2>Review Ride Request</h2>
+    <p><strong>Pickup Location:</strong> {{ ride_request.pickup_location }}</p>
+    <p><strong>Destination:</strong> {{ ride_request.destination }}</p>
+    <p><strong>Amount:</strong> K {{ ride_request.amount }}</p>
+</div>
+{% endblock %}
+
