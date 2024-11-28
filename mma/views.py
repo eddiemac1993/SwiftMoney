@@ -52,16 +52,35 @@ from django.http import JsonResponse
 from django.http import HttpResponse
 from django.template.loader import get_template
 from xhtml2pdf import pisa
+from django.shortcuts import render
 
-def accepted_rides(request):
+def ride_requests_by_ip(request):
+    # Get the user's IP address
+    ip_address = get_client_ip(request)
+
+    # Fetch the ride requests associated with this IP address
+    ride_requests = RideRequest.objects.filter(ip_address=ip_address)
+
+    # Pass the ride requests to the template to render them
+    return render(request, 'ride_requests_list.html', {'ride_requests': ride_requests})
+
+def accepted_rides(request, ride_id):
     # Ensure the user is a driver
     if not request.user.is_authenticated or not request.user.is_driver:
         return render(request, "error.html", {"message": "You do not have access to this page."})
 
-    # Fetch accepted rides for the logged-in driver
-    rides = RideRequest.objects.filter(driver=request.user, status="Accepted")
-    return render(request, "accepted_rides.html", {"rides": rides})
+    # Get the ride request by ID
+    ride_request = get_object_or_404(RideRequest, id=ride_id)
 
+    # Check if the ride is still pending and not already accepted
+    if ride_request.status == "Pending":
+        # Update the ride request with the driver's details
+        ride_request.status = "Accepted"
+        ride_request.driver = request.user  # Set the logged-in driver
+        ride_request.save()
+
+    # Redirect to the driver's accepted rides page
+    return redirect('accepted_rides')
 
 def generate_pdf(request, pk):
     ride_request = get_object_or_404(RideRequest, pk=pk)

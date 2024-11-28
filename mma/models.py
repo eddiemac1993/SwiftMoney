@@ -8,7 +8,6 @@ from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 import random
 import string
-from django.db import models
 
 class RideRequest(models.Model):
     username = models.CharField(max_length=255, blank=True, null=True)

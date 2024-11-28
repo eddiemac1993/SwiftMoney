@@ -1,0 +1,70 @@
+{% extends "mma/base.html" %}
+
+{% block content %}
+<style>
+.card {
+    border-radius: 10px;
+    border: 1px solid #ddd;
+}
+
+.text-success {
+    font-weight: bold;
+}
+
+.text-warning {
+    color: #ff9900;
+    font-weight: bold;
+}
+
+.text-muted {
+    font-style: italic;
+}
+
+.list-group-item {
+    border: none;
+    padding: 15px 20px;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+</style>
+<div class="container mt-5">
+    <div class="card shadow p-4">
+        <h2 class="text-center mb-4">Your Ride Requests</h2>
+        {% if ride_requests %}
+            <ul class="list-group">
+                {% for request in ride_requests %}
+                    <li class="list-group-item mb-3">
+                        <p><strong>Pickup Location:</strong> {{ request.pickup_location }}</p>
+                    <p><strong>Destination:</strong> {{ request.destination }}</p>
+                    <p><strong>Amount:</strong> k {{ request.amount }}</p>
+                        <p>
+                            <strong>Status:</strong> 
+                            <span class="{% if request.status == 'accepted' %}text-success{% else %}text-warning{% endif %}">
+                                {{ request.status|title }}
+                            </span>
+                        </p>
+                        {% if request.status == 'accepted' %}
+                            <p>
+                                <strong>Driver Information:</strong> 
+                                <span class="text-info">
+                                   {{ request.driver.first_name }} {{ request.driver.last_name }} - {{ request.driver.phone_number }}
+                                </span>
+                            </p>
+                        {% else %}
+                            <p class="text-muted">
+                                <em>Awaiting call...</em>
+                            </p>
+                        {% endif %}
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p class="text-center text-muted">No ride requests found.</p>
+        {% endif %}
+        <div class="text-center mt-4">
+            <a href="{% url 'home' %}" class="btn btn-primary">Go Back</a>
+        </div>
+    </div>
+</div>
+{% endblock %}
