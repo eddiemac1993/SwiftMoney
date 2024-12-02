@@ -373,24 +373,37 @@ button:hover {
 
 <nav class="bottom-nav">
     {% if user.is_authenticated %}
-        <a href="{% url 'dashboard' %}" class="icon-btn {% if request.resolver_match.url_name == 'dashboard' %}active-page{% endif %}" title="Dashboard">
-            <span class="icon"><i class="fas fa-home"></i></span>
-            <span class="icon-text">Dashboard</span>
-        </a>
-        <a href="{% url 'request_cash' %}" class="icon-btn {% if request.resolver_match.url_name == 'request_cash' %}active-page{% endif %}" title="Request Cash">
-            <span class="icon"><i class="fas fa-money-bill-wave"></i></span>
-            <span class="icon-text">Cash</span>
-        </a>
-        <a href="{% url 'cashout' %}" class="icon-btn {% if request.resolver_match.url_name == 'cashout' %}active-page{% endif %}" title="Cash Out">
-            <span class="icon"><i class="fas fa-hand-holding-usd"></i></span>
-            <span class="icon-text">CashOut</span>
-        </a>
+        {% if user.is_driver %}
+            <!-- Show Driver Dashboard link for drivers -->
+            <a href="{% url 'driver_dashboard' %}" class="icon-btn {% if request.resolver_match.url_name == 'driver_dashboard' %}active-page{% endif %}" title="Driver Dashboard">
+                <span class="icon"><i class="fas fa-taxi"></i></span>
+                <span class="icon-text">Driver Dashboard</span>
+            </a>
+        {% else %}
+            <!-- Show other links for non-drivers -->
+            <a href="{% url 'dashboard' %}" class="icon-btn {% if request.resolver_match.url_name == 'dashboard' %}active-page{% endif %}" title="Dashboard">
+                <span class="icon"><i class="fas fa-home"></i></span>
+                <span class="icon-text">Dashboard</span>
+            </a>
+            <a href="{% url 'request_cash' %}" class="icon-btn {% if request.resolver_match.url_name == 'request_cash' %}active-page{% endif %}" title="Request Cash">
+                <span class="icon"><i class="fas fa-money-bill-wave"></i></span>
+                <span class="icon-text">Cash</span>
+            </a>
+            <a href="{% url 'cashout' %}" class="icon-btn {% if request.resolver_match.url_name == 'cashout' %}active-page{% endif %}" title="Cash Out">
+                <span class="icon"><i class="fas fa-hand-holding-usd"></i></span>
+                <span class="icon-text">CashOut</span>
+            </a>
+        {% endif %}
+        <!-- Profile link always visible for authenticated users -->
         <a href="{% url 'profile' %}" class="icon-btn {% if request.resolver_match.url_name == 'profile' %}active-page{% endif %}" title="Profile">
             <span class="icon"><i class="fas fa-user"></i></span>
             <span class="icon-text">Profile</span>
         </a>
     {% endif %}
 </nav>
+
+
+
 
 <button id="installButton" class="install-btn">Install App</button>
 

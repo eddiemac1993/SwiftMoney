@@ -161,8 +161,8 @@ EMAIL_USE_TLS = True
 EMAIL_HOST_USER = "manjoloe800@gmail.com"
 EMAIL_HOST_PASSWORD = "dlihvdakwpyqkpzk"
 
-PWA_APP_NAME = 'Comagil'
-PWA_APP_DESCRIPTION = "Comagil's Spare Parts and Timber Supply"
+PWA_APP_NAME = 'Swiftstyles'
+PWA_APP_DESCRIPTION = "Swiftstyles's all in one"
 PWA_APP_THEME_COLOR = '#000000'
 PWA_APP_BACKGROUND_COLOR = '#ffffff'
 PWA_APP_ICONS = [
@@ -170,8 +170,8 @@ PWA_APP_ICONS = [
     {'src': '/static/images/icons/icon-512x512.png', 'sizes': '512x512', 'type': 'image/png'},
 ]
 PWA_APP_MANIFEST = {
-    'name': 'Comagil',
-    'short_name': 'Comagil',
+    'name': 'Swiftstyles',
+    'short_name': 'Swiftstyles',
     'start_url': '/',
     'display': 'standalone',
     'background_color': '#ffffff',
@@ -181,3 +181,4 @@ USE_THOUSAND_SEPARATOR = True
 THOUSAND_SEPARATOR = ','
 DECIMAL_SEPARATOR = '.'
 LOGOUT_REDIRECT_URL = '/'
+LOGIN_REDIRECT_URL = 'home'

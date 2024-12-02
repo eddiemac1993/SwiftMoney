@@ -52,7 +52,24 @@ from django.http import JsonResponse
 from django.http import HttpResponse
 from django.template.loader import get_template
 from xhtml2pdf import pisa
-from django.shortcuts import render
+
+def slot_view(request):
+    return render(request, 'slot.html')
+
+def number_view(request):
+    return render(request, '2048.html')
+
+def xo_view(request):
+    return render(request, 'xo.html')
+
+def simon_view(request):
+    return render(request, 'simonsays.html')
+
+def snake_view(request):
+    return render(request, 'snake.html')
+
+def tetris_view(request):
+    return render(request, 'tetris.html')
 
 def ride_requests_by_ip(request):
     # Get the user's IP address
@@ -64,23 +81,13 @@ def ride_requests_by_ip(request):
     # Pass the ride requests to the template to render them
     return render(request, 'ride_requests_list.html', {'ride_requests': ride_requests})
 
-def accepted_rides(request, ride_id):
-    # Ensure the user is a driver
+def accepted_rides(request):
     if not request.user.is_authenticated or not request.user.is_driver:
         return render(request, "error.html", {"message": "You do not have access to this page."})
 
-    # Get the ride request by ID
-    ride_request = get_object_or_404(RideRequest, id=ride_id)
+    rides = RideRequest.objects.filter(driver=request.user, status="Accepted")
+    return render(request, "accepted_rides.html", {"rides": rides})
 
-    # Check if the ride is still pending and not already accepted
-    if ride_request.status == "Pending":
-        # Update the ride request with the driver's details
-        ride_request.status = "Accepted"
-        ride_request.driver = request.user  # Set the logged-in driver
-        ride_request.save()
-
-    # Redirect to the driver's accepted rides page
-    return redirect('accepted_rides')
 
 def generate_pdf(request, pk):
     ride_request = get_object_or_404(RideRequest, pk=pk)
@@ -1575,8 +1582,8 @@ def generate_sales_pdf(request):
         'orders': orders_data,
         'summary': summary_data,
         'company_name': 'SwiftStyles Co.',
-        'company_address': 'Monze',
-        'company_phone': '+260773351643',
+        'company_address': 'Lusaka',
+        'company_phone': '+260772447190',
         'company_email': 'swiftstyles@gmail.com'
     })
 

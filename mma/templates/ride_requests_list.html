@@ -32,33 +32,38 @@
     <div class="card shadow p-4">
         <h2 class="text-center mb-4">Your Ride Requests</h2>
         {% if ride_requests %}
-            <ul class="list-group">
-                {% for request in ride_requests %}
-                    <li class="list-group-item mb-3">
-                        <p><strong>Pickup Location:</strong> {{ request.pickup_location }}</p>
-                    <p><strong>Destination:</strong> {{ request.destination }}</p>
-                    <p><strong>Amount:</strong> k {{ request.amount }}</p>
-                        <p>
-                            <strong>Status:</strong> 
-                            <span class="{% if request.status == 'accepted' %}text-success{% else %}text-warning{% endif %}">
-                                {{ request.status|title }}
-                            </span>
-                        </p>
-                        {% if request.status == 'accepted' %}
-                            <p>
-                                <strong>Driver Information:</strong> 
-                                <span class="text-info">
-                                   {{ request.driver.first_name }} {{ request.driver.last_name }} - {{ request.driver.phone_number }}
-                                </span>
-                            </p>
+<ul class="list-group">
+    {% for request in ride_requests %}
+        <li class="list-group-item mb-3">
+            <p><strong>Pickup Location:</strong> {{ request.pickup_location }}</p>
+            <p><strong>Destination:</strong> {{ request.destination }}</p>
+            <p><strong>Amount:</strong> K{{ request.amount|floatformat:2 }}</p>
+            <p>
+                <strong>Status:</strong>
+                <span class="{% if request.status == 'accepted' %}text-success{% else %}text-warning{% endif %}">
+                    {{ request.status|title }}
+                </span>
+            </p>
+            {% if request.status == 'accepted' %}
+                <p>
+                    <strong>Driver Information:</strong>
+                    <span class="text-info">
+                        {% if request.driver %}
+                            {{ request.driver.username }} {{ request.driver.last_name }} - {{ request.driver.phone_number }}
                         {% else %}
-                            <p class="text-muted">
-                                <em>Awaiting call...</em>
-                            </p>
+                            <em>No driver assigned yet</em>
                         {% endif %}
-                    </li>
-                {% endfor %}
-            </ul>
+                    </span>
+                </p>
+            {% else %}
+                <p class="text-muted">
+                    <em>Awaiting call...</em>
+                </p>
+            {% endif %}
+        </li>
+    {% endfor %}
+</ul>
+
         {% else %}
             <p class="text-center text-muted">No ride requests found.</p>
         {% endif %}

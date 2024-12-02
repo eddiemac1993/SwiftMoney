@@ -55,23 +55,6 @@
             color: var(--secondary-text);
         }
 
-/* Category Filter Section Styles */
-.category-filter-section {
-    margin-bottom: 20px;
-    padding-top: 20px;
-}
-
-/* Line for separating categories */
-.category-divider {
-    border-bottom: 2px solid var(--primary-color); /* Use primary color for consistency */
-    margin-bottom: 20px;
-}
-/* Category Filter Buttons Styling */
-.category-filter {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px; /* Space between category buttons */
-}
 
 
 /* Container for image and price tag */
@@ -540,48 +523,59 @@
         </form>
     </div>
 <style>
-    .category-buttons {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 2px;
-        justify-content: center;
-        padding: 2px;
-    }
+.category-filter {
+    justify-content: center;
+    margin: 20px 0;
+    overflow-x: auto; /* Enable horizontal scrolling */
+    padding: 10px 0;
+}
 
-    .category-btn {
-        display: flex;
-        align-items: center;
-        color: white;
-        background-color: var(--card-background);
-        padding: 8px 8px;
-        text-decoration: none;
-        border: 2px solid white;
-        border-radius: 20px;
-        box-sizing: border-box;
-        transition: transform 0.2s ease;
-        font-family: Arial, sans-serif;
-    }
+.category-carousel {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    overflow-x: auto;
+}
 
-    .category-btn i {
-        margin-right: 8px; /* Space between icon and text */
-        font-size: 1.2rem;
-    }
+.category-btn {
+    display: flex;
+    align-items: center;
+    color: white;
+    background-color: var(--card-background);
+    padding: 10px 12px;
+    text-decoration: none;
+    border: 2px solid white;
+    border-radius: 20px;
+    box-sizing: border-box;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    font-family: Arial, sans-serif;
+    white-space: nowrap; /* Prevent text wrapping */
+    flex-shrink: 0; /* Prevent shrinking in flex container */
+}
 
-    .category-btn:hover {
-        transform: scale(1.1);
-    }
+.category-btn i {
+    margin-right: 8px; /* Space between icon and text */
+    font-size: 1.2rem;
+}
 
-    .category-btn.active {
-        background-color: #007bff;
-        color: white;
-        border-color: #0056b3;
-    }
-    .category-btn.active {
+.category-btn:hover {
+    transform: scale(1.1);
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.category-btn.active {
     background-color: #007bff; /* Highlight color */
     color: white;
-    border-color: #0056b3; /* Optional border color for active state */
-    font-weight: bold; /* Optional bold text for active category */
+    border-color: #0056b3;
+    font-weight: bold;
 }
+.carousel-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+
 /* Add this CSS to style the time-since badge */
 .image-container {
     position: relative;
@@ -656,22 +650,26 @@
 </style>
 
 <div class="category-filter">
-    <div class="category-buttons">
-        <!-- 'All' button -->
-        <a href="?" class="category-btn {% if not request.GET.category %}active{% endif %}">
-            <i class="fas fa-th"></i>
-            <span class="category-title">All</span>
-        </a>
-        <!-- Loop through categories -->
-        {% for category in categories %}
-            <a href="?category={{ category }}"
-               class="category-btn {% if request.GET.category == category %}active{% endif %}">
-                <i class="{{ category|category_icon }}"></i>
-                <span class="category-title">{{ category|title }}</span>
+    <div class="carousel-wrapper">
+        <div class="category-carousel">
+            <!-- 'All' button -->
+            <a href="?" class="category-btn {% if not request.GET.category %}active{% endif %}">
+                <i class="fas fa-th"></i>
+                <span class="category-title">All Categories</span>
             </a>
-        {% endfor %}
+            <!-- Loop through categories -->
+            {% for category in categories %}
+                <a href="?category={{ category }}"
+                   class="category-btn {% if request.GET.category == category %}active{% endif %}">
+                    <i class="{{ category|category_icon }}"></i>
+                    <span class="category-title">{{ category|title }}</span>
+                </a>
+            {% endfor %}
+        </div>
     </div>
 </div>
+
+
 
 
 
@@ -696,7 +694,7 @@
 
                         <span class="verified-badge" title="Verified Product" style="color: green;">✓</span>
                     {% else %}
-                        Service User
+                       <span style="color: white;"> Service User</span>
                         <i class="fas fa-check-circle" style="color: red;" title="Unverified User"></i>
                     {% endif %}
                 </span>
@@ -798,6 +796,8 @@
 <br/>
 <br/>
 <script>
+
+
     // Handle like/dislike button clicks
     document.querySelectorAll('.like-btn').forEach(btn => {
         btn.addEventListener('click', function () {
@@ -852,5 +852,6 @@
 
         cards.forEach(card => observer.observe(card));
     });
+
 </script>
 {% endblock %}

@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2048 Game - Mobile Friendly</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #faf8ef;
+            overflow: hidden;
+        }
+
+        h1 {
+            margin: 0;
+            color: #776e65;
+            font-size: 2.5rem;
+        }
+
+        .score-board {
+            display: flex;
+            justify-content: space-between;
+            width: 90%;
+            margin: 10px 0;
+        }
+
+        .score {
+            background-color: #bbada0;
+            padding: 10px;
+            border-radius: 5px;
+            color: #fff;
+            font-size: 1.2rem;
+        }
+
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            grid-gap: 10px;
+            background-color: #bbada0;
+            padding: 10px;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 400px;
+        }
+
+        .grid-cell {
+            width: 100%;
+            padding-top: 100%; /* Makes the grid-cell a perfect square */
+            position: relative;
+            background-color: #cdc1b4;
+            font-size: 2rem;
+            color: #776e65;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+
+        .grid-cell span {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .grid-cell[data-value="2"] { background-color: #eee4da; }
+        .grid-cell[data-value="4"] { background-color: #ede0c8; }
+        .grid-cell[data-value="8"] { background-color: #f2b179; color: #f9f6f2; }
+        .grid-cell[data-value="16"] { background-color: #f59563; color: #f9f6f2; }
+        .grid-cell[data-value="32"] { background-color: #f67c5f; color: #f9f6f2; }
+        .grid-cell[data-value="64"] { background-color: #f65e3b; color: #f9f6f2; }
+        .grid-cell[data-value="128"] { background-color: #edcf72; color: #f9f6f2; }
+        .grid-cell[data-value="256"] { background-color: #edcc61; color: #f9f6f2; }
+        .grid-cell[data-value="512"] { background-color: #edc850; color: #f9f6f2; }
+        .grid-cell[data-value="1024"] { background-color: #edc53f; color: #f9f6f2; }
+        .grid-cell[data-value="2048"] { background-color: #edc22e; color: #f9f6f2; }
+
+        .game-over {
+            text-align: center;
+            font-size: 2rem;
+            color: #776e65;
+            margin-top: 20px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <h1>2048</h1>
+    <div class="score-board">
+        <div class="score">Score: <span id="score">0</span></div>
+    </div>
+    <div class="grid-container" id="grid"></div>
+    <div class="game-over" id="gameOver">Game Over!</div>
+
+    <script>
+        const gridSize = 4;
+        const grid = document.getElementById('grid');
+        const scoreDisplay = document.getElementById('score');
+        const gameOverDisplay = document.getElementById('gameOver');
+        let cells = [];
+        let score = 0;
+
+        function createGrid() {
+            for (let i = 0; i < gridSize * gridSize; i++) {
+                const cell = document.createElement('div');
+                cell.classList.add('grid-cell');
+                cell.dataset.value = 0;
+                const span = document.createElement('span');
+                cell.appendChild(span);
+                grid.appendChild(cell);
+                cells.push(cell);
+            }
+            addRandomTile();
+            addRandomTile();
+            updateGrid();
+        }
+
+        function addRandomTile() {
+            const emptyCells = cells.filter(cell => cell.dataset.value == 0);
+            if (emptyCells.length > 0) {
+                const randomCell = emptyCells[Math.floor(Math.random() * emptyCells.length)];
+                randomCell.dataset.value = Math.random() < 0.9 ? 2 : 4;
+            }
+        }
+
+        function updateGrid() {
+            cells.forEach(cell => {
+                const value = cell.dataset.value;
+                cell.querySelector('span').textContent = value > 0 ? value : '';
+                cell.dataset.value = value;
+            });
+        }
+
+        function move(direction) {
+            let moved = false;
+
+            for (let row = 0; row < gridSize; row++) {
+                let rowValues = [];
+                for (let col = 0; col < gridSize; col++) {
+                    const index = direction === 'up' || direction === 'down'
+                        ? col * gridSize + row
+                        : row * gridSize + col;
+
+                    rowValues.push(parseInt(cells[index].dataset.value, 10));
+                }
+
+                if (direction === 'right' || direction === 'down') {
+                    rowValues = rowValues.reverse();
+                }
+
+                const merged = mergeRow(rowValues);
+                if (merged.moved) moved = true;
+                if (direction === 'right' || direction === 'down') {
+                    merged.values = merged.values.reverse();
+                }
+
+                for (let col = 0; col < gridSize; col++) {
+                    const index = direction === 'up' || direction === 'down'
+                        ? col * gridSize + row
+                        : row * gridSize + col;
+
+                    cells[index].dataset.value = merged.values[col];
+                }
+            }
+
+            if (moved) {
+                addRandomTile();
+                updateGrid();
+                checkGameOver();
+            }
+        }
+
+        function mergeRow(row) {
+            const filtered = row.filter(value => value > 0);
+            const merged = [];
+            let moved = false;
+
+            while (filtered.length > 0) {
+                if (filtered.length > 1 && filtered[0] === filtered[1]) {
+                    merged.push(filtered.shift() * 2);
+                    score += merged[merged.length - 1];
+                    filtered.shift();
+                    moved = true;
+                } else {
+                    merged.push(filtered.shift());
+                }
+            }
+
+            while (merged.length < gridSize) {
+                merged.push(0);
+            }
+
+            return { values: merged, moved };
+        }
+
+        function checkGameOver() {
+            if (cells.some(cell => cell.dataset.value == 0)) return;
+
+            for (let row = 0; row < gridSize; row++) {
+                for (let col = 0; col < gridSize; col++) {
+                    const index = row * gridSize + col;
+                    const value = parseInt(cells[index].dataset.value, 10);
+
+                    if (
+                        (col < gridSize - 1 && value === parseInt(cells[index + 1].dataset.value, 10)) ||
+                        (row < gridSize - 1 && value === parseInt(cells[index + gridSize].dataset.value, 10))
+                    ) {
+                        return;
+                    }
+                }
+            }
+
+            gameOverDisplay.style.display = 'block';
+        }
+
+        // Touch event handlers
+        let touchStartX = 0;
+        let touchStartY = 0;
+
+        document.addEventListener('touchstart', (event) => {
+            touchStartX = event.touches[0].clientX;
+            touchStartY = event.touches[0].clientY;
+        });
+
+        document.addEventListener('touchend', (event) => {
+            const touchEndX = event.changedTouches[0].clientX;
+            const touchEndY = event.changedTouches[0].clientY;
+
+            const deltaX = touchEndX - touchStartX;
+            const deltaY = touchEndY - touchStartY;
+
+            if (Math.abs(deltaX) > Math.abs(deltaY)) {
+                if (deltaX > 0) move('right');
+                else move('left');
+            } else {
+                if (deltaY > 0) move('down');
+                else move('up');
+            }
+
+            scoreDisplay.textContent = score;
+        });
+
+        createGrid();
+    </script>
+</body>
+</html>

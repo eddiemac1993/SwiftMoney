@@ -1,0 +1,885 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Moji-Mayhem</title>
+  </head>
+  <style>body {
+  background-color:black;
+  -moz-user-select: none;
+   -khtml-user-select: none;
+   -webkit-user-select: none;
+}
+
+.reels {
+  
+  position:absolute;
+  display:block;
+  height:68vh;
+  width:78.5vw;
+  left:1.5vw;
+  top:17vh;
+  max-width:700px;
+  max-height:800px;
+  z-index:2;
+  cursor:default;
+  overflow:hidden;
+ 
+}
+
+#reel1 {
+  height: 800vh;
+  width: 14vw;
+  max-width:130px;
+  border-left:0.1vw solid black;
+  text-align:center;
+  background-color:thistle;
+  line-height:17vh;
+  line-spacing:vh;
+  font-size: 300%;
+  position:absolute;
+  left:4%;
+  top: -85vh;
+  overflow:hidden;
+  animation:reel1ColorChange 10s infinite;
+}
+
+#reel2 {
+  height: 800vh;
+  width: 14vw;
+  max-width:130px;
+  border-left:0.1vw solid black;
+  text-align:center;
+  background-color:lightblue;
+  line-height:17vh;
+  font-size: 300%;
+  position:absolute;
+  left:21%;
+  top:-390vh;
+  overflow:hidden;
+  animation:reel2ColorChange 10s infinite;
+}
+
+#reel3 {
+  height: 800vh;
+  width: 14vw;
+  max-width:130px;
+  border-left:0.1vw solid black;
+  text-align:center;
+  background-color:lightgray;
+  line-height:17vh;
+  font-size: 300%;
+  position:absolute;
+  left:38%;
+  top:-50vh;
+  overflow:hidden;
+  animation:reel3ColorChange 10s infinite;
+}
+
+#reel4 {
+  height: 800vh;
+  width: 14vw;
+  max-width:130px;
+  text-align:center;
+  border-left:0.1vw solid black;
+  background-color:palegoldenrod;
+  line-height:17vh;
+  font-size: 300%;
+  position:absolute;
+  left:55%;
+  top:-85vh;
+  overflow:hidden;
+  animation:reel4ColorChange 10s infinite;
+  
+}
+
+#reel5 {
+  height: 800vh;
+  width: 14vw;
+  max-width:130px;
+  border-left:0.1vw solid black;
+  text-align:center;
+  background-color:tan;
+  line-height:17vh;
+  font-size: 300%;
+  position:absolute;
+  left:72%;
+  top:-390vh;
+  overflow:hidden;
+  animation:reel5ColorChange 10s infinite;
+}
+
+#reelSideLeft {
+  height: 100vh;
+  width: 3vw;
+  max-width:30px;
+  text-align:center;
+  background-color:black;
+  color:white;
+  line-height:17vh;
+  font-size: 120%;
+  position:absolute;
+  left:0%;
+  text-orientation:upright;
+  overflow:hidden;
+  }
+ #reelSideRight {
+  height: 100vh;
+  width: 2.5vw;
+  max-width:30px;
+  text-align:center;
+  background-color:black;
+  color:white;
+  line-height:17vh;
+  font-size: 120%;
+  position:absolute;
+  left:89.7%;
+  overflow:hidden;
+  }
+
+#reelTop {
+  width:72vw;
+  height:1vh;
+  max-width:650px;
+  background-color:black;
+  position:absolute;
+  top:0px;
+  left:0vw;
+}
+
+#reelBottom {
+  width:72vw;
+  height:1vh;
+  max-width:650px;
+  background-color:black;
+  position:absolute;
+  top:67vh;
+  left:0vw;
+}
+
+.machine{
+  height:100vh;
+  width:78.5vw;
+  max-width:700px;
+  max-height:800px;
+  background-image:radial-gradient(black, darkgray, gray, black);
+  border-color:blue;
+  position:absolute;
+  overflow:hidden;
+  z-index:1;
+}
+
+#topDisplay {
+  width:72vw;
+  height:13vh;
+  max-width:655px;
+  background-color:black;
+  verticle-align: middle;
+  border-style:double;
+  border-width:3px;
+  border-color:darkgray;
+  overflow:hidden;
+  font-family:courier;
+  text-align:center;
+  text-transform:uppercase;
+  position:absolute;
+  top:1vh;
+  left:1.5vw;
+  animation-name:topDisplayAni;
+  animation-iteration-count:infinite;
+  animation-duration:5s;
+}
+
+#topDisplayGlass {
+  width:74vw;
+  height:14vh;
+  max-width:661px;
+  background-color:rgba(33, 33, 33, 0.7);
+  color:white;
+  text-transform:uppercase;
+  font-weight:bold;
+  font-weight:bold;
+  font-size: 240%;
+  line-height:13vh;
+  overflow:hidden;
+  text-align:center;
+  position:absolute;
+  top:1vh;
+  left:1.5vw;
+}
+
+#spin {
+  height: 10vh;
+  width: 17vw;
+  border-color:black;
+  border-radius:6%;
+  color:white;
+  box-shadow: 0px 15px 10px black;
+  font-family:courier;
+  font-weight:bold;
+  font-size:120%;
+  text-align:center;
+  background-image:radial-gradient(red, black);
+  position:relative;
+  left:77%;
+  max-width:130px;
+  top:86vh;
+  overflow:hidden;
+}
+
+#spin:active {
+  top:87.5vh;
+  box-shadow: -1px 1px 1px black;
+  border:1px solid black;
+  color:pink;
+}
+
+#totalMoney {
+ height: 8vh;
+  width: 16vw;
+  border-radius:6%;
+  color:goldenrod;
+  line-height:8vh;
+  box-shadow: 0px 0px 10px darkgray;
+  font-family:courier;
+  font-weight:bold;
+  font-size:150%;
+  text-align:center;
+  background-color:black;
+  position:relative;
+  left:2%;
+  max-width:130px;
+  top:76vh;
+  overflow:hidden;
+}
+
+#totalMoneySign {
+ height: 3vh;
+  width: 16vw;
+  color:tan;
+  border-radius:3%;
+  box-shadow: 0px 0px 10px black;
+  font-family:sans-serif;
+  font-weight:bold;
+  font-size:80%;
+  text-align:center;
+  background-color:green;
+  text-transform:uppercase;
+  position:relative;
+  left:2%;
+  max-width:130px;
+  top:76.2vh;
+  overflow:hidden;
+}
+
+#betAmount {
+  height: 8vh;
+  width: 16vw;
+  border-radius:6%;
+  color:goldenrod;
+  line-height:8vh;
+  box-shadow: 0px 0px 10px darkgray;
+  font-family:courier;
+  font-weight:bold;
+  font-size:150%;
+  text-align:center;
+  background-color:black;
+  position:relative;
+  left:44.5%;
+  max-width:136px;
+  top:62vh;
+  overflow:hidden;
+}
+
+#betSign{
+  height: 3vh;
+  width: 16vw;
+  color:white;
+  border-radius:3%;
+  box-shadow: 0px 0px 10px black;
+  font-family:sans-serif;
+  line-height:3vh;
+  font-size:70%;
+  text-align:center;
+  background-image:linear-gradient(darkgray, black);
+  text-transform:uppercase;
+  position:relative;
+  left:44.5%;
+  max-width:136px;
+  top:73.2vh;
+  cursor:default;
+  overflow:hidden;
+}
+
+#plusBet {
+  height: 4vh;
+  width: 4vw;
+  color:white;
+  border-radius:3%;
+  box-shadow:0px 3px 3px black;
+  font-family:sans-serif;
+  line-height:4vh;
+  font-size:200%;
+  text-align:center;
+  background-color:firebrick;
+  text-transform:uppercase;
+  position:relative;
+  left:66%;
+  max-width:43px;
+  top:54.4vh;
+  cursor:default;
+  overflow:hidden;
+}
+
+#plusBet:active {
+  top:54.9vh;
+  box-shadow:0px 0px 1px black;
+}
+
+#minusBet {
+  height: 4vh;
+  width: 4vw;
+  color:white;
+  border-radius:3%;
+  box-shadow:0px 3px 3px black;
+  font-family:sans-serif;
+  line-height:3vh;
+  font-size:200%;
+  text-align:center;
+  background-color:cadetblue;
+  text-transform:uppercase;
+  position:relative;
+  left:37.7%;
+  max-width:43px;
+  top:50.4vh;
+  cursor:default;
+  overflow:hidden;
+}
+
+#minusBet:active {
+  top:50.9vh;
+  box-shadow:0px 0px 1px black;
+}
+
+#minBet {
+  height: 6vh;
+  width: 4vw;
+  color:white;
+  border-radius:3%;
+  box-shadow:0px 3px 3px black;
+  font-family:sans-serif;
+  line-height:5vh;
+  writing-mode:vertical-rl;
+  text-orientation:upright;
+  font-size:50%;
+  text-align:center;
+  background-color:darkcyan;
+  text-transform:uppercase;
+  position:relative;
+  left:37.7%;
+  max-width:43px;
+  top:45.3vh;
+  cursor:default;
+  overflow:hidden;
+}
+
+#minBet:active {
+  top:45.8vh;
+  box-shadow:0px 0px 1px black;
+}
+
+#maxBet {
+  height: 6vh;
+  width: 4vw;
+  color:white;
+  border-radius:3%;
+  box-shadow: 0px 0px 10px black;
+  font-family:sans-serif;
+  line-height:4vh;
+  font-size:50%;
+  text-align:center;
+  background-color:darkred;
+  box-shadow:0px 3px 3px black;
+  text-transform:uppercase;
+  writing-mode:vertical-rl;
+  text-orientation:upright;
+  position:relative;
+  left:66%;
+  max-width:43px;
+  top:51.2vh;
+  cursor:default;
+  overflow:hidden;
+}
+
+#maxBet:active {
+  top:51.7vh;
+  box-shadow:0px 0px 1px black;
+}
+
+#level {
+  height: 8vh;
+  width: 8vw;
+  border-radius:6%;
+  color:white;
+  line-height:8vh;
+  box-shadow: 0px 0px 10px darkgray;
+  font-family:courier;
+  font-weight:bold;
+  font-size:170%;
+  text-align:center;
+  background-image:radial-gradient(turquoise, black);
+  position:relative;
+  left:22.5%;
+  max-width:60px;
+  top:31.3vh;
+  overflow:hidden;
+}
+
+#levelSign{
+  height: 3vh;
+  width: 8vw;
+  color:aquamarine;
+  border-radius:3%;
+  box-shadow: 0px 0px 10px black;
+  font-family:sans-serif;
+  line-height:3vh;
+  font-size:60%;
+  text-align:center;
+  background-color:black;
+  text-transform:uppercase;
+  position:relative;
+  left:22.5%;
+  max-width:60px;
+  top:42.2vh;
+  overflow:hidden;
+}
+
+#winLine {
+  width:73vw;
+  max-width:660px;
+  height:14vh;
+  font-family:courier;
+  font-size:120%;
+  font-weight:bold;
+  text-align:center;
+  line-height:15vh;
+  background-image:radial-gradient(red, rgba(100, 100, 100, 0.3));
+  z-index:0;
+  color:white;
+  position:relative;
+  top: 1vh;
+  left: 1.5vw;
+  cursor:default;
+}
+
+/*@keyframes reel1ColorChange {
+  0% {background-image:linear-gradient(to right, white, thistle)}
+  25% {background-image:linear-gradient(to right, lightcoral, lightgray)}
+  50% {background-image:linear-gradient(to right, palegoldenrod, aqua)}
+  75% {background-image:linear-gradient(to right, white, tan)}
+  100% {background-image:linear-gradient(to right, white, thistle)}
+}
+
+@keyframes reel2ColorChange {
+  0% {background-image:linear-gradient(to right, thistle, lightcoral)}
+  25% {background-image:linear-gradient(to right, lightgray, palegoldenrod)}
+  50% {background-image:linear-gradient(to right, aqua, white)}
+  75% {background-image:linear-gradient(to right, tan, white)}
+  100% {background-image:linear-gradient(to right, thistle, lightcoral)}
+}
+
+@keyframes reel3ColorChange {
+  0% {background-image:linear-gradient(to right, lightcoral, lightgray)}
+  25% {background-image:linear-gradient(to right, palegoldenrod, aqua)}
+  50% {background-image:linear-gradient(to right, white, tan)}
+  75% {background-image:linear-gradient(to right, white, thistle)}
+  100% {background-image:linear-gradient(to right, lightcoral, lightgray)}
+}
+
+@keyframes reel4ColorChange {
+  0% {background-image:linear-gradient(to right, lightgray, palegoldenrod)}
+  25% {background-image:linear-gradient(to right, aqua, white)}
+  50% {background-image:linear-gradient(to right, tan, white)}
+  75% {background-image:linear-gradient(to right, thistle, lightcoral)}
+  100% {background-image:linear-gradient(to right, lightgray, palegoldenrod)}
+}
+
+@keyframes reel5ColorChange {
+  0% {background-image:linear-gradient(to right, palegoldenrod, aqua)}
+  25% {background-image:linear-gradient(to right, white, tan)}
+  50% {background-image:linear-gradient(to right, white, thistle)}
+  75% {background-image:linear-gradient(to right, lightcoral, lightgray)}
+  100% {background-image:linear-gradient(to right, palegoldenrod, aqua)}
+}*/
+
+@keyframes topDisplayAni {
+  0% {background-image:linear-gradient(to right, black, orange)}
+  33% {background-image:linear-gradient(to right, red, darkgray)}
+  66% {background-image:linear-gradient(to right, green, blue)}
+  100% {background-image:linear-gradient(to right, black, orange)}
+}
+</style>
+  <body scroll="no" style="margin:0; overflow:hidden;">
+    <span class="reels">
+      <div id="reel1">💰</br>🤑</br>🍆</br>😟</br>💲</br>👿</br>🚽</br>🤢</br>🚽</br>😠</br>🕴️</br>💩</br>🔥</br>💰</br>🤑</br>💩</br>😟</br>💲</br>👿</br>💎</br>🤢</br>🚽</br>😠</br>🕴️</br>💰</br>😠</br>🤑</br>💎</br>💎</br>💎</br>💎</br>🍆</br>😟</br>💲</br>👿</br>💎</br>🤢</br>🚽</br>😠</br>💲</br> 💲</br>💲</br>💲</br>🕴️</br>💩</br>🔥</br>👿</div>
+      <div id="reel2">💰</br>🤑</br>🍆</br>😟</br>💲</br>👿</br>💎</br>🤢</br>🚽</br>😠</br>🕴️</br>💩</br>🔥</br>💰</br>🤑</br>🍆</br>😟</br>💩</br>👿</br>💎</br>🤢</br>🚽</br>😠</br>👿</br>💩</br>💰</br>🤑</br>💎</br>💎</br>💎</br>💎</br>🍆</br>😟</br>💲</br>👿</br>💎</br>💰</br>🚽</br>😠</br>💲</br>💲</br>💲</br>💲</br>🕴️</br>💩</br>🔥</br>👿</div>
+      <div id="reel3">💰</br>🤑</br>🍆</br>👿</br>💰</br>👿</br>💎</br>🤢</br>🚽</br>😠</br>🕴️</br>🚽</br>🔥</br>💰</br>🤑</br>🍆</br>😟</br>💲</br>👿</br>💎</br>💩</br>🚽</br>😠</br>🕴️</br>💩</br>💰</br>🤑</br>💎</br>💎</br>💎</br>💎</br>🍆</br>😟</br>💲</br>👿</br>💎</br>🤢</br>🚽</br>😠</br>💲</br>💲</br>💲</br>💲</br>🕴️</br>💩</br>🔥</br>👿</div>
+      <div id="reel4">💰</br>🤑</br>🍆</br>😟</br>💲</br>👿</br>💎</br>🤢</br>🚽</br>😠</br>🕴️</br>💩</br>🔥</br>🚽</br>🤑</br>🍆</br>😟</br>💲</br>👿</br>💎</br>🤢</br>🚽</br>😠</br>💩</br>💎</br>💰</br>🤑</br>💎</br>💎</br>💎</br>💎</br>💰</br>😟</br>💲</br>👿</br>💎</br>🤢</br>🚽</br>😠</br>💲</br> 💲</br>💲</br>💲</br>🕴️</br>💩</br>🔥</br>👿</div>
+      <div id="reel5">💰</br>🤑</br>🍆</br>😟</br>💲</br>👿</br>💎</br>🤢</br>🚽</br>😠</br>🕴️</br>💩</br>🔥</br>💰</br>🤑</br>🍆</br>🚽</br>💲</br>👿</br>💎</br>🤢</br>🚽</br>😠</br>🕴️</br>💰</br>💩</br>🤑</br>💎</br>💎</br>💎</br>💎</br>🍆</br>😟</br>💲</br>💰</br>💎</br>🤢</br>🚽</br>😠</br>💲</br> 💲</br> 💲</br> 💲</br> 🕴️</br>💩</br>🔥</br>👿</div>
+      <div id="reelSideLeft">4</br>3</br>2</br>1</div>
+      <div id="reelSideRight">4</br>3</br>2</br>1</div>
+      <div id="reelTop"></div>
+      <div id="reelBottom"></div>
+    </span>
+    <span class="machine">
+      <div id="topDisplay">💰 🤑 🍆 😟 💲 👿 💎 🤢 🚽 😠 🕴️ 💩 🔥 💰 🤑 🍆 😟 💲 👿 💎 🤢 🚽 😠 🕴️ 💩 🔥 💰 🤑 🍆 😟 💲 👿 💎 🤢 🚽 😠 🕴️💰 🤑 🍆 😟 💲 👿 💎 🤢 🚽 😠 🕴️ 💩 🔥 💰 🤑 🍆 😟 💲 👿 💎 🤢 🚽 😠 🕴️ 💩 🔥 💰 🤑 🍆 😟 💲 👿 💎 🤢 🚽 😠 🕴️💰 🤑 🍆 😟 💲 👿 💎 🤢 🚽 😠 🕴️ 💩 🔥 💰 🤑 🍆 😟 💲 👿 💎 🤢</div>
+      <div id="topDisplayGlass">Moji-Mayhem</div>
+      <div id="reelBox"></div>
+        <button id="spin">SPIN</button>
+      <div id="totalMoney"></div>
+      <div id="totalMoneySign">Money</div>
+      <div id="betSign">BET PER LINE</div>
+      <div id="betAmount"></div>
+      <div id="plusBet">+</div>
+      <div id="minusBet">-</div>
+      <div id="maxBet">MAX</div>
+      <div id="minBet">min</div>
+      <div id="levelSign">Level</div>
+      <div id="level">1</div>
+    </span>
+<div id="winLine">WINNING LINE!</div>
+<div id="jackpot">JACKPOT!</div>
+</span>
+<script>//Buttons and Displays
+///////////////////////////////////////////////////////////
+var getMoney = setInterval(getMoney, 100);
+var getBet = setInterval(getBet, 50);
+var getLevel = setInterval(getLevel, 100);
+
+var winBanner = document.getElementById("winLine");
+
+function getMoney() {
+    var moneyDisplay = document.getElementById("totalMoney").innerHTML= "$" + money;
+  spinButton = false;
+}
+
+function getBet() {
+  if (money < 40) {
+    bet = money/4;
+  }
+  document.getElementById("betAmount").innerHTML = "$" + (bet * 4);
+  }
+
+var bet = 1;
+var increaseButton = document.getElementById("plusBet");
+increaseButton.addEventListener("click", increaseBet);
+
+function increaseBet() {
+  if (bet < 10) {
+  bet += 1;
+  }
+}
+
+var decreaseButton = document.getElementById("minusBet");
+decreaseButton.addEventListener("click", decreaseBet);
+
+function decreaseBet() {
+  if (bet > 1) {
+    bet -= 1;
+  }
+}
+
+var maximumBet = document.getElementById("maxBet");
+maxBet.addEventListener("click", maxTheBet);
+
+function maxTheBet() {
+  while(bet < 10) {
+    bet += 1;
+  }
+}
+
+var minimumBet = document.getElementById("minBet");
+minimumBet.addEventListener("click", minTheBet);
+
+function minTheBet() {
+  while(bet > 1) {
+    bet -= 1;
+  }
+}
+
+//money and level system
+////////////////////////////////////////////////////////////
+
+
+var money = 400;
+var moneyDisplay = document.getElementById("totalMoney").innerHTML= "$" + money;
+var level = 1;
+
+function getLevel() {
+var theLevel = document.getElementById("level").innerHTML = level;
+}
+
+//Reel Spin System
+///////////////////////////////////////////////////////////
+
+var spinButton = document.getElementById("spin");
+spinButton.addEventListener("click", startGame);
+
+function spinTheReels() {
+  
+  if (money > 500 && money <1000) {
+  level = 2;
+var theLevel = document.getElementById("level").innerHTML = level;
+} else if (money >= 1000 && money <3000) {
+  level = 3;
+var theLevel = document.getElementById("level").innerHTML = level;
+} else if (money >= 10000) {
+  level = 4;
+var theLevel = document.getElementById("level").innerHTML = level;
+} else {
+    level = 1;
+  }
+  
+   reel1.style.backgroundColor = null;
+   reel2.style.backgroundColor = null;
+   reel3.style.backgroundColor = null;
+   reel4.style.backgroundColor = null;
+   reel5.style.backgroundColor = null;
+        
+winBanner.style.zIndex="0";
+ 
+var loseArray = ["-660", "-457.5", "-50", "-85", "-135", "-170", "-220", "-595", "-105", "-505", "-50", "-25", "-255", "-510", "-510", "-510", "-457.5", "-457.5", "-215", "-95", "-315", "-75", "-145", "-140", "-640", "-235", "-230", "-85"]
+  
+//Spin The Reels - Where will the reels land?
+var resultArray = [ "lose", "lose", "lose", "lose", "lose", "lose", "lose", "lose", "lose", "lose", "lose", "lose", "lose", "lose", "lose", "lose", "lose", "lose", "lose", "lose", "fullDiamonds", "fullDollarSign", "line1Toilet", "line2Poop", "line3Bags", "line4Angry", "lose",  "lose", "lose", "lose", "lose", "lose", "lose", "lose", "lose", "lose", "lose", "lose", "lose", "line1Toilet", "line1Toilet", "line3Bags", "line3Bags", "line4Angry", "lose" ]
+var randResult = resultArray[Math.floor(Math.random()*resultArray.length)];
+                                         
+ switch (randResult) {
+   case "fullDollarSign":
+     rand1 = -660;
+     rand2 = -660;
+     rand3 = -660;
+     rand4 = -660;
+     rand5 = -660;
+     break;
+   case "fullDiamonds":
+     rand1 = -457.5;
+     rand2 = -457.5;
+     rand3 = -457.5;
+     rand4 = -457.5;
+     rand5 = -457.5;
+     var winResult = "fullDiamonds";
+     break;
+   case "line1Toilet":
+     rand1 = -50;
+     rand2 = -85;
+     rand3 = -135;
+     rand4 = -170;
+     rand5 = -220;
+     break;
+   case "line2Poop":
+     rand1 = -220;
+     rand2 = -255;
+     rand3 = -305;
+     rand4 = -355;
+     rand5 = -390;
+     break;
+   case "line3Bags":
+     rand1 = -390;
+     rand2 = -595;
+     rand3 = -50;
+     rand4 = -510;
+     rand5 = -560;
+     break;
+   case "line4Angry":
+     rand1 = -85;
+     rand2 = -390;
+     rand3 = -48.5;
+     rand4 = -85;
+     rand5 = -85;
+     break;
+   case "lose":
+     rand1 = Math.floor(Math.random()*-700);
+     rand2 = Math.floor(Math.random()*-700);
+     rand3 = Math.floor(Math.random()*-700);
+     rand4 = Math.floor(Math.random()*-700);
+     rand5 = Math.floor(Math.random()*-700);
+     break;
+   default:
+     rand1 = -5;
+     rand2 = -10;
+     rand3 = -15;
+     rand4 = -20;
+     rand5 = -25;
+     break;
+     }
+  
+  rand1;
+  rand2;
+  rand3;
+  rand4;
+  rand5;
+  
+  setTimeout(function bannerDisplay() {
+    
+    var countUpInt = setInterval(CountUp, 100);
+    
+    switch (randResult) {
+      case "fullDollarSign":
+        winBanner.style.zIndex="2";
+        winBanner.innerHTML="💲WIN💲 $" + (100*bet);
+        reel1.style.backgroundColor = "green";
+        reel2.style.backgroundColor = "green";
+        reel3.style.backgroundColor = "green";
+        reel4.style.backgroundColor = "green";
+        reel5.style.backgroundColor = "green";
+        money += (50*bet);
+        function CountUp() {
+          while (money < (money + (100*bet))) {
+            money++;
+        var moneyDisplay = document.getElementById("totalMoney").innerHTML= "$" + money;
+          }
+        }
+        break;
+      case "fullDiamonds":
+        winBanner.style.zIndex="2";
+        winBanner.innerHTML="💎JACKPOT💎 Win $" + (200*bet);
+        reel1.style.backgroundColor = "white";
+        reel2.style.backgroundColor = "white";
+        reel3.style.backgroundColor = "white";
+        reel4.style.backgroundColor = "white";
+        reel5.style.backgroundColor = "white";
+        money += (200*bet);
+        var moneyDisplay = document.getElementById("totalMoney").innerHTML= "$" + money;
+        break;
+      case "line1Toilet":
+        winBanner.style.zIndex="2";
+        winBanner.style.backgroundColor="white";
+        winBanner.innerHTML="🚽WHAT STINKS?🚽 $" + (15*bet);
+        money += (15*bet);
+        var moneyDisplay = document.getElementById("totalMoney").innerHTML= "$" + money;
+        break;
+      case "line2Poop":
+        winBanner.style.zIndex="2";
+        winBanner.style.backgroundColor="brown";
+        winBanner.innerHTML="💩CRAP!💩 $" + (5*bet);
+        money += (5*bet);
+        var moneyDisplay = document.getElementById("totalMoney").innerHTML= "$" + money;
+        break;
+      case "line3Bags":
+        winBanner.style.zIndex="2";
+        winBanner.style.backgroundColor="tan";
+        winBanner.innerHTML="💰Bag it!💰 $" + (20*bet);
+        money += (20*bet);
+        var moneyDisplay = document.getElementById("totalMoney").innerHTML= "$" + money;
+        break;
+      case "line4Angry":
+        winBanner.style.zIndex="2";
+        winBanner.style.backgroundColor="black";
+        winBanner.innerHTML="👿Watch Out!👿 $" + (40*bet);
+        money += (40*bet);
+        var moneyDisplay = document.getElementById("totalMoney").innerHTML= "$" + money;
+        break;
+      default:
+        winBanner.style.zIndex="0";
+        
+    }
+  }, 1000);
+  
+  //Spin The Reels - How do they spin??
+  //////////////////////////////////////////////////////////////////
+  
+  var spinner1 = document.getElementById("reel1");
+  var spinner2 = document.getElementById("reel2");
+  var spinner3 = document.getElementById("reel3");
+  var spinner4 = document.getElementById("reel4");
+  var spinner5 = document.getElementById("reel5");
+  var pos1 = -10;
+  var pos2 = -5;
+  var pos3 = -25;
+  var pos4 = -35;
+  var pos5 = -15;
+  
+  var id1 = setInterval(row1,1);
+  var id2 = setInterval(row2,1);
+  var id3 = setInterval(row3,1);
+  var id4 = setInterval(row4,1);
+  var id5 = setInterval(row5,1);
+  
+  //It costs money to spin!
+  money -= (bet * 4);
+  var moneyDisplay = document.getElementById("totalMoney").innerHTML= "$" + money;
+  
+ function row1() {
+    if (pos1 <= rand1) {
+      clearInterval(id1);
+    } else {
+      pos1-= 5;
+      spinner1.style.top = pos1 + "vh";
+      }
+    }
+  
+  function row2() {
+    setTimeout (function row2time() {
+    if (pos2 <= rand2) {
+      clearInterval(id2);
+    } else {
+      pos2-= 5;
+      spinner2.style.top = pos2 + "vh";
+      }
+    }, 20);
+    }
+  
+  function row3() {
+    setTimeout (function row3time() {if (pos3 <= rand3) {
+      clearInterval(id3);
+    } else {
+      pos3-= 5;
+      spinner3.style.top = pos3 + "vh";
+      }
+     }, 40);
+    }
+  
+  function row4() {
+    setTimeout ( function row4time() {
+      if (pos4 <= rand4) {
+      clearInterval(id4);
+    } else {
+      pos4-= 5;
+      spinner4.style.top = pos4 + "vh";
+      }
+    }, 60);
+    }
+  
+  function row5() {
+    setTimeout ( 
+      function row5time() {
+        if (pos5 <= rand5) {
+      clearInterval(id5);
+    } else {
+      pos5-= 5; 
+      spinner5.style.top = pos5 + "vh";
+      }
+        }, 80);
+    }
+  }
+//Reel Spin System - Win System
+//////////////////////////////////////////////////////////////////////////
+
+function startGame() {
+if (money > 0 && money < 5000) {
+spinTheReels();
+} else if (money >= 5000) {
+  alert("OVER $5,000!? You've put those Moji's back in line! You're truly a master. Now go get some fresh air.")
+  money = 1000000000;
+}
+  else {
+    winBanner.style.zIndex = "2";
+    winBanner.style.top = "40vh";
+    winBanner.innerHTML = "You're Broke! Refresh the page to try again!";
+    winBanner.style.height = "32vh";
+  }
+}</script>
+  </body>
+</html>

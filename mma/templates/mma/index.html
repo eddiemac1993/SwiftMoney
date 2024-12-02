@@ -100,11 +100,14 @@
             <i class="fas fa-taxi"></i> Request Ride
         </a>
     {% else %}
+    {% if user.is_driver %}
         <p class="taxi-message">Hello, {{ user.username }}! Manage your taxi requests here:</p>
-        <a href="{% url 'driver_dashboard' %}" class="cta-button">
-            <i class="fas fa-taxi"></i> Go to Driver Dashboard
-        </a>
+    {% else %}
+        <p class="taxi-message">Hello, {{ user.username }}! Manage your Cash</p>
+{% endif %}
+
     {% endif %}
+
     <a href="{% url 'ride_requests_by_ip' %}" class="btn btn-primary">View My Ride Requests</a>
 
     <div class="feature-grid">

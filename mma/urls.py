@@ -3,6 +3,12 @@ from . import views
 
 urlpatterns = [
     path('home/', views.index, name='home'),
+    path('slot/', views.slot_view, name='slot'),
+    path('2048/', views.number_view, name='2048'),
+    path('xo/', views.xo_view, name='xo'),
+    path('tetris/', views.tetris_view, name='tetris'),
+    path('simon/', views.simon_view, name='simon'),
+    path('snake/', views.snake_view, name='snake'),
     path("create-ride/", views.create_ride_request, name="create_ride"),
     path("driverdashboard/", views.driver_dashboard, name="driver_dashboard"),
     path("accept-ride/<int:pk>/", views.accept_ride_request, name="accept_ride_request"),

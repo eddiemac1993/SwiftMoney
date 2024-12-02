@@ -2,41 +2,51 @@
 
 {% block content %}
 <style>
+    /* Container for the game links, with a flexible layout */
     .game-links-container {
         display: flex;
         flex-wrap: wrap; /* Ensures responsiveness for smaller screens */
         gap: 15px; /* Space between items */
         justify-content: center; /* Center-align items */
         padding: 20px;
+        margin-bottom: 20px;
     }
 
+    /* Style for individual game link buttons */
     .game-link-btn {
         color: white;
         background-color: var(--card-background);
-        padding: 10px 15px;
+        padding: 12px 20px;
         text-decoration: none;
         border: 2px solid white; /* White border */
         border-radius: 20px; /* Rounded corners */
         box-sizing: border-box; /* Ensures padding is inside the border */
-        transition: transform 0.2s ease; /* Smooth scaling transition */
+        transition: transform 0.2s ease, background-color 0.3s ease; /* Smooth scaling and color transition */
+        font-size: 1.1rem; /* Larger text for better readability */
+        text-align: center;
     }
 
+    /* Hover effect for the game link buttons */
     .game-link-btn:hover {
-        transform: scale(1.1); /* Scale effect on hover */
+        transform: scale(1.05); /* Slightly scale the button */
+        background-color: #333; /* Darken background on hover */
     }
 
+    /* Icon size adjustment */
     .game-link-btn i {
-        font-size: 1.2rem; /* Icon size */
-        margin-right: 5px; /* Space between icon and text */
+        font-size: 1.3rem; /* Icon size */
+        margin-right: 8px; /* Space between icon and text */
     }
 
+    /* Mobile responsiveness */
     @media (max-width: 600px) {
         .game-link-btn {
-            padding: 8px 12px;
-            font-size: 0.9rem;
+            padding: 10px 16px;
+            font-size: 1rem; /* Adjust font size */
         }
     }
 
+    /* Styling for instructions container */
     .instructions-container {
         max-width: 600px;
         margin: auto;
@@ -51,49 +61,76 @@
         text-align: center;
         font-size: 1.5em;
         margin-bottom: 20px;
+        color: #ff69b4; /* Adding a highlight color to the heading */
     }
 
-    .instructions-container p {
+    .instructions-container p, .instructions-container ul {
         font-size: 1.1em;
         line-height: 1.6;
         color: white;
+        margin-bottom: 10px; /* Better spacing for paragraphs and lists */
+    }
+
+    .instructions-container ul {
+        padding-left: 20px; /* Indentation for list items */
+    }
+
+    .instructions-container li {
+        margin-bottom: 10px; /* Space between list items */
     }
 
 </style>
 
 <div class="container" style="max-width: 600px; margin: auto; padding: 20px;">
-    <h1 style="text-align: center; font-family: Arial, sans-serif;">Bible Quiz Game</h1>
+    <h1 style="text-align: center; font-family: Arial, sans-serif; color: white;">Bible Quiz Game</h1>
     <hr style="border: none; height: 1px; background: #ddd; margin: 20px 0;">
 
     <!-- Game Links Section -->
     <div class="game-links-container">
         <a href="{% url 'quiz' %}" class="game-link-btn">
-            <i class="fas fa-question-circle"></i> Start Bible Quiz
+            <i class="fas fa-book"></i> Start Bible Quiz
+        </a>
+        <a href="{% url 'simon' %}" class="game-link-btn">
+            <i class="fas fa-lightbulb"></i> Simon
+        </a>
+        <a href="{% url 'xo' %}" class="game-link-btn">
+            <i class="fas fa-times-circle"></i> Tic-Tac-Toe
+        </a>
+
+        <!--<a href="{% url 'tetris' %}" class="game-link-btn">
+            <i class="fas fa-gamepad"></i> Tetris
+        </a>
+        <a href="{% url 'snake' %}" class="game-link-btn">
+            <i class="fas fa-apple-alt"></i> Snake
+        </a>
+
+        <a href="{% url '2048' %}" class="game-link-btn">
+            <i class="fas fa-th"></i> 2048
+        </a>
+          <a href="{% url 'slot' %}" class="game-link-btn">
+            <i class="fas fa-th"></i> Slot
         </a>
 
         <!-- You can add more games here in the future -->
-        <a href="{% url 'create_wish' %}" class="game-link-btn" style="text-decoration: none; color: white; background-color: #ff69b4; padding: 10px 20px; border-radius: 10px; display: inline-block; font-size: 18px;">
-    <i class="fas fa-birthday-cake" style="margin-right: 8px;"></i> Create a Birthday Wish
-</a>
-
+        <a href="{% url 'create_wish' %}" class="game-link-btn" style="background-color: #ff69b4;">
+            <i class="fas fa-birthday-cake" style="margin-right: 8px;"></i> Create a Birthday Wish
+        </a>
     </div>
-<!-- Instructions Section -->
-<div class="instructions-container">
-    <h2>How to Play</h2>
-    <p>Welcome to the Bible Quiz! Test your knowledge about the Bible and earn money based on your score. Here’s how it works:</p>
-    <ul>
-        <li>You will be presented with multiple-choice questions about the Bible.</li>
-        <li>For each correct answer, you will earn points which are translated into money (K). Each correct answer is worth K 0.5, and each incorrect answer will cost you K 0.3.</li>
-        <li>Answer as many questions as you can before time runs out. There’s a countdown timer to keep track of your time!</li>
-        <li>If you want to stop the quiz and submit your score, simply click the "Done" button.</li>
-        <li>The more correct answers you give, the higher your score will be. The score represents the amount of money you could win in the game!</li>
-        <li>The top scorer at the end of the week will win a special reward! The game is part of a weekly draw, so your score could earn you even more prizes!</li>
-    </ul>
-    <p>Good luck, and may your knowledge of the Bible help you win! Remember, the more you play, the better your chances of winning the weekly reward!</p>
-</div>
 
-
-
+    <!-- Instructions Section -->
+    <div class="instructions-container">
+        <h2>How to Play Bible Quiz</h2>
+        <p>Welcome to the Bible Quiz! Test your knowledge about the Bible and earn money based on your score. Here’s how it works:</p>
+        <ul>
+            <li>You will be presented with multiple-choice questions about the Bible.</li>
+            <li>For each correct answer, you will earn points which are translated into money (K). Each correct answer is worth K 0.5, and each incorrect answer will cost you K 0.3.</li>
+            <li>Answer as many questions as you can before time runs out. There’s a countdown timer to keep track of your time!</li>
+            <li>If you want to stop the quiz and submit your score, simply click the "Done" button.</li>
+            <li>The more correct answers you give, the higher your score will be. The score represents the amount of money you could win in the game!</li>
+            <li>The top scorer at the end of the week will win a special reward! The game is part of a weekly draw, so your score could earn you even more prizes!</li>
+        </ul>
+        <p>Good luck, and may your knowledge of the Bible help you win! Remember, the more you play, the better your chances of winning the weekly reward!</p>
+    </div>
 </div>
 
 {% endblock %}

@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enhanced Tic-Tac-Toe</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            background: linear-gradient(to bottom, #6a11cb, #2575fc);
+            color: #fff;
+        }
+        .board {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin: 20px 0;
+        }
+        .cell {
+            width: 100px;
+            height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid #fff;
+            border-radius: 10px;
+            font-size: 2rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.3s, background 0.3s;
+        }
+        .cell:hover {
+            transform: scale(1.1);
+            background: rgba(255, 255, 255, 0.4);
+        }
+        .cell.taken {
+            cursor: not-allowed;
+        }
+        .cell.winning {
+            animation: glow 1s infinite alternate;
+        }
+        @keyframes glow {
+            from { box-shadow: 0 0 10px #00ff00; }
+            to { box-shadow: 0 0 20px #00ff00; }
+        }
+        .message, .scoreboard, .timer {
+            margin: 10px 0;
+            font-size: 1.5rem;
+        }
+        .reset-btn {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background: #ff5722;
+            border: none;
+            border-radius: 5px;
+            color: #fff;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        .reset-btn:hover {
+            background: #e64a19;
+        }
+        .timer-bar {
+            width: 100%;
+            height: 10px;
+            background: #fff;
+            margin: 10px 0;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        .timer-bar-inner {
+            height: 100%;
+            background: #00ff00;
+            transition: width 1s linear;
+        }
+        @media (max-width: 600px) {
+            .cell {
+                width: 80px;
+                height: 80px;
+                font-size: 1.5rem;
+            }
+            .message, .scoreboard, .timer {
+                font-size: 1.2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="scoreboard" id="scoreboard">X: 0 | O: 0</div>
+<div class="timer">Time left: <span id="timer">10</span>s</div>
+<div class="timer-bar">
+    <div class="timer-bar-inner" id="timerBar"></div>
+</div>
+<div class="board" id="board"></div>
+<div class="message" id="message"></div>
+<button class="reset-btn" id="resetBtn">Reset Game</button>
+
+<script>
+    const board = document.getElementById('board');
+    const message = document.getElementById('message');
+    const timerElement = document.getElementById('timer');
+    const timerBar = document.getElementById('timerBar');
+    const resetBtn = document.getElementById('resetBtn');
+    const scoreboard = document.getElementById('scoreboard');
+
+    const cells = [];
+    let currentPlayer = 'X';
+    let gameOver = false;
+    let timeLeft = 10;
+    let timerInterval;
+    let scores = { X: 0, O: 0 };
+
+    // Create the board cells
+    for (let i = 0; i < 9; i++) {
+        const cell = document.createElement('div');
+        cell.classList.add('cell');
+        cell.dataset.index = i;
+        cell.addEventListener('click', handleCellClick);
+        board.appendChild(cell);
+        cells.push(cell);
+    }
+
+    function handleCellClick(event) {
+        const cell = event.target;
+        if (cell.classList.contains('taken') || gameOver) return;
+
+        cell.textContent = currentPlayer;
+        cell.classList.add('taken');
+        clearInterval(timerInterval);
+
+        if (checkWinner()) {
+            highlightWinningCells();
+            message.textContent = `${currentPlayer} Wins! 🎉`;
+            scores[currentPlayer]++;
+            updateScoreboard();
+            gameOver = true;
+            return;
+        }
+
+        if (cells.every(cell => cell.classList.contains('taken'))) {
+            message.textContent = `It's a Tie! 🤝`;
+            gameOver = true;
+            return;
+        }
+
+        currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+        message.textContent = `Player ${currentPlayer}'s turn`;
+        startTimer();
+    }
+
+    function checkWinner() {
+        const winningCombinations = [
+            [0, 1, 2], [3, 4, 5], [6, 7, 8],
+            [0, 3, 6], [1, 4, 7], [2, 5, 8],
+            [0, 4, 8], [2, 4, 6]
+        ];
+
+        return winningCombinations.some(combination => {
+            const [a, b, c] = combination;
+            if (cells[a].textContent && cells[a].textContent === cells[b].textContent && cells[a].textContent === cells[c].textContent) {
+                combination.forEach(index => cells[index].classList.add('winning'));
+                return true;
+            }
+            return false;
+        });
+    }
+
+    function highlightWinningCells() {
+        const winningCells = document.querySelectorAll('.cell.winning');
+        winningCells.forEach(cell => cell.classList.add('winning'));
+    }
+
+    function startTimer() {
+        clearInterval(timerInterval);
+        timeLeft = 10;
+        timerBar.style.width = '100%';
+        timerElement.textContent = timeLeft;
+
+        timerInterval = setInterval(() => {
+            timeLeft--;
+            timerElement.textContent = timeLeft;
+            timerBar.style.width = `${(timeLeft / 10) * 100}%`;
+
+            if (timeLeft === 0) {
+                clearInterval(timerInterval);
+                autoSwitchTurn();
+            }
+        }, 1000);
+    }
+
+    function autoSwitchTurn() {
+        currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+        message.textContent = `Player ${currentPlayer}'s turn (Time expired!)`;
+        startTimer();
+    }
+
+    function updateScoreboard() {
+        scoreboard.textContent = `X: ${scores.X} | O: ${scores.O}`;
+    }
+
+    resetBtn.addEventListener('click', () => {
+        cells.forEach(cell => {
+            cell.textContent = '';
+            cell.classList.remove('taken', 'winning');
+        });
+        message.textContent = `Player ${currentPlayer}'s turn`;
+        gameOver = false;
+        startTimer();
+    });
+
+    message.textContent = `Player ${currentPlayer}'s turn`;
+    updateScoreboard();
+    startTimer();
+</script>
+
+</body>
+</html>
